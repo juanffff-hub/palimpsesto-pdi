@@ -1,0 +1,54 @@
+{
+  "hypothesis": "Añadir giros rectos a las vistas de entrenamiento de la cabeza mejora la clasificación de fotos giradas sin empeorar las derechas.",
+  "data": "Solo desarrollo (split != test): 408 fotos, 41 bloques provisionales. Encoder ResNet18 ImageNet congelado.",
+  "folds": "5-fold StratifiedGroupKFold, semilla 2026 (idénticos a train_transfer.py)",
+  "c_grid": [
+    0.01,
+    0.1,
+    1.0
+  ],
+  "c_selection": "macro-F1 medio de folds en fotos derechas, por variante",
+  "variants": {
+    "base": [
+      "vista0@0",
+      "vista1@0",
+      "vista2@0",
+      "vista3@0"
+    ],
+    "giros_originales": [
+      "vista0@0",
+      "vista1@0",
+      "vista2@0",
+      "vista3@0",
+      "vista0@90",
+      "vista0@180",
+      "vista0@270"
+    ],
+    "giros_todas": [
+      "vista0@0",
+      "vista0@90",
+      "vista0@180",
+      "vista0@270",
+      "vista1@0",
+      "vista1@90",
+      "vista1@180",
+      "vista1@270",
+      "vista2@0",
+      "vista2@90",
+      "vista2@180",
+      "vista2@270",
+      "vista3@0",
+      "vista3@90",
+      "vista3@180",
+      "vista3@270"
+    ]
+  },
+  "base_views": "vista0 original; vista1 brillo 0,75; vista2 giro +8°; vista3 giro -8° y brillo 1,12",
+  "adoption_rule": {
+    "upright_macro_f1_min": "base - 0.01",
+    "upright_recall_each_class_min": 0.8,
+    "rotated_mean_macro_f1_min": "base + 0.05"
+  },
+  "secondary_test": "72 fotos ya abiertas; se reportan una vez y no deciden",
+  "fixed_before_running": true
+}
