@@ -1,0 +1,21 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "packages": {
+    "numpy": "2.5.4",
+    "Pillow": "13.0.0",
+    "torch": "2.15.0+cpu",
+    "torchvision": "0.29.2+cpu",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "scikit-image": "0.26.0",
+    "segmentation-models-pytorch": "0.5.0",
+    "timm": "1.0.31",
+    "huggingface-hub": "0.35.3",
+    "opencv-python-headless": "5.1.0.95",
+    "Flask": "3.1.2",
+    "reportlab": "4.4.9",
+    "matplotlib": "3.11.2",
+    "pytest": "9.2.0"
+  }
+}

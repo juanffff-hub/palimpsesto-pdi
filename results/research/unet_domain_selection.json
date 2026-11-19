@@ -1,0 +1,194 @@
+[
+  {
+    "image_id": "I0034",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\test\\manuscrito_test\\WhatsApp Image 2026-10-10 at 11.38.20 PM (1).jpeg",
+    "mask_fraction": 0.47336612654320986,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0048",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\test\\manuscrito_test\\WhatsApp Image 2026-10-11 at 12.09.05 AM (7).jpeg",
+    "mask_fraction": 0.1528226273148148,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0206",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 12.15.01 AM (5).jpeg",
+    "mask_fraction": 0.13176070601851853,
+    "quad_produced": false,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0221",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 12.16.50 AM (3).jpeg",
+    "mask_fraction": 0.16641203703703702,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0235",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 7.40.12 PM (2).jpeg",
+    "mask_fraction": 0.37236400462962965,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0250",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 7.45.48 PM.jpeg",
+    "mask_fraction": 0.3292071759259259,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0264",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 7.49.44 PM (5).jpeg",
+    "mask_fraction": 0.450306712962963,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0279",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 7.54.04 PM (1).jpeg",
+    "mask_fraction": 0.29495515046296295,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0293",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 8.00.11 PM (4).jpeg",
+    "mask_fraction": 0.23281105324074075,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0308",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\manuscrito_train\\WhatsApp Image 2026-10-11 at 8.09.18 PM.jpeg",
+    "mask_fraction": 0.5067013888888889,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0466",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\val\\manuscrito_val\\WhatsApp Image 2026-10-10 at 11.38.03 PM (1).jpeg",
+    "mask_fraction": 0.5225636574074074,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0481",
+    "class": "manuscrito",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\val\\manuscrito_val\\WhatsApp Image 2026-10-11 at 12.06.16 AM.jpeg",
+    "mask_fraction": 0.47044126157407407,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0050",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\test\\pintura_test\\20261010_214306.jpg",
+    "mask_fraction": 0.3405516975308642,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0064",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\test\\pintura_test\\IMG-20261010-WA0204.jpg",
+    "mask_fraction": 0.18071614583333334,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0334",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\20261010_215235.jpg",
+    "mask_fraction": 0.007534722222222222,
+    "quad_produced": false,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0349",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\20261010_220527.jpg",
+    "mask_fraction": 0.22538387345679012,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0363",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\20261010_222046.jpg",
+    "mask_fraction": 0.10757716049382716,
+    "quad_produced": false,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0378",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\IMG-20261010-WA0212.jpg",
+    "mask_fraction": 0.2183714258841234,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0392",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\IMG-20261010-WA0245.jpg",
+    "mask_fraction": 0.07145174943566591,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0407",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\IMG-20261010-WA0267.jpg",
+    "mask_fraction": 0.10565274642588413,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0421",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\WhatsApp Image 2026-10-11 at 5.25.52 PM.jpeg",
+    "mask_fraction": 0.30953510802469136,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0436",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\train\\pintura_train\\WhatsApp Image 2026-10-11 at 5.28.13 PM(1).jpeg",
+    "mask_fraction": 0.28496672453703703,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0482",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\val\\pintura_val\\20261010_214747.jpg",
+    "mask_fraction": 0.2169656635802469,
+    "quad_produced": true,
+    "no_ground_truth": true
+  },
+  {
+    "image_id": "I0497",
+    "class": "pintura",
+    "path": "dataset_primer_punto-20261118T163444Z-1-001\\dataset_primer_punto\\val\\pintura_val\\20261010_220605.jpg",
+    "mask_fraction": 0.3415065586419753,
+    "quad_produced": true,
+    "no_ground_truth": true
+  }
+]

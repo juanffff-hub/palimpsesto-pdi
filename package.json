@@ -1,0 +1,1 @@
+{"name":"palimpsesto-ui-tests","private":true,"version":"0.2.0","scripts":{"test:ui":"node tests/ui_browser.cjs"},"devDependencies":{"playwright":"1.62.1"}}

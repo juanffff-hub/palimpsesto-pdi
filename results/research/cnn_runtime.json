@@ -1,0 +1,20 @@
+[
+  {
+    "size": 128,
+    "batch": 16,
+    "median_step_s": 0.0549722999567166,
+    "approx_epoch_336_train_s": 1.1544182990910485
+  },
+  {
+    "size": 192,
+    "batch": 16,
+    "median_step_s": 0.1396571999648586,
+    "approx_epoch_336_train_s": 2.9328011992620304
+  },
+  {
+    "size": 256,
+    "batch": 16,
+    "median_step_s": 0.2369178999797441,
+    "approx_epoch_336_train_s": 4.975275899574626
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "seed": 2026,
+  "reference": "Constructed page, not cultural heritage ground truth",
+  "metrics": "Aligned same-sized RGB; data_range=255; SSIM channel_axis=2",
+  "intent": "Probe method behavior, not universal ranking; font may vary across OS",
+  "fft": "Real signed inverse; no abs() on derivative; periodic boundary assumptions"
+}

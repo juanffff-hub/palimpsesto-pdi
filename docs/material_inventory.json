@@ -1,0 +1,437 @@
+[
+  {
+    "file": "Actividad_GAN_MNIST_JuanFelipeFajardo(2).ipynb",
+    "cells": 12,
+    "code_cells": 5,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 10555
+  },
+  {
+    "file": "Act_Generalización_FelipeFajardo(1).ipynb",
+    "cells": 18,
+    "code_cells": 13,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 19256
+  },
+  {
+    "file": "Backpropagation - CNN.pdf",
+    "pages": 38,
+    "characters": 7815,
+    "sparse_pages": [
+      2,
+      3,
+      5,
+      19,
+      22,
+      24,
+      26,
+      28,
+      29,
+      34,
+      37,
+      38
+    ]
+  },
+  {
+    "file": "clase _Pytorch_cnn_regularization(2).ipynb",
+    "cells": 116,
+    "code_cells": 65,
+    "executed_cells": 19,
+    "errors": [],
+    "characters": 2610650
+  },
+  {
+    "file": "Clase7_ANN(1).ipynb",
+    "cells": 25,
+    "code_cells": 18,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 27521
+  },
+  {
+    "file": "Clase8_CNN_PDI(2).ipynb",
+    "cells": 25,
+    "code_cells": 16,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 7080
+  },
+  {
+    "file": "Clase8_CNN_PDI_FajardoFelipe(1).ipynb",
+    "cells": 25,
+    "code_cells": 16,
+    "executed_cells": 16,
+    "errors": [],
+    "characters": 7136
+  },
+  {
+    "file": "Clase_1_A_2026_PDI_2(1).ipynb",
+    "cells": 36,
+    "code_cells": 13,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 9145
+  },
+  {
+    "file": "Clase_3A_PDI_JuanFelipe_Fajardo(1).ipynb",
+    "cells": 37,
+    "code_cells": 16,
+    "executed_cells": 16,
+    "errors": [],
+    "characters": 6455
+  },
+  {
+    "file": "Clase_4_PDI(1).ipynb",
+    "cells": 31,
+    "code_cells": 16,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 9253
+  },
+  {
+    "file": "Clase_CNNs_2026(2).ipynb",
+    "cells": 39,
+    "code_cells": 19,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 2591344
+  },
+  {
+    "file": "Ejercicio_clase_25_de_Agosto_JuanFelipe_Fajardo(1).ipynb",
+    "cells": 1,
+    "code_cells": 1,
+    "executed_cells": 1,
+    "errors": [],
+    "characters": 666
+  },
+  {
+    "file": "Palimpsesto - Tipo de aprendizaje - Juan Fajardo(1).docx",
+    "paragraphs": 3,
+    "characters": 1694
+  },
+  {
+    "file": "Palimpsesto_Neira_Gomez_Fajardo_Definicion_Proyecto_alcance_prototipo (1).docx",
+    "paragraphs": 134,
+    "characters": 23351
+  },
+  {
+    "file": "Parcial_3_PDI_FajardoNeiraGomez___ (1).ipynb",
+    "cells": 95,
+    "code_cells": 35,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 174976
+  },
+  {
+    "file": "Parcial_Practico_2_NeiraGomezFajardo. (3).ipynb",
+    "cells": 65,
+    "code_cells": 27,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 85348
+  },
+  {
+    "file": "PDI Regularización.pdf",
+    "pages": 25,
+    "characters": 5873,
+    "sparse_pages": [
+      2,
+      8,
+      9,
+      12,
+      23,
+      25
+    ]
+  },
+  {
+    "file": "PDI S1 - 2026 2.pdf",
+    "pages": 32,
+    "characters": 4772,
+    "sparse_pages": [
+      5,
+      7,
+      8,
+      10,
+      11,
+      12,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      22,
+      23,
+      24,
+      26,
+      30,
+      31,
+      32
+    ]
+  },
+  {
+    "file": "PDI_Laboratorio_Segmentacion_y_Deteccion_2026(7).ipynb",
+    "cells": 156,
+    "code_cells": 53,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 1302085
+  },
+  {
+    "file": "PDI_Laboratorio_Segmentacion_y_Deteccion_2026_Fajardo_Gomez_Neira (1).ipynb",
+    "cells": 163,
+    "code_cells": 56,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 1395725
+  },
+  {
+    "file": "Practica_Autoencoders(2).ipynb",
+    "cells": 28,
+    "code_cells": 11,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 141946
+  },
+  {
+    "file": "Rubrica proyecto final PDI 2026-2.pdf",
+    "pages": 3,
+    "characters": 5531,
+    "sparse_pages": []
+  },
+  {
+    "file": "S13 - Segmentation 2026.pptx.pdf",
+    "pages": 29,
+    "characters": 3507,
+    "sparse_pages": [
+      5,
+      7,
+      8,
+      12,
+      14,
+      16,
+      18,
+      19,
+      20,
+      27,
+      28,
+      29
+    ]
+  },
+  {
+    "file": "S14 - Generative Modeling - 2026.pdf",
+    "pages": 39,
+    "characters": 6580,
+    "sparse_pages": [
+      2,
+      3,
+      4,
+      12,
+      14,
+      15,
+      16,
+      18,
+      19,
+      23,
+      24,
+      25,
+      26,
+      27,
+      31,
+      35,
+      36,
+      38,
+      39
+    ]
+  },
+  {
+    "file": "S2 - Pasos fundamentales PDI - 2026 1.pdf",
+    "pages": 67,
+    "characters": 10288,
+    "sparse_pages": [
+      2,
+      6,
+      7,
+      12,
+      15,
+      17,
+      19,
+      21,
+      22,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      33,
+      35,
+      50,
+      52,
+      57,
+      59,
+      61,
+      63,
+      67
+    ]
+  },
+  {
+    "file": "S4 - Sesión 4 - Filtrado en frecuencia.pdf",
+    "pages": 45,
+    "characters": 9808,
+    "sparse_pages": [
+      15,
+      16,
+      20,
+      23,
+      34,
+      40,
+      41,
+      42,
+      43,
+      45
+    ]
+  },
+  {
+    "file": "S5 - Histograma 2026.pdf",
+    "pages": 33,
+    "characters": 4933,
+    "sparse_pages": [
+      2,
+      6,
+      11,
+      12,
+      13,
+      14,
+      17,
+      18,
+      21,
+      23,
+      26,
+      28,
+      29,
+      30,
+      33
+    ]
+  },
+  {
+    "file": "S7 2026 2 ML - CV.pdf",
+    "pages": 71,
+    "characters": 7292,
+    "sparse_pages": [
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14,
+      17,
+      20,
+      22,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      41,
+      44,
+      48,
+      49,
+      53,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      69,
+      71
+    ]
+  },
+  {
+    "file": "S8_modelos_difusion_solucionado(1).ipynb",
+    "cells": 27,
+    "code_cells": 11,
+    "executed_cells": 10,
+    "errors": [],
+    "characters": 24239
+  },
+  {
+    "file": "Semana10_Detección.pdf",
+    "pages": 24,
+    "characters": 5208,
+    "sparse_pages": [
+      4,
+      6,
+      12,
+      23,
+      24
+    ]
+  },
+  {
+    "file": "Semana7_Actividad_FajardoGomezNeira(1).ipynb",
+    "cells": 34,
+    "code_cells": 16,
+    "executed_cells": 0,
+    "errors": [],
+    "characters": 25963
+  },
+  {
+    "file": "Sesion Diffusion Models .pdf",
+    "pages": 39,
+    "characters": 5961,
+    "sparse_pages": [
+      2,
+      3,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12,
+      15,
+      18,
+      24,
+      31,
+      34,
+      35,
+      37,
+      39
+    ]
+  },
+  {
+    "file": "Sesión 12 Proyecto.pdf",
+    "pages": 32,
+    "characters": 15198,
+    "sparse_pages": [
+      32
+    ]
+  },
+  {
+    "file": "ZIP__Examen1_FajardoNeiraGomez.ipynb",
+    "cells": 55,
+    "code_cells": 24,
+    "executed_cells": 24,
+    "errors": [],
+    "characters": 52367
+  }
+]

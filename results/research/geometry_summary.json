@@ -1,0 +1,29 @@
+{
+  "base": {
+    "n": 80,
+    "detected": 25,
+    "mean_iou": 0.2815147831121682,
+    "median_iou": 0.0,
+    "iou_ge_90": 16,
+    "iou_ge_95": 16,
+    "median_ms": 2.2719499829690903
+  },
+  "multi": {
+    "n": 80,
+    "detected": 69,
+    "mean_iou": 0.6421220223992841,
+    "median_iou": 0.8121535324017621,
+    "iou_ge_90": 32,
+    "iou_ge_95": 32,
+    "median_ms": 12.090249976608902
+  },
+  "quad_from_GT_mask": {
+    "n": 80,
+    "detected": 80,
+    "mean_iou": 0.9848207511564617,
+    "median_iou": 0.990566464723069,
+    "iou_ge_90": 80,
+    "iou_ge_95": 75,
+    "median_ms": 0.0
+  }
+}

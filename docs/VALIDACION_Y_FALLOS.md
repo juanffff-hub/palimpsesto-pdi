@@ -1,0 +1,50 @@
+# Validación y fallos — evidencia y recuperación
+
+Esta matriz delimita lo implementado. Ningún conjunto finito de pruebas demuestra ausencia de todos los errores posibles. La aplicación está diseñada para demostración local supervisada, una pieza plana por foto, con entradas JPG/PNG.
+
+| Entrada o situación | Comportamiento y recuperación | Evidencia |
+|---|---|---|
+| Sin archivo, archivo vacío, varios archivos arrastrados | Mensaje en español; permanece en carga | Python + navegador |
+| PDF/BMP/texto renombrado JPG, corrupción/truncamiento | Valida formato real y decodificación; rechaza | Python + navegador |
+| Más de 40 MiB, más de 40 megapíxeles, lado menor de 64 px | Rechazo antes de procesamiento costoso | Python; límites de píxeles simulados en test |
+| PNG animado | Pide una imagen estática | Python |
+| EXIF de orientación o canal alfa | Reorienta RGB; compone alfa sobre blanco; conserva original | Python |
+| Imagen vacía/casi uniforme | Rechazo con petición de nueva captura | Python |
+| Poca resolución, oscuridad, sobreexposición, pocos bordes | Aviso orientativo; revisar detalle o repetir captura | Reglas explícitas; no diagnóstico de fidelidad |
+| Contenido ajeno a las piezas conocidas | Alerta de alcance; oculta clase y puntuaciones; exige confirmación explícita y categoría manual | Pruebas stub + evaluación real + gato en navegador |
+| Escena desconocida que no activa alerta | Puede pasar: confirmación de una pieza plana obligatoria en interfaz | Fallo documentado: astronaut |
+| Retrato/pintura de retrato | Detector de presencia de rostro puede pedir revisión; no identifica personas | Heurística auxiliar, sin métrica aislada |
+| JSON roto/no objeto, campos desconocidos o faltantes | 400/415 con mensaje; no procesa | Python |
+| NaN/infinito, booleanos, null, listas, texto, valor fuera de rango | Rechaza antes de transformar | Python |
+| Proporción | Solo 0 (estimada) o 0,1–10; inválida mantiene encuadre y permite corregir | Python + navegador |
+| Cuatro esquinas repetidas, cruzadas, no convexas, fuera de foto, área mínima insuficiente, orden invertido | Rechaza geometría; usuario ajusta en canvas/teclado | Python |
+| Borde neuronal incorrecto/ausente | Redetectar, contornos o borde manual; cuatro puntos revisables | Integración real + controles UI |
+| Binarización de pintura | Control deshabilitado y API rechaza | Python |
+| Cambio de esquinas/clase/proporción después de procesar | Invalida exportación; pide procesar de nuevo | Python + navegador |
+| Enlace de resultado viejo o pestaña con otra foto | Tokens de imagen/revisión impiden mezclar resultados | Python; también vistas previas |
+| Acciones simultáneas | Cola frontend y exclusión mutua del servidor local; rotación no modifica una imagen durante proceso | Test concurrente Python |
+| Sesión expirada (1 h sin actividad), sin foto, límite de ocho sesiones | Mensaje, recarga o reinicio; sesiones aisladas | Python para aislamiento/expiración; límite explícito |
+| Faltan pesos o pesos corruptos | Estado de IA informa degradación; modo manual/contornos; no simula inferencia | Python |
+| Banco de alcance de otro modelo/manifiesto | Se desactiva filtro, informa falta de correspondencia; recalibrar | Verificación hash en carga |
+| Conexión fallida / respuesta no JSON / demora >90 s | Mensaje y reintento; controles no quedan bloqueados | Corte de conexión probado en navegador; ramas de timeout/JSON implementadas |
+| Ruta/método/formato exportación inexistente | Respuesta controlada; exportación válida posterior funciona | Python |
+| Error inesperado | Mensaje genérico al usuario, traza en consola para diagnosticar | Manejador global; no afirmar prueba de toda excepción posible |
+| Cambios demasiado fuertes | Antes/después, detalle, deshacer, ajustes en cero o rechazar | Navegador; cero conserva píxeles RGB |
+| No hay referencia limpia real | SSIM/PSNR no se inventan; aparecen no disponibles | Python + reportes |
+| Original y salida confundidos | ZIP conserva bytes originales y SHA256; derivados separados | Python y nueve casos reales |
+
+## Qué se ejecutó
+
+`python scripts/check.py`: 81 tests, incluyendo contratos parametrizados, homografía, EXIF, sesión, concurrencia y recuperación. Los tests API unitarios usan stubs: no miden calidad de red.
+
+`python scripts/verify_real_pipeline.py --root RUTA`: nueve imágenes, una por bloque de prueba y tres por clase, con ambos checkpoints reales; comprueba salida PNG/PDF/JSON/ZIP y original. No sustituye revisión de trazos. `results/integration/real_pipeline.json` contiene cada caso.
+
+`npm run test:ui` con servidor iniciado: 12 comprobaciones en Chrome/Playwright; anchos 320, 390, 768 y 1440; confirmación, valores inválidos, fallo de conexión y reintento, detalle, deshacer, cuatro descargas, invalidación de resultado y foto ajena. `results/browser/verification.json` registra ausencia/presencia de errores JS. Requiere Node, `npm install` y Chrome; `CHROME_PATH` admite otra ruta. Playwright es solo herramienta de prueba.
+
+`python scripts/evaluate_scope.py --root RUTA`: 10 negativos de conveniencia, 72 positivos provisionales y un escaneo externo. Resultado 9/10 alertas negativas, 0/72 y 0/1 positivas. **Un negativo pasa.** No es una estimación robusta de sensibilidad/especificidad en población abierta. La cara del astronaut no fue advertida por la heurística auxiliar de esta configuración. El umbral no se eligió con estos negativos.
+
+## Límites funcionales que deben explicarse en la sustentación
+
+No se recupera información tapada, quemada o fuera de foco. No se garantizan colorimetría patrimonial, autenticidad, OCR ni reconstrucción documental. La homografía no aplana páginas curvas y la proporción automática no conoce dimensiones físicas. Pueden fallar clase/borde/alcance; por eso la revisión no es decorativa. No hay evaluación humana completada, test externo nuevo ni identidades físicas certificadas. La aplicación no está endurecida como servicio público multiusuario.
+
+Para cualquier fallo nuevo registrar foto original (con autorización), pasos, versión, parámetros, esperado/observado y resultado tras corregir. Añadir un test que reproduzca el defecto cuando sea estable y significativo, y conservar también el caso de fallo en el informe académico.

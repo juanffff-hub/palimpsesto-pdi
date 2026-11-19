@@ -1,0 +1,702 @@
+{
+  "summary": {
+    "negative": {
+      "n": 10,
+      "flagged": 9
+    },
+    "positive_dataset": {
+      "n": 72,
+      "flagged": 0
+    },
+    "positive_external_scan": {
+      "n": 1,
+      "flagged": 0
+    }
+  },
+  "cases": [
+    {
+      "set": "negative",
+      "image_id": "astronaut",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7040076851844788,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "negative",
+      "image_id": "brick",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.6135331988334656,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "camera",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.5451835989952087,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "chelsea",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.577528178691864,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "coffee",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.5841068029403687,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "coins",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.6037883162498474,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "grass",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.4579803943634033,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "hubble_deep_field",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.5739881992340088,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "moon",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.5311673879623413,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "rocket",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.6205994486808777,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_external_scan",
+      "image_id": "page",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7839491963386536,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0018",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9117650985717773,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0019",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8920865058898926,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0020",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8838335871696472,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0021",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9184222221374512,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0022",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9198266863822937,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0023",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9295201301574707,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0024",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8833667635917664,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0025",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9257524013519287,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0066",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8917201161384583,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0067",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8642576336860657,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0068",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8671781420707703,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0069",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8674862384796143,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0070",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8224391937255859,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0071",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8885235786437988,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0072",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8771539330482483,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0073",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8912091255187988,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0162",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8967337608337402,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0163",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8698078989982605,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0164",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8339120745658875,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0165",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8484107851982117,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0166",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8652176260948181,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0167",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8674471974372864,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0168",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.878535270690918,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0169",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8623003959655762,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0226",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8709562420845032,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0227",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8498845100402832,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0228",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8134307861328125,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0229",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8440907001495361,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0230",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8774052262306213,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0231",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8747360110282898,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0232",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8141745924949646,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0233",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8672325015068054,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0266",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8368589282035828,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0267",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9203339219093323,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0268",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8519065380096436,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0269",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8350882530212402,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0270",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.87139493227005,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0271",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8604370951652527,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0272",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.851675808429718,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0273",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8105964660644531,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0290",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8449723124504089,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0291",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8597168922424316,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0292",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8503349423408508,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0293",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7811148762702942,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0294",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8042097091674805,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0295",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.9144299626350403,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0296",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.82903653383255,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0297",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7759636044502258,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0050",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8589043617248535,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0051",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8572015762329102,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0052",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8383840918540955,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0053",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8228966593742371,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0054",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8032720685005188,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0055",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7422113418579102,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0056",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8585684895515442,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0057",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8032832145690918,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0362",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.775449275970459,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0363",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7395680546760559,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0364",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7554986476898193,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0365",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7679219245910645,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0366",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.749852180480957,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0367",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.757722795009613,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0368",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7427141666412354,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0369",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7901174426078796,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0490",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7974088788032532,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0491",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7884233593940735,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0492",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7982087135314941,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0493",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7872616648674011,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0494",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8007108569145203,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0495",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7899206280708313,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0496",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.7664009928703308,
+      "raw_class": "pintura"
+    },
+    {
+      "set": "positive_dataset",
+      "image_id": "I0497",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.8090011477470398,
+      "raw_class": "pintura"
+    }
+  ],
+  "limitations": "Convenience negative examples and provisional positive split. Face warning deliberately also flags some portrait paintings. Human confirmation remains mandatory. Not an open-world accuracy claim.",
+  "source": "https://scikit-image.org/docs/stable/api/skimage.data.html"
+}

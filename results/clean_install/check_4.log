@@ -1,0 +1,15 @@
+{
+  "negative": {
+    "n": 10,
+    "flagged": 9
+  },
+  "positive_dataset": {
+    "n": 72,
+    "flagged": 0
+  },
+  "positive_external_scan": {
+    "n": 1,
+    "flagged": 0
+  }
+}
+

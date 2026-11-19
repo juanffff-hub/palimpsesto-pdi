@@ -1,0 +1,20 @@
+{
+  "passed": 12,
+  "checks": [
+    "ready_models",
+    "responsive_home",
+    "explicit_scope_confirmation",
+    "invalid_aspect_and_recovery",
+    "network_error_and_retry",
+    "detail_at_output_resolution",
+    "adjust_undo_and_zero",
+    "export_four_formats",
+    "stale_export_step_disabled",
+    "outside_scope_cat",
+    "invalid_and_empty_file",
+    "responsive_mobile"
+  ],
+  "page_errors": [],
+  "browser": "Chromium/Chrome headless",
+  "note": "Automation, not a human usability study."
+}

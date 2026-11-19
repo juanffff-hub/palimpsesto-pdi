@@ -1,0 +1,29 @@
+{
+  "train": {
+    "photos": 336,
+    "groups": 32,
+    "classes": {
+      "documento_impreso": 112,
+      "manuscrito": 112,
+      "pintura": 112
+    }
+  },
+  "val": {
+    "photos": 72,
+    "groups": 9,
+    "classes": {
+      "documento_impreso": 24,
+      "manuscrito": 24,
+      "pintura": 24
+    }
+  },
+  "test": {
+    "photos": 72,
+    "groups": 9,
+    "classes": {
+      "documento_impreso": 24,
+      "manuscrito": 24,
+      "pintura": 24
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "selection": "5-fold StratifiedGroupKFold on train+val only; C=.01,.1,1; mean fold macro-F1",
+  "seed": 2026,
+  "deployment_gate": {
+    "out_of_fold_macro_f1_min": 0.85,
+    "each_class_recall_min": 0.8
+  },
+  "test_status": "Previously opened for course CNN; secondary diagnostic, NOT untouched confirmatory test",
+  "group_status": "Provisional conservative blocks; physical identities require human review",
+  "augmentations": "Original plus fixed brightness .75, rotation +8 degrees, rotation -8 degrees + brightness 1.12. Within fold only."
+}

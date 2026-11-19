@@ -1,0 +1,50 @@
+{
+  "runtime": {
+    "python": "3.12.14",
+    "torch": "2.15.0+cpu",
+    "smp": "0.5.0",
+    "opencv": "5.1.0",
+    "threads": 4,
+    "cpu": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "checkpoint_epoch": 35,
+    "checkpoint_val_dice": 0.9925730029741923
+  },
+  "groups": {
+    "all": {
+      "n": 80,
+      "mask_dice_256_mean": 0.9949837342849337,
+      "mask_iou_256_mean": 0.9900289685766502,
+      "quad_iou_960_mean": 0.9687475105676592,
+      "quad_ge_90": 80.0,
+      "quad_ge_95": 68.0,
+      "median_ms": 58.234349999111146
+    },
+    "train": {
+      "n": 56,
+      "mask_dice_256_mean": 0.9958988643002183,
+      "mask_iou_256_mean": 0.9918356128351287,
+      "quad_iou_960_mean": 0.9689026789087877,
+      "quad_ge_90": 56.0,
+      "quad_ge_95": 47.0,
+      "median_ms": 58.58509999234229
+    },
+    "val": {
+      "n": 12,
+      "mask_dice_256_mean": 0.9925730232845366,
+      "mask_iou_256_mean": 0.9852710621241917,
+      "quad_iou_960_mean": 0.9686215290073038,
+      "quad_ge_90": 12.0,
+      "quad_ge_95": 10.0,
+      "median_ms": 59.4897499831859
+    },
+    "test": {
+      "n": 12,
+      "mask_dice_256_mean": 0.9931238385473359,
+      "mask_iou_256_mean": 0.9863558684895438,
+      "quad_iou_960_mean": 0.9681493732027487,
+      "quad_ge_90": 12.0,
+      "quad_ge_95": 11.0,
+      "median_ms": 51.77814999478869
+    }
+  }
+}

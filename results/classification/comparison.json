@@ -1,0 +1,247 @@
+[
+  {
+    "variant": "base",
+    "epochs_run": 13,
+    "best_epoch": 5,
+    "seconds": 37.20575640001334,
+    "validation": {
+      "n": 72,
+      "accuracy": 0.9166666666666666,
+      "macro_f1": 0.9149658002735978,
+      "confusion_matrix": [
+        [
+          19,
+          2,
+          3
+        ],
+        [
+          0,
+          24,
+          0
+        ],
+        [
+          0,
+          1,
+          23
+        ]
+      ],
+      "classes": {
+        "documento_impreso": {
+          "precision": 1.0,
+          "recall": 0.7916666666666666,
+          "f1": 0.8837209302325582,
+          "support": 24
+        },
+        "manuscrito": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1": 0.9411764705882353,
+          "support": 24
+        },
+        "pintura": {
+          "precision": 0.8846153846153846,
+          "recall": 0.9583333333333334,
+          "f1": 0.9199999999999999,
+          "support": 24
+        }
+      },
+      "loss": 0.34579308827718097
+    }
+  },
+  {
+    "variant": "dropout",
+    "epochs_run": 12,
+    "best_epoch": 4,
+    "seconds": 36.424396399990655,
+    "validation": {
+      "n": 72,
+      "accuracy": 0.8888888888888888,
+      "macro_f1": 0.8842203548085902,
+      "confusion_matrix": [
+        [
+          17,
+          4,
+          3
+        ],
+        [
+          1,
+          23,
+          0
+        ],
+        [
+          0,
+          0,
+          24
+        ]
+      ],
+      "classes": {
+        "documento_impreso": {
+          "precision": 0.9444444444444444,
+          "recall": 0.7083333333333334,
+          "f1": 0.8095238095238096,
+          "support": 24
+        },
+        "manuscrito": {
+          "precision": 0.8518518518518519,
+          "recall": 0.9583333333333334,
+          "f1": 0.9019607843137256,
+          "support": 24
+        },
+        "pintura": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1": 0.9411764705882353,
+          "support": 24
+        }
+      },
+      "loss": 0.4160727262496948
+    }
+  },
+  {
+    "variant": "l2",
+    "epochs_run": 23,
+    "best_epoch": 15,
+    "seconds": 66.73399280000012,
+    "validation": {
+      "n": 72,
+      "accuracy": 0.9722222222222222,
+      "macro_f1": 0.9722161914411154,
+      "confusion_matrix": [
+        [
+          23,
+          1,
+          0
+        ],
+        [
+          0,
+          24,
+          0
+        ],
+        [
+          1,
+          0,
+          23
+        ]
+      ],
+      "classes": {
+        "documento_impreso": {
+          "precision": 0.9583333333333334,
+          "recall": 0.9583333333333334,
+          "f1": 0.9583333333333334,
+          "support": 24
+        },
+        "manuscrito": {
+          "precision": 0.96,
+          "recall": 1.0,
+          "f1": 0.9795918367346939,
+          "support": 24
+        },
+        "pintura": {
+          "precision": 1.0,
+          "recall": 0.9583333333333334,
+          "f1": 0.9787234042553191,
+          "support": 24
+        }
+      },
+      "loss": 0.10259161475631925
+    }
+  },
+  {
+    "variant": "augmentation",
+    "epochs_run": 31,
+    "best_epoch": 23,
+    "seconds": 101.06982939998852,
+    "validation": {
+      "n": 72,
+      "accuracy": 0.9583333333333334,
+      "macro_f1": 0.9588072046579965,
+      "confusion_matrix": [
+        [
+          22,
+          0,
+          2
+        ],
+        [
+          0,
+          23,
+          1
+        ],
+        [
+          0,
+          0,
+          24
+        ]
+      ],
+      "classes": {
+        "documento_impreso": {
+          "precision": 1.0,
+          "recall": 0.9166666666666666,
+          "f1": 0.9565217391304348,
+          "support": 24
+        },
+        "manuscrito": {
+          "precision": 1.0,
+          "recall": 0.9583333333333334,
+          "f1": 0.9787234042553191,
+          "support": 24
+        },
+        "pintura": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1": 0.9411764705882353,
+          "support": 24
+        }
+      },
+      "loss": 0.14851303070059252
+    }
+  },
+  {
+    "variant": "combined",
+    "epochs_run": 31,
+    "best_epoch": 23,
+    "seconds": 110.94875860004686,
+    "validation": {
+      "n": 72,
+      "accuracy": 0.9444444444444444,
+      "macro_f1": 0.9453734671125975,
+      "confusion_matrix": [
+        [
+          24,
+          0,
+          0
+        ],
+        [
+          2,
+          22,
+          0
+        ],
+        [
+          2,
+          0,
+          22
+        ]
+      ],
+      "classes": {
+        "documento_impreso": {
+          "precision": 0.8571428571428571,
+          "recall": 1.0,
+          "f1": 0.923076923076923,
+          "support": 24
+        },
+        "manuscrito": {
+          "precision": 1.0,
+          "recall": 0.9166666666666666,
+          "f1": 0.9565217391304348,
+          "support": 24
+        },
+        "pintura": {
+          "precision": 1.0,
+          "recall": 0.9166666666666666,
+          "f1": 0.9565217391304348,
+          "support": 24
+        }
+      },
+      "loss": 0.18764202959007686
+    }
+  }
+]

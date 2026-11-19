@@ -1,0 +1,111 @@
+{
+  "files": 757,
+  "unique_bytes": 736,
+  "unique_decoded_pixels": 736,
+  "errors": [],
+  "by_top_directory": {
+    "dataset-20261118T163430Z-1-001": 17,
+    "dataset_primer_punto-20261118T163444Z-1-001": 480,
+    "PDI_Punto1_Dataset-20261118T163439Z-1-001": 165,
+    "PDI_Punto2_Dataset-20261118T163440Z-1-001": 78,
+    "ZIP::dataset/Atardecer8.jpeg": 1,
+    "ZIP::dataset/doc_control.jpg": 1,
+    "ZIP::dataset/doc_iluminacion.jpg": 1,
+    "ZIP::dataset/doc_movimiento.jpg": 1,
+    "ZIP::dataset/doc_perspectiva.jpg": 1,
+    "ZIP::dataset/foto_control.jpg": 1,
+    "ZIP::dataset/foto_iluminacion.jpg": 1,
+    "ZIP::dataset/foto_movimiento.jpg": 1,
+    "ZIP::dataset/foto_perspectiva.jpg": 1,
+    "ZIP::dataset/libro_control.jpg": 1,
+    "ZIP::dataset/libro_iluminacion.jpg": 1,
+    "ZIP::dataset/libro_movimiento.jpg": 1,
+    "ZIP::dataset/libro_perspectiva.jpg": 1,
+    "ZIP::dataset/panoramica1.jpeg": 1,
+    "ZIP::dataset/panoramica2.jpeg": 1,
+    "ZIP::dataset/panoramica_atardecer.jpg": 1,
+    "ZIP::dataset/panoramica_resultante.jpg": 1
+  },
+  "by_size": [
+    [
+      "4080x3060",
+      160
+    ],
+    [
+      "1440x1920",
+      142
+    ],
+    [
+      "1200x1600",
+      120
+    ],
+    [
+      "4000x2252",
+      71
+    ],
+    [
+      "512x512",
+      60
+    ],
+    [
+      "1600x1200",
+      43
+    ],
+    [
+      "4000x3000",
+      20
+    ],
+    [
+      "900x1600",
+      19
+    ],
+    [
+      "1920x1440",
+      18
+    ],
+    [
+      "1600x739",
+      16
+    ],
+    [
+      "739x1600",
+      16
+    ],
+    [
+      "1600x900",
+      15
+    ],
+    [
+      "1659x2212",
+      14
+    ],
+    [
+      "4000x1848",
+      8
+    ],
+    [
+      "3000x4000",
+      4
+    ],
+    [
+      "964x651",
+      4
+    ],
+    [
+      "1920x1081",
+      4
+    ],
+    [
+      "2212x1659",
+      4
+    ],
+    [
+      "596x335",
+      2
+    ],
+    [
+      "459x629",
+      2
+    ]
+  ]
+}
