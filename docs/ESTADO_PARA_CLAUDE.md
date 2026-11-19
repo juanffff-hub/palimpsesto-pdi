@@ -63,3 +63,20 @@ Rama `revision/feedback-interfaz`, partiendo de `e616955`. Trabajo hecho por Dav
 **Límites honestos:** las pruebas de navegador son automatización, no usabilidad humana. Lectores de pantalla reales (NVDA/VoiceOver) sin probar: solo se verificaron roles y contenido de las regiones vivas. El rediseño visual no lo ha revisado una persona en un celular físico.
 
 **Siguientes acciones:** revisar la calidad real de red y procesamiento (modelo, dataset, alcance) según MODEL_CARD y DATA_CARD; alinear el README con las secciones de la rúbrica (problemática, justificación, objetivos, datos con enlace de Drive, capturas de la GUI, conclusiones); póster y video al final. Siguen pendientes las tareas humanas de arriba.
+
+## Fase 2 de revisión — calidad de la red y README según la rúbrica (19 de noviembre de 2026)
+
+Rama `revision/fase2-calidad-rubrica`, creada sobre `revision/feedback-interfaz` (PR #1 abierto para revisión). El PR de esta fase se apila sobre el de la fase 1.
+
+**Red (clasificador v0.3.0).** Hipótesis: la cabeza no generaliza a fotos giradas (diagnóstico 0,930 → 0,798 con 90°). `scripts/experiment_rotation.py` compara, con los mismos folds y la misma rejilla, base / giros de la vista original / giros de todas las vistas, con una regla de adopción escrita antes de ejecutar. La base reproduce exactamente la v0.2.0. Se adoptó «giros de la vista original» (C=0,1): OOF derechas 0,9581 (antes 0,9531), giradas 0,9548 (antes 0,8797). Se desplegó con `--promote`. El anterior está en `models/classifier_v0.2.0.pt`. Se recalibró el alcance (`calibrate_scope.py`; umbral prácticamente igual) y se reevaluaron robustez (`results/robustness/evaluation.json`; la v0.2.0 queda en `evaluation_v0.2.0.json`) y alcance (9/10, sin cambio). Checksums actualizados.
+- Sin conexión a download.pytorch.org en el entorno de revisión: el encoder ImageNet se tomó del `classifier.pt` desplegado (contiene la red completa). La reproducción exacta de la base demuestra que es el mismo encoder.
+- Retroceso: brillo ×1,25 pasa de 0,972 a 0,958 en el diagnóstico. Integración real: I0018 ahora se sugiere como manuscrito (la usuaria confirma la clase; el flujo pasa).
+- `classifier.pt` NO está en Git (`.gitignore`): para que el equipo use la v0.3.0 hay que bajar `modelos_palimpsesto_v0.3.0.zip` de la pre-release `v0.3.0-rc1`.
+
+**README reestructurado** con las 8 secciones de la rúbrica (descripción con problemática/justificación/objetivos tomados del Word de definición, arquitectura en Mermaid validada, metodología con cambios frente a la propuesta, implementación, datos con figuras, GUI con capturas, resultados con análisis, conclusiones), además de la instalación, la reproducción, el trabajo humano y las referencias. Afirmaciones técnicas verificadas contra el código (vistas de 1200/960 px, mejora en el canal L de Lab con filtro bilateral, PDF con ReportLab, métodos de contornos de `probe_geometry.py`). La comparación de bordes aclara que las 80 fotos de la U-Net incluyen 56 de entrenamiento; la cifra justa es 12/12 de prueba (0,968).
+
+**Figuras y capturas reproducibles:** `scripts/make_figures.py [--root]` (robustez v0.2.0 frente a v0.3.0, confusiones CNN/v0.2.0/v0.3.0, experimento de rotación, distribución y muestra del dataset con documentos difuminados por privacidad); `node scripts/capture_gui.cjs` (capturas de la GUI con el ejemplo sintético, en `docs/img/`).
+
+**Comandos verificados:** check 83/83; verify_real_pipeline 9/9; test:ui 22/22 con el modelo nuevo.
+
+**Pendiente humano nuevo:** enlace de Google Drive del dataset con permiso para el profesor (README, sección 5).
