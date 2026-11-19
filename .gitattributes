@@ -11,3 +11,5 @@
 *.jpg binary
 *.pdf binary
 *.npz binary
+# Checkpoint provenance hashes the exact manifest bytes on every platform.
+data/manifest.csv -text
