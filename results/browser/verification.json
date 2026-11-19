@@ -1,20 +1,37 @@
 {
-  "passed": 12,
+  "passed": 22,
   "checks": [
     "ready_models",
     "responsive_home",
+    "upload_success_toast",
     "explicit_scope_confirmation",
+    "no_duplicate_toasts",
+    "field_feedback_cleared",
     "invalid_aspect_and_recovery",
-    "network_error_and_retry",
+    "network_error_retry_action",
+    "slow_operation_feedback",
+    "stale_preview_and_retry",
+    "error_persists_success_expires",
+    "screen_reader_regions",
     "detail_at_output_resolution",
     "adjust_undo_and_zero",
+    "discard_needs_confirmation",
     "export_four_formats",
     "stale_export_step_disabled",
     "outside_scope_cat",
     "invalid_and_empty_file",
-    "responsive_mobile"
+    "responsive_mobile",
+    "mobile_scrolled_feedback_visible",
+    "reduced_motion"
   ],
   "page_errors": [],
   "browser": "Chromium/Chrome headless",
+  "viewports": [
+    320,
+    390,
+    768,
+    1024,
+    1440
+  ],
   "note": "Automation, not a human usability study."
 }

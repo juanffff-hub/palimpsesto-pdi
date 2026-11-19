@@ -15,6 +15,9 @@ app.config.update(MAX_CONTENT_LENGTH=42*1024*1024,SESSION_COOKIE_SAMESITE='Stric
 models=None;states={};lock=threading.RLock();model_lock=threading.RLock()
 operation_lock=threading.RLock()
 
+class SessionError(ValueError):
+    """La sesión no tiene una imagen válida: la interfaz debe pedir otra foto, no reintentar."""
+
 @app.before_request
 def serialize_image_operations():
     # A local CPU application: serialize stateful operations, including exports,
@@ -30,11 +33,11 @@ def current():
     sid=session.get('sid')
     with lock:
         state=states.get(sid)
-        if not state:raise ValueError('La sesión no tiene una imagen. Carga una foto para comenzar.')
+        if not state:raise SessionError('La sesión no tiene una imagen. Carga una foto para comenzar.')
         if time.monotonic()-state['access']>3600:
-            states.pop(sid,None);raise ValueError('La sesión expiró tras una hora sin actividad. Vuelve a cargar la fotografía.')
+            states.pop(sid,None);raise SessionError('La sesión expiró tras una hora sin actividad. Vuelve a cargar la fotografía.')
         expected=request.headers.get('X-Palimpsesto-Image') or request.args.get('image_key')
-        if expected and expected!=sid:raise ValueError('La imagen cambió en otra pestaña. Vuelve a cargar la foto en esta pestaña antes de continuar.')
+        if expected and expected!=sid:raise SessionError('La imagen cambió en otra pestaña. Vuelve a cargar la foto en esta pestaña antes de continuar.')
         state['access']=time.monotonic();return state
 
 @app.before_request
@@ -49,6 +52,7 @@ def handle_error(error):
     if isinstance(error,HTTPException):
         messages={400:'La solicitud no tiene un formato válido.',404:'Ese recurso no existe.',405:'Esta operación no admite ese método.',413:'El archivo o la solicitud supera el tamaño permitido.',415:'Envía los parámetros como JSON válido.'}
         return jsonify(error=messages.get(error.code,error.description),code='http_'+str(error.code)),error.code
+    if isinstance(error,SessionError):return jsonify(error=str(error),code='session'),400
     if isinstance(error,(ValueError,KeyError,TypeError)):return jsonify(error=str(error)),400
     app.logger.exception('Error de procesamiento');return jsonify(error='No se pudo completar la operación. Cambia la imagen o reinicia los ajustes.'),500
 
