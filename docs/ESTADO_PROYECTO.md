@@ -8,10 +8,12 @@ Repositorio único: https://github.com/juanffff-hub/palimpsesto-pdi
 
 ## Evidencia existente
 
-- 96 comprobaciones Python (incluidas la descarga verificada de los pesos y el semáforo de la captura), nueve recorridos con modelos reales y 23 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
+- 108 comprobaciones Python (incluidas la descarga verificada de los pesos, el semáforo de la captura, la confianza del borde y los tonos recortados), nueve recorridos con modelos reales y 25 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
 - Diagnóstico secundario: 70/72 clasificaciones correctas; es un conjunto reutilizado, no un test ciego.
 - CV macro-F1 0,9581 en vistas derechas y 0,9548 en vistas giradas, con grupos provisionales.
 - U-Net v0.4.0 (impresos, manuscritos y pinturas): IoU media del borde propuesto 0,937 en 40 fotos de prueba por pieza, frente a 0,811 de la v0.3.0 (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963; impresos 0,968 → 0,970). Regla de adopción fijada antes de entrenar.
+- Histograma y tonos recortados: con los preajustes, 0 de 240 fotos pierde detalle por recorte; el aviso aparece sobre todo con iluminación alta en manuscritos (8 de 80 al 100 %).
+- Confianza del borde: en fotos de prueba marca como dudosos los 21 bordes malos de las 3 U-Net (6 de 6 con la desplegada) y 10 de 98 buenos; ningún borde «seguro» resultó malo.
 - Semáforo de la captura: con defectos controlados avisa en el 80–100 % de los casos (antes 2–23 %); en fotos reales marca en rojo 23 fotos, todas revisadas a ojo y justificadas.
 - Filtro de alcance: nueve de diez negativos de conveniencia alertados; persiste un falso negativo.
 - Clasificación propia del curso y ANN conservadas como líneas base, incluidos sus fallos.

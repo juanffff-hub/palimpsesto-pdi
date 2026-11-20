@@ -1,0 +1,92 @@
+{
+  "regla": "dudosa si encaje < 0.92 o franja dudosa > 5.0 px; umbrales elegidos con validación",
+  "validacion_3_semillas": {
+    "bordes": 120,
+    "malos": 15,
+    "malos_marcados_dudosos": 14,
+    "buenos": 105,
+    "buenos_marcados_dudosos": 8,
+    "iou_media_seguros": 0.9544,
+    "iou_media_dudosos": 0.866,
+    "malos_entre_seguros": 1
+  },
+  "prueba_3_semillas": {
+    "bordes": 119,
+    "malos": 21,
+    "malos_marcados_dudosos": 21,
+    "buenos": 98,
+    "buenos_marcados_dudosos": 10,
+    "iou_media_seguros": 0.9695,
+    "iou_media_dudosos": 0.8239,
+    "malos_entre_seguros": 0
+  },
+  "prueba_unet_desplegada": {
+    "bordes": 40,
+    "malos": 6,
+    "malos_marcados_dudosos": 6,
+    "buenos": 34,
+    "buenos_marcados_dudosos": 5,
+    "iou_media_seguros": 0.9677,
+    "iou_media_dudosos": 0.8639,
+    "malos_entre_seguros": 0
+  },
+  "prueba_por_clase": {
+    "documento_impreso": {
+      "bordes": 36,
+      "malos": 0,
+      "malos_marcados_dudosos": 0,
+      "buenos": 36,
+      "buenos_marcados_dudosos": 0,
+      "iou_media_seguros": 0.9693,
+      "iou_media_dudosos": null,
+      "malos_entre_seguros": 0
+    },
+    "manuscrito": {
+      "bordes": 48,
+      "malos": 4,
+      "malos_marcados_dudosos": 4,
+      "buenos": 44,
+      "buenos_marcados_dudosos": 4,
+      "iou_media_seguros": 0.9686,
+      "iou_media_dudosos": 0.8617,
+      "malos_entre_seguros": 0
+    },
+    "pintura": {
+      "bordes": 35,
+      "malos": 17,
+      "malos_marcados_dudosos": 17,
+      "buenos": 18,
+      "buenos_marcados_dudosos": 6,
+      "iou_media_seguros": 0.9735,
+      "iou_media_dudosos": 0.8107,
+      "malos_entre_seguros": 0
+    }
+  },
+  "entrenamiento_unet_desplegada": {
+    "bordes": 160,
+    "malos": 15,
+    "malos_marcados_dudosos": 15,
+    "buenos": 145,
+    "buenos_marcados_dudosos": 4,
+    "iou_media_seguros": 0.9683,
+    "iou_media_dudosos": 0.848,
+    "malos_entre_seguros": 0
+  },
+  "fotos_de_clasificacion_sin_referencia": {
+    "documento_impreso": {
+      "segura": 144,
+      "dudosa": 16
+    },
+    "manuscrito": {
+      "dudosa": 47,
+      "contornos": 5,
+      "segura": 104,
+      "manual": 4
+    },
+    "pintura": {
+      "segura": 88,
+      "dudosa": 71,
+      "contornos": 1
+    }
+  }
+}

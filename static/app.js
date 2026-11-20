@@ -9,6 +9,7 @@ const methodNames = { unet: 'Segmentación U-Net', contornos: 'Detección por co
 const sliders = ['illumination', 'contrast', 'denoise', 'sharpness'];
 
 let step = 1, maxStep = 1, upload = null, kind = 'documento_impreso', points = [], presets = {}, params = {}, history = [];
+let maskImage = null, showMask = false;  // salida de la U-Net superpuesta en el paso 3
 let originalImage = null, activeCorner = 0, dragging = false, processing = false, pending = false, lastResult = null;
 let lastFile = null;          // última foto intentada, para «Reintentar» la carga
 let currentAbort = null, userCancelled = false;
@@ -135,6 +136,7 @@ async function loadFile(file) {
     presets = upload.presets || presets;
     kind = upload.classification.class || 'documento_impreso';
     points = upload.detection.points; maxStep = 2; lastResult = null; history = [];
+    maskImage = null; showMask = false;
     $('#class-image').src = upload.image_url;
     $('#file-info').textContent = `${upload.name} · ${upload.metadata.width} × ${upload.metadata.height} px`;
     $('#prediction-label').textContent = upload.classification.class ? names[kind] : 'Selecciona una pieza admitida';
@@ -272,16 +274,47 @@ $('#confirm-kind').onclick = async function confirmKind() {
     points = d.points; upload.detection = d; detectionText();
     Feedback.clear((o, key) => ['scope', 'classification', 'detect', 'upload-ok'].includes(key) || key.startsWith('error:'));
     show(3);
-    Feedback.notify({ type: 'success', key: 'detect-ok', title: 'Borde propuesto', text: `${methodNames[d.method]}. Revisa que los cuatro puntos coincidan con las esquinas.` });
+    if (d.confidence?.level === 'dudosa') {
+      Feedback.notify({ type: 'warning', key: 'detect-ok', title: 'Borde dudoso',
+        text: 'La red no está segura del borde. Se muestra su máscara: lleva los puntos a las esquinas reales de la pieza.',
+        actions: [{ label: 'Marcar manualmente', onClick: () => detect('manual') }] });
+    } else {
+      Feedback.notify({ type: 'success', key: 'detect-ok', title: 'Borde propuesto', text: `${methodNames[d.method]}. Revisa que los cuatro puntos coincidan con las esquinas.` });
+    }
   } catch (e) { showError(e, { key: 'detect', effect: 'Sigues en el paso 2.', retry: confirmKind }); }
   finally { busy(false); }
 };
 
 // ---------------------------------------------------------------- 3 · encuadrar
 function detectionText() {
-  $('#detection-method').textContent = methodNames[upload.detection.method];
-  $('#corner-notice').textContent = upload.detection.warnings.join(' ');
+  const d = upload.detection, conf = d.confidence;
+  $('#detection-method').textContent = methodNames[d.method] + (conf ? (conf.level === 'segura' ? ' · borde seguro' : ' · borde dudoso') : '');
+  // Con la U-Net, el bloque de confianza ya explica el borde; el aviso queda para contornos y modo manual.
+  $('#corner-notice').textContent = conf ? '' : d.warnings.join(' ');
+  const box = $('#border-confidence'); box.hidden = !conf; $('#toggle-mask').hidden = !conf;
+  if (conf) {
+    box.dataset.level = conf.level;
+    $('#bc-title').textContent = conf.level === 'segura' ? 'Borde seguro' : 'Borde dudoso: revisa las esquinas';
+    $('#bc-text').textContent = conf.level === 'segura'
+      ? `Los cuatro puntos cubren el ${Math.round(conf.fit * 100)} % de la zona que la red marcó como pieza y su contorno es nítido. Confírmalo de todos modos.`
+      : conf.reasons.join(' ');
+    loadMask(conf.level === 'dudosa');
+  } else { maskImage = null; setMask(false); }
 }
+function setMask(on) {
+  showMask = on && !!maskImage;
+  $('#toggle-mask').setAttribute('aria-pressed', String(showMask));
+  $('#toggle-mask').textContent = showMask ? 'Ocultar la máscara de la red' : 'Ver lo que vio la red';
+  $('#mask-legend').hidden = !showMask;
+  drawCorners();
+}
+function loadMask(autoShow) {
+  const img = new Image();
+  img.onload = () => { maskImage = img; setMask(autoShow || showMask); };
+  img.onerror = () => { maskImage = null; setMask(false); };
+  img.src = imageUrl('mask', Date.now());
+}
+$('#toggle-mask').onclick = () => setMask(!showMask);
 function loadOriginal() {
   return new Promise((resolve, reject) => {
     originalImage = new Image();
@@ -294,6 +327,7 @@ function drawCorners() {
   if (!originalImage || !points.length) return;
   const c = $('#corner-canvas'), ctx = c.getContext('2d'), w = c.width, h = c.height;
   ctx.clearRect(0, 0, w, h); ctx.drawImage(originalImage, 0, 0, w, h);
+  if (showMask && maskImage) ctx.drawImage(maskImage, 0, 0, w, h);
   ctx.beginPath();
   points.forEach((p, i) => { const x = p[0] * (w - 1), y = p[1] * (h - 1); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
   ctx.closePath(); ctx.fillStyle = '#b9e1c214'; ctx.fill();
@@ -419,7 +453,7 @@ async function process({ quiet = false } = {}) {
       if (pending) continue;
       lastResult = result;
       $('#processing-time').textContent = `${result.width} × ${result.height} px · ${(result.elapsed_ms / 1000).toFixed(2)} s`;
-      renderMetrics(result.metrics);
+      renderMetrics(result.metrics); renderTones(result.metrics);
     } while (pending);
     setStale(false);
     Feedback.dismiss('process');
@@ -439,7 +473,7 @@ async function process({ quiet = false } = {}) {
 }
 $('#stale-retry').onclick = () => process();
 
-$('#confirm-corners').onclick = async () => { if (await process()) { history = []; show(4); } };
+$('#confirm-corners').onclick = async () => { if (await process()) { history = []; Feedback.dismiss('detect-ok'); show(4); } };
 function changeParameters() { history.push({ ...params }); params = readControls(); process(); }
 sliders.forEach(k => {
   $('#' + k).oninput = () => $('#' + k + '-value').textContent = $('#' + k).value + ' %';
@@ -471,6 +505,49 @@ function renderMetrics(m) {
     box.append(small, strong, span); $('#metrics').append(box);
   }
 }
+// Histograma de luminancia (64 niveles) antes y después, y tonos que el ajuste recortó.
+let clipShown = false, lastClipWarning = false;
+function drawHistogram(before, after) {
+  const c = $('#histogram'), ctx = c.getContext('2d'), w = c.width, h = c.height, n = before.length;
+  const peak = Math.max(...before, ...after) || 1, bw = w / n, y = v => h - 6 - (h - 14) * Math.sqrt(v / peak);
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#c9d3c2';
+  before.forEach((v, i) => { const top = y(v); ctx.fillRect(i * bw + 1, top, bw - 2, h - 6 - top); });
+  ctx.beginPath(); after.forEach((v, i) => { const x = i * bw + bw / 2; i ? ctx.lineTo(x, y(v)) : ctx.moveTo(x, y(v)); });
+  ctx.strokeStyle = '#2f6d4c'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+  ctx.fillStyle = '#e6eadf'; ctx.fillRect(0, h - 4, w, 4);
+}
+function renderTones(m) {
+  const card = $('#tone-card'); if (!m.before.histogram) { card.hidden = true; return; }
+  card.hidden = false; drawHistogram(m.before.histogram, m.after.histogram);
+  const clip = m.clipping || {}, status = $('#tone-status'), toggle = $('#toggle-clipping');
+  if (!clip.available) {
+    status.textContent = 'Blanco y negro'; status.dataset.level = 'info';
+    $('#tone-text').textContent = clip.note || ''; toggle.hidden = true; setClipping(false); lastClipWarning = false; return;
+  }
+  const b = clip.new_bright_percent, d = clip.new_dark_percent, total = b + d, fmt = v => v.toLocaleString('es', { maximumFractionDigits: 1 });
+  status.dataset.level = clip.warning ? 'warn' : 'ok';
+  status.textContent = clip.warning ? 'Tonos recortados' : total < 0.05 ? 'Sin recorte' : 'Recorte leve';
+  $('#tone-text').textContent = total < 0.05
+    ? 'El ajuste no llevó píxeles a negro o blanco puros: no se pierde detalle por recorte.'
+    : `El ajuste llevó a blanco puro el ${fmt(b)} % y a negro puro el ${fmt(d)} % de la imagen.` + (clip.warning ? ' Ese detalle ya no se recupera: baja la iluminación o la nitidez.' : ' Es poco; revisa el detalle si son trazos finos.');
+  toggle.hidden = total < 0.05;
+  if (clipShown && !toggle.hidden) setClipping(true); else setClipping(false);
+  if (clip.warning && !lastClipWarning) {
+    Feedback.notify({ type: 'warning', key: 'clipping', title: 'El ajuste quema detalle',
+      text: `Un ${fmt(total)} % de la imagen quedó en negro o blanco puros por el ajuste.`, detail: 'Mira dónde en el «después» y reduce el control que lo causa.',
+      actions: [{ label: 'Ver dónde', onClick: () => setClipping(true) }] });
+  } else if (!clip.warning) Feedback.dismiss('clipping');
+  lastClipWarning = !!clip.warning;
+}
+function setClipping(on) {
+  clipShown = on && !!lastResult && !$('#toggle-clipping').hidden;
+  const img = $('#clip-overlay'), t = $('#toggle-clipping');
+  t.setAttribute('aria-pressed', String(clipShown)); t.textContent = clipShown ? 'Ocultar tonos recortados' : 'Ver tonos recortados';
+  if (clipShown) { img.src = imageUrl('clipping', lastResult.revision); img.hidden = false; } else img.hidden = true;
+}
+$('#toggle-clipping').onclick = () => setClipping(!clipShown);
+
 function compare() { const v = $('#compare-slider').value; $('#before-layer').style.clipPath = `inset(0 ${100 - v}% 0 0)`; $('#compare-divider').style.left = v + '%'; }
 $('#compare-slider').oninput = compare;
 

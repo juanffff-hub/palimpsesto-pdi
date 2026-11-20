@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import Flask,request,jsonify,send_file,session,render_template,g
 from werkzeug.exceptions import HTTPException
 from .models import ModelService,CLASSES
-from .imaging import load_image,resize_long,encode_png,detect_quad,rectify,enhance,compare_metrics,PRESETS
+from .imaging import load_image,resize_long,encode_png,detect_quad,rectify,enhance,compare_metrics,mask_overlay,clipping_overlay,PRESETS
 from .exporting import build_report,create_pdf,create_bundle
 from .validation import object_payload,choice,number,assess_input
 from .capture import assess as assess_capture
@@ -85,9 +85,9 @@ def upload():
     if not f:raise ValueError('Selecciona una imagen.')
     data=f.read();rgb,meta=load_image(data);sid=secrets.token_urlsafe(24);t=time.perf_counter()
     with model_lock:
-        prediction=models.classify(rgb);assessment=assess_input(rgb,prediction);kind=prediction['class'] or 'documento_impreso';corners=detect_quad(rgb,models,kind)
-        capture=assess_capture(rgb,models.segment(rgb),kind)
-    state={'original_bytes':data,'rgb':rgb,'metadata':meta,'name':Path(f.filename or 'imagen').name[:180],'classification':prediction,'detection':corners,'assessment':assessment,'capture':capture,'scope_confirmed':False,'access':time.monotonic(),'result':None}
+        prediction=models.classify(rgb);assessment=assess_input(rgb,prediction);kind=prediction['class'] or 'documento_impreso'
+        prob=models.segment(rgb);corners=detect_quad(rgb,models,kind,prob=prob);capture=assess_capture(rgb,prob,kind)
+    state={'original_bytes':data,'rgb':rgb,'metadata':meta,'name':Path(f.filename or 'imagen').name[:180],'classification':prediction,'detection':corners,'assessment':assessment,'capture':capture,'mask_prob':prob,'scope_confirmed':False,'access':time.monotonic(),'result':None}
     with lock:
         old=session.get('sid')
         if old:states.pop(old,None)
@@ -105,7 +105,7 @@ def detect():
     if 'scope_confirmed' in body and type(body['scope_confirmed']) is not bool:raise ValueError('La confirmación de alcance debe ser verdadera o falsa.')
     if body.get('scope_confirmed') is True:state['scope_confirmed']=True
     if state['assessment']['requires_confirmation'] and not state['scope_confirmed']:raise ValueError('La imagen parece fuera del alcance. Confirma que contiene una pieza plana o carga otra fotografía.')
-    with model_lock:corners=detect_quad(state['rgb'],models,kind,method)
+    with model_lock:corners=detect_quad(state['rgb'],models,kind,method,prob=state.get('mask_prob'))
     state['detection']=corners;state['result']=None;return jsonify(corners)
 
 @app.post('/api/rotate')
@@ -115,7 +115,7 @@ def rotate():
     state['rgb']=cv2.rotate(state['rgb'],cv2.ROTATE_90_COUNTERCLOCKWISE if direction=='left' else cv2.ROTATE_90_CLOCKWISE)
     state['metadata']['user_rotation_degrees']=(state['metadata'].get('user_rotation_degrees',0)+(90 if direction=='right' else -90))%360
     state['metadata']['working_width']=state['rgb'].shape[1];state['metadata']['working_height']=state['rgb'].shape[0]
-    with model_lock:corners=detect_quad(state['rgb'],models,kind)
+    with model_lock:state['mask_prob']=models.segment(state['rgb']);corners=detect_quad(state['rgb'],models,kind,prob=state['mask_prob'])
     state['detection']=corners;state['result']=None;return jsonify(detection=corners)
 
 @app.post('/api/process')
@@ -125,7 +125,7 @@ def process():
     choice(kind,CLASSES,'Tipo de pieza')
     if state['assessment']['requires_confirmation'] and not state['scope_confirmed']:raise ValueError('Confirma primero que la foto corresponde a una pieza admitida.')
     points=body.get('points');aspect=number(body.get('aspect',0),'Proporción ancho/alto',0,10);params=body.get('parameters',{})
-    t=time.perf_counter();before,H=rectify(state['rgb'],points,aspect,max_side=2400);after,p=enhance(before,params,kind);metrics=compare_metrics(before,after)
+    t=time.perf_counter();before,H=rectify(state['rgb'],points,aspect,max_side=2400);after,p=enhance(before,params,kind);metrics=compare_metrics(before,after,binary=p['binary']!='off')
     report=build_report(state,p,points,H,metrics,kind,state['detection']['method'],aspect)
     revision=secrets.token_hex(12);result={'before':before,'after':after,'report':report,'revision':revision};state['result']=result
     return jsonify(width=after.shape[1],height=after.shape[0],metrics=metrics,parameters=p,elapsed_ms=round(1000*(time.perf_counter()-t)),revision=revision)
@@ -133,6 +133,16 @@ def process():
 @app.get('/api/image/<which>')
 def get_image(which):
     state=current()
+    if which=='mask':
+        # Salida de la U-Net para superponer en el paso 3 (verde: pieza; naranja: zona dudosa).
+        if state.get('mask_prob') is None:raise ValueError('No hay máscara de la red para esta foto.')
+        h,w=resize_long(state['rgb'],1200).shape[:2]
+        response=send_file(io.BytesIO(mask_overlay(state['mask_prob'],(h,w))),mimetype='image/png',max_age=0);response.headers['Cache-Control']='no-store';return response
+    if which=='clipping':
+        # Tonos que el ajuste actual recortó, alineados con la vista «después».
+        if not state['result']:raise ValueError('Todavía no hay una imagen procesada.')
+        if request.args.get('v') and request.args['v']!=state['result']['revision']:raise ValueError('La vista previa corresponde a un resultado anterior. Vuelve a procesar la imagen.')
+        response=send_file(io.BytesIO(clipping_overlay(state['result']['before'],state['result']['after'])),mimetype='image/png',max_age=0);response.headers['Cache-Control']='no-store';return response
     if which=='original':im=state['rgb']
     elif which in ['before','after'] and state['result']:
         if request.args.get('v') and request.args['v']!=state['result']['revision']:raise ValueError('La vista previa corresponde a un resultado anterior. Vuelve a procesar la imagen.')

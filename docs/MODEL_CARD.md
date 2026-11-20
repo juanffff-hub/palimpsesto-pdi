@@ -39,6 +39,8 @@ Protocolo y regla fijados antes de entrenar (`results/segmentation/protocol.json
 
 Se cumplieron las cuatro condiciones (media +0,03, ninguna clase −0,01, mismas o más detecciones, mejora con 3 semillas: 0,937 / 0,902 / 0,924). Tiempo mediano en CPU: 49 ms, igual que antes.
 
+Confianza del borde (`imaging.border_confidence`): «dudosa» si el cuadrilátero encaja < 0,92 con la máscara o la franja incierta supera 5 px. En prueba marcó los 6 bordes malos de la U-Net desplegada (5 de 34 buenos como falsas alarmas). Ver `results/border_confidence/`.
+
 Limitaciones: 8 piezas o bloques en prueba; pinturas con fondos del mismo color (PIN008) siguen siendo difíciles y solo 4/12 pinturas superan IoU 0,95. Los manuscritos elegidos tienen bordes rectos. La sugerencia de borde sigue exigiendo revisión humana. La U-Net del parcial se conserva (`unet_resnet18_imagenet.pth`) como línea base.
 
 ## Baselines y segmentación
