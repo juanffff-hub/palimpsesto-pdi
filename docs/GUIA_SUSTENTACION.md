@@ -12,7 +12,7 @@ Equipo: Neira, Gómez y Fajardo. Confirmar nombres completos, institución y fec
 6. Geometría: cuatro correspondencias, matriz 3×3 hasta escala; puntos no colineales, plano y proporción física opcional.
 7. Mejora: estimación de fondo, CLAHE, bilateral y unsharp; pintura inicia neutra. Explicar signo, flotantes y canales.
 8. Evaluación: macro-F1, confusión, Dice/IoU, SSIM/PSNR solo alineados. Presentar limitaciones antes de conclusiones.
-9. Demo real: cargar, confirmar clase, mover esquina, ajustar, deshacer, exportar; abrir PDF y mostrar original/JSON.
+9. Demo real: cargar una foto borrosa para mostrar el semáforo en rojo y otra buena; confirmar clase, mover esquina, ajustar, deshacer, exportar; abrir PDF y mostrar original/JSON.
 
 ## Preguntas que el equipo debe poder responder
 
@@ -24,6 +24,7 @@ Equipo: Neira, Gómez y Fajardo. Confirmar nombres completos, institución y fec
 - ¿Por qué no se usa difusión? Puede producir contenido plausible sin fidelidad; no hay referencias para validarla en este alcance.
 - ¿Cómo saben que la U-Net nueva es mejor y no solo distinta? La regla de adopción se escribió antes de entrenar, la prueba es por pieza (piezas que la red no vio) y se compara con lo que hacía la v0.3.0 con la misma función de la aplicación; además se repitió con 3 semillas.
 - ¿Por qué la máscara de las pinturas incluye el marco? El marco forma parte de la pieza fotografiada y da un borde recto y estable para la homografía; quien quiera solo el lienzo puede mover las esquinas.
+- ¿Cómo sabe el semáforo que la foto está borrosa si una pintura lisa también tiene pocos bordes? Mide solo la pieza (máscara de la U-Net), toma el bloque más nítido y usa un umbral distinto para pinturas; el temblor se detecta porque deja una dirección mucho más nítida que la otra. Umbrales calibrados con las 480 fotos y verificados con defectos controlados y revisión visual.
 - ¿Qué sucede si el modelo falla? La persona corrige clase o esquinas. Si la captura perdió información, hay que repetirla.
 - ¿La fotografía de una pintura conserva color exacto? No se dispone de calibración colorimétrica; se evita modificación automática pero no se certifica fidelidad.
 

@@ -37,7 +37,7 @@ Gran parte del patrimonio documental y artístico (manuscritos, cartas, diplomas
 - La UNESCO (2003) reconoce como patrimonio digital los recursos que se convierten a formato digital a partir de material analógico y llama a conservarlos. Una captura ilegible no sirve para citar la fuente ni para incorporarla a un archivo digital.
 - **Un mismo tratamiento no sirve para todo:** binarizar un manuscrito puede borrar trazos débiles, y "mejorar" el color de una pintura altera la obra. Por eso una red identifica el tipo de pieza y ese tipo define el tratamiento inicial.
 - **La persona que conoce la pieza debe decidir.** Una imagen "bonita" no garantiza fidelidad documental; el sistema propone y el usuario confirma, corrige o rechaza en cada etapa.
-- **Valor práctico:** permite descubrir *antes de salir de la sala* que la foto no sirve y repetirla mientras la pieza sigue sobre la mesa.
+- **Valor práctico:** permite descubrir *antes de salir de la sala* que la foto no sirve y repetirla mientras la pieza sigue sobre la mesa. El **semáforo de la captura** lo dice en cuanto se carga la foto.
 
 ### Objetivos
 
@@ -55,7 +55,7 @@ Gran parte del patrimonio documental y artístico (manuscritos, cartas, diplomas
 
 Palimpsesto actúa como un **restaurador digital asistido** en cinco pasos:
 
-1. **Cargar** la foto (JPG/PNG). Se valida el archivo, se corrige la orientación EXIF y se comprueba si el contenido parece una pieza admitida.
+1. **Cargar** la foto (JPG/PNG). Se valida el archivo, se corrige la orientación EXIF y se comprueba si el contenido parece una pieza admitida. Un **semáforo de la captura** revisa nitidez, luz, reflejos, encuadre y tamaño de la pieza y dice si conviene repetir la foto.
 2. **Identificar**: una CNN sugiere el tipo de pieza y el usuario lo confirma o lo cambia.
 3. **Encuadrar**: una U-Net, entrenada con impresos, manuscritos y pinturas, propone las cuatro esquinas; el usuario las revisa, las arrastra o las marca a mano.
 4. **Mejorar**: homografía a vista frontal y mejora clásica ajustable (iluminación, CLAHE, suavizado, nitidez, binarización solo en documentos), con comparación antes/después y detalle a resolución real.
@@ -78,6 +78,7 @@ flowchart TB
     direction TB
     V[Validación de archivo<br/>formato real, tamaño, EXIF, alfa] --> M1[M1 · Preproceso<br/>RGB, vistas reducidas 1200/960 px, hash]
     M1 --> AL[Control de alcance<br/>similitud de embeddings]
+    M1 --> CQ[Calidad de la captura<br/>nitidez, luz, reflejos, encuadre y tamaño<br/>sobre la máscara de la U-Net]
     M1 --> M2[M2 · Clasificación<br/>ResNet18 congelada + cabeza lineal<br/>224×224 → 3 puntuaciones]
     M2 --> P[Preajuste por clase]
     M1 --> M3[M3 · Borde<br/>U-Net de 3 clases 256×256 → máscara → cuadrilátero<br/>respaldo: contornos Canny / manual]
@@ -89,6 +90,7 @@ flowchart TB
   end
   U1 -- JPG/PNG --> V
   AL -- alerta --> U2
+  CQ -- semáforo verde / amarillo / rojo --> U2
   M2 -- clase + puntuaciones --> U2
   U2 -- clase confirmada --> P
   M3 -- 4×2 puntos --> U3
@@ -112,6 +114,7 @@ flowchart TB
 | Validación | bytes → RGB uint8 | decodificación real, límites de tamaño/píxeles, EXIF, alfa sobre blanco | `palimpsesto/imaging.py` |
 | M1 Preproceso | RGB → vista previa (1200 px), vista de detección (960 px), hash | redimensión INTER_AREA, SHA-256 | `imaging.py` |
 | Alcance | RGB → alerta sí/no | similitud coseno con 408 embeddings de desarrollo | `palimpsesto/models.py` |
+| Calidad de la captura | RGB + máscara de la U-Net → veredicto y 5 chequeos | segunda derivada por dirección y por bloques, percentil 95 de luminancia, manchas saturadas compactas (componentes conexas), contacto de la máscara con el borde | `palimpsesto/capture.py` |
 | M2 Clasificación | RGB 224×224 → 3 puntuaciones | ResNet18 ImageNet congelada + cabeza lineal | `models.py` |
 | M3 Borde | RGB 256×256 → máscara → 4 puntos | U-Net de 3 clases (encoder ResNet18); contornos; manual | `models.py`, `imaging.py` |
 | M4 Rectificación | RGB + 4 puntos → vista frontal | homografía (`getPerspectiveTransform`, `warpPerspective`) | `imaging.py` |
@@ -143,6 +146,7 @@ flowchart TB
 - **Segmentación:** U-Net con encoder ResNet18, con la receta del tercer parcial (Soft Dice, Adam, volteo y giro). En el parcial se entrenó solo con documentos impresos (80 fotos); en la v0.4.0 se reentrenó con **240 fotos de las tres clases** (80 impresos, 80 manuscritos y 80 pinturas anotados con polígonos en makesense.ai). De su máscara se extrae el cuadrilátero.
 - **Mejora (en el canal L de Lab, para no alterar el tono):** filtro bilateral contra el ruido; estimación de iluminación con filtro gaussiano grande y división; CLAHE (Zuiderveld, 1994); máscara de enfoque; binarización global de Otsu (1979) y local de Sauvola (2000) solo en documentos.
 - **Frecuencia:** filtro *high-boost* con FFT, evaluado en `notebooks/Palimpsesto_experimentos.ipynb` y `results/quality/`, pero no desplegado porque no superó a los filtros espaciales.
+- **Calidad de la captura:** nitidez como varianza de la segunda derivada en *x* y en *y* por bloques de la pieza (el temblor borra una sola dirección), exposición por histograma de luminancia (percentil 95), reflejos como componentes conexas saturadas y compactas, y encuadre a partir de la máscara de la U-Net.
 - **Métricas:** SSIM (Wang et al., 2004) y PSNR solo cuando hay referencia alineada; nitidez (varianza del Laplaciano) y contraste RMS como descriptores, no como notas de fidelidad.
 
 ### Modelos
@@ -177,6 +181,7 @@ palimpsesto/        Núcleo del sistema
   imaging.py        Validación, EXIF, homografía, mejora clásica, métricas
   models.py         Carga estricta de pesos (weights_only=True), clasificación, alcance, U-Net
   exporting.py      PNG, PDF, JSON y ZIP con el original y sus hashes
+  capture.py        Semáforo de la captura: nitidez, luz, reflejos, encuadre y tamaño de la pieza
   weights.py        Al iniciar, comprueba los pesos por SHA-256 y descarga los de la release vigente
 templates/index.html  Interfaz de cinco pasos
 static/app.js       Flujo de la interfaz (carga → identificar → encuadrar → mejorar → guardar)
@@ -196,6 +201,7 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 | El original nunca se modifica | Se guardan sus bytes y su SHA-256; las transformaciones trabajan sobre copias y el ZIP incluye el archivo exacto. |
 | Resultados que no se mezclan | Cada imagen tiene una clave y cada procesamiento una revisión; un enlace viejo o una pestaña con otra foto se rechazan. |
 | Clasificación con supervisión | Si la puntuación es baja, si falta el modelo o si el contenido parece ajeno, la interfaz no impone la clase. |
+| Avisar a tiempo | Al cargar la foto, un semáforo (verde, amarillo o rojo) explica qué falla y ofrece cargar otra; se recalcula si cambias el tipo de pieza y queda en el registro JSON. |
 | Esquinas revisables | Canvas con arrastre, selección de punto y flechas del teclado; la geometría inválida (cruzada, repetida, fuera de la foto) se rechaza. |
 | Ajustes reversibles | Deshacer, mejoras en cero y comparación antes/después con la misma geometría. |
 | Avisos y recuperación | `feedback.js`: avisos dentro de la ventana con icono, título y acción (Reintentar, Ir al campo, Cargar otra foto). |
@@ -254,6 +260,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 | Paso | Qué hace el usuario | Qué responde el sistema |
 |---|---|---|
 | ![](docs/img/gui_02_identificar.png) **2 · Identificar** | Confirma que la foto es una pieza admitida y confirma o cambia el tipo | Puntuaciones por clase, preajuste y alerta de alcance |
+| ![](docs/img/gui_02b_semaforo.png) **2 · Semáforo de la captura** | Lee si la foto sirve; si está en rojo, la repite con un clic | Veredicto, cinco chequeos con el motivo concreto y botón para cargar otra foto |
 | ![](docs/img/gui_03_encuadrar.png) **3 · Encuadrar** | Arrastra las 4 esquinas, vuelve a detectar, marca a mano o gira 90° | Cuadrilátero sobre la foto y método usado (U-Net, contornos, manual) |
 | ![](docs/img/gui_04_mejorar.png) **4 · Mejorar** | Mueve deslizadores, deshace, pone en cero o amplía el detalle | Vista previa, comparación antes/después y métricas |
 | ![](docs/img/gui_05_guardar.png) **5 · Guardar** | Descarga ZIP, PNG, PDF o JSON | Resumen de las decisiones; el original va intacto |
@@ -264,7 +271,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 **Instrucciones de uso**
 
 1. Abre la aplicación (ver [instalación](#9-instalación-y-ejecución)) y pulsa **Seleccionar JPG o PNG**, arrastra una foto o usa el **ejemplo sintético**.
-2. Revisa la categoría sugerida, marca la casilla de confirmación y pulsa **Confirmar y revisar borde**.
+2. Mira el **semáforo de la captura**: en verde, sigue; en amarillo, revisa el punto señalado; en rojo, repite la foto ahora con **Repetir la foto**. Luego revisa la categoría sugerida, marca la casilla de confirmación y pulsa **Confirmar y revisar borde**.
 3. Comprueba que los cuatro puntos caen en las esquinas de la pieza. Si no, arrástralos o pulsa **Volver a detectar** o **Marcar manualmente**. Si conoces las medidas, escribe la proporción ancho/alto; si no, deja 0.
 4. Ajusta las mejoras mirando la comparación. Usa **Ver detalle** para revisar trazos finos. Si algo empeora, **Deshacer** o **Sin mejoras**.
 5. Pulsa **Revisado, continuar** y descarga el ZIP completo o el formato que necesites.
@@ -372,6 +379,40 @@ Los métodos clásicos no se entrenan, así que se miden sobre las 80 fotos. La 
 
 No existe un ajuste universal: cada defecto pide una técnica distinta, y por eso la mejora es ajustable y reversible. En fotos reales no hay referencia limpia, así que **la interfaz no inventa SSIM ni PSNR**: los muestra como no disponibles y usa nitidez y contraste solo como descriptores.
 
+### Semáforo de la captura
+
+**Qué resuelve.** El escenario de uso pide saber *antes de salir de la sala* si la foto sirve. Hasta ahora había tres avisos genéricos calculados sobre la foto entera, fondo incluido, con umbrales fijos. El semáforo mide **la pieza**: usa la máscara de la U-Net y revisa cinco puntos.
+
+| Chequeo | Medida | Amarillo (revisar) | Rojo (repetir) |
+|---|---|---|---|
+| Nitidez | Segunda derivada en *x* y en *y* por bloques de 48 px (vista de 960 px); se toma la dirección más pobre | < 20 en documentos, < 12 en pinturas, o una dirección 10 veces más nítida que la otra (temblor) | < 8 |
+| Luz | Percentil 95 de la luminancia de la pieza; % saturado | percentil 95 < 70 | percentil 95 < 40, o ≥ 10 % de la pieza quemada |
+| Reflejos | Mayor mancha saturada y compacta dentro de la pieza | ≥ 1,2 % de la pieza | — |
+| Pieza completa | Contacto de la máscara con un lado de la foto | > 5 % del lado | > 25 % del lado |
+| Tamaño | Fracción del encuadre y lado menor de la pieza en píxeles | < 10 % del encuadre, o < 450 px de lado | — |
+
+**Cómo se calibró y se comprobó** (`scripts/evaluate_capture.py`, `results/capture/`). Los umbrales se eligieron observando las 480 fotos reales y versiones con defectos controlados. Tres decisiones salieron de revisar las fotos una por una:
+- La **luz** se mide con el percentil 95 y no con la mediana: la tarjeta negra de letras amarillas está bien expuesta aunque su mediana sea baja.
+- Los **reflejos** exigen una mancha compacta: el paspartú blanco de un cuadro no es un reflejo.
+- El **tamaño** separa "acércate" de "la foto llegó comprimida por chat".
+
+![Semáforo de la captura frente a los avisos anteriores](results/figures/semaforo_captura.png)
+
+| Las 480 fotos con un defecto aplicado | Avisos anteriores | Semáforo |
+|---|---:|---:|
+| Desenfoque (gaussiano σ = 1,4 a 960 px) | 11 % | **80 %** |
+| Temblor horizontal / vertical (11 px) | 8 % / 10 % | **99 % / 100 %** |
+| Poca luz (× 0,28) | 23 % | **100 %** |
+| Exceso de luz (× 2,3) | 2 % | **84 %** |
+| Pieza cortada (se quita un 25 % de la pieza) | — (no existía) | **91 %** |
+
+**En las fotos reales:**
+- **Veredictos.** 376 quedan en verde, 81 en amarillo y 23 en rojo.
+- **Revisión visual.** Se revisaron a ojo las 23 en rojo: todas están borrosas, muy oscuras o tienen la pieza cortada. Los avisos anteriores solo detectaban 5 de ellas. En las amarillas, casi todas tienen un motivo visible; los pocos avisos dudosos son pinturas muy lisas.
+- **Pieza completa contra la máscara de referencia.** En las 80 fotos de validación y prueba que la U-Net no vio, avisó en las 5 que tocan el borde, con 1 falsa alarma. En las 240, 19 de 21.
+
+**Límites.** No es una prueba ciega: los umbrales se ajustaron mirando estas mismas fotos. Los defectos son sintéticos y se aplican a la vista de 960 px. Una pintura muy lisa puede recibir un aviso amarillo de nitidez. Sin la U-Net, el semáforo mide la foto entera y omite los chequeos de encuadre y tamaño. El veredicto orienta; la persona decide.
+
 ### Control de alcance
 
 Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 fotos de diagnóstico. **El retrato del astronauta pasó sin alerta:** no es un detector universal. Por eso la confirmación humana de que la foto es una pieza admitida es obligatoria.
@@ -380,9 +421,9 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto y descarga verificada de pesos | 90/90 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos y semáforo de la captura | 96/96 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
-| `npm run test:ui`: navegador en 320–1440 px, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 22/22 |
+| `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 23/23 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
 
 Las pruebas automáticas verifican los contratos del software. La evaluación experimental del modelo se describe por separado, con sus protocolos y limitaciones.
@@ -398,6 +439,7 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 - Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
 - La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos). Al reentrenarla con 160 máscaras nuevas de manuscritos y pinturas, con una regla de adopción fijada de antemano, el borde propuesto en prueba subió de 0,811 a 0,937 de IoU media (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963) sin empeorar los impresos.
 - La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
+- El semáforo de la captura lleva a la práctica el escenario de uso: dice en el momento si conviene repetir la foto. Frente a los avisos anteriores, detecta defectos controlados en el 80–100 % de los casos (antes 2–23 %) y marcó en rojo las 23 fotos reales que lo merecían, de las que antes se detectaban 5.
 
 **Limitaciones**
 
@@ -446,6 +488,7 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 .\.venv\Scripts\python.exe scripts/calibrate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_model.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
+.\.venv\Scripts\python.exe scripts/evaluate_capture.py --root "C:\ruta\datos" --seg "C:\ruta\segmentacion_3clases"   # semáforo de la captura
 .\.venv\Scripts\python.exe scripts/benchmark_quality.py
 .\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 42 --save   # U-Net v0.4.0
 .\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 7          # semillas de control (también 2026)
