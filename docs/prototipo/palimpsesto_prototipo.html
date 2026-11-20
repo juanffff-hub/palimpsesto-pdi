@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prototipo de Palimpsesto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<!--
+  Prototipo navegable de la interfaz (Momento 3 de la propuesta, octubre de 2026).
+  Representa el flujo y los estados alternativos; ninguna función del sistema se ejecuta.
+  La aplicación real está en templates/ y static/.
+-->
+<style>
+/* Layout: app de una columna con encabezado fijo, stepper de 5 pasos, área de trabajo en dos columnas (vista | controles) que se apila en el celular. */
+:root {
+  --bg: #F4F6F8; --surface: #FFFFFF; --surface-2: #ECF1F4; --line: #D3DCE4;
+  --fg: #1B2633; --muted: #566273;
+  --primary: #1F3A5F; --on-primary: #FFFFFF;
+  --accent: #1E6B78; --accent-soft: #DDEFF2;
+  --sepia: #94500F;
+  --ok: #2B7148; --ok-bg: #E5F3EA; --warn: #8A5200; --warn-bg: #FFF3DC; --err: #B3261E; --err-bg: #FCEBEA;
+  --table: #3A332D; --paper: #EADFC6; --hand: #4A3426; --shade: #2A1C0C;
+  --f-ui: "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10151C; --surface: #18202A; --surface-2: #1F2935; --line: #2F3B49;
+  --fg: #E5EBF1; --muted: #9DAAB9; --primary: #9CC2E6; --on-primary: #0D1520;
+  --accent: #6CC2CE; --accent-soft: #173840; --sepia: #E2A86E;
+  --ok: #86D3A4; --ok-bg: #14301F; --warn: #F1C36A; --warn-bg: #362810; --err: #FF8D84; --err-bg: #3A1917;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10151C; --surface: #18202A; --surface-2: #1F2935; --line: #2F3B49;
+  --fg: #E5EBF1; --muted: #9DAAB9; --primary: #9CC2E6; --on-primary: #0D1520;
+  --accent: #6CC2CE; --accent-soft: #173840; --sepia: #E2A86E;
+  --ok: #86D3A4; --ok-bg: #14301F; --warn: #F1C36A; --warn-bg: #362810; --err: #FF8D84; --err-bg: #3A1917;
+  color-scheme: dark }
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 16px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.2; }
+p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* encabezado */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 16px; padding-block: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.brand b { display: block; font-size: 18px; color: var(--primary); letter-spacing: .2px; }
+.brand span { display: block; font-size: 13px; color: var(--muted); }
+.tag { margin-left: auto; font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--sepia); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
+
+/* stepper */
+.stepper { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.step { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; text-align: left; min-height: 48px; }
+.step:disabled { cursor: not-allowed; opacity: .55; }
+.step .n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--surface-2); color: var(--muted); }
+.step .lbl { font-size: 14px; font-weight: 500; min-width: 0; }
+.step .lbl small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.step.done .n { background: var(--ok-bg); color: var(--ok); }
+.step[aria-current="step"] { border-color: var(--accent); background: var(--accent-soft); }
+.step[aria-current="step"] .n { background: var(--accent); color: var(--surface); }
+.steps-bar { padding-block: 16px 0; }
+
+main { padding-block: 20px 32px; }
+.screen-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--sepia); }
+.screen-head h1 { font-size: clamp(24px, 3.2vw, 32px); color: var(--fg); }
+.screen-head p { color: var(--muted); max-width: 62ch; }
+
+.work { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel h2 { font-size: 17px; }
+.muted { color: var(--muted); font-size: 14px; }
+.example { font-size: 12px; color: var(--muted); font-style: italic; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.actions .right { display: flex; flex-wrap: wrap; gap: 10px; margin-left: auto; }
+.btn { min-height: 44px; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+.btn:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+
+/* foto (contenido de imagen, igual en ambos temas) */
+.stage { position: relative; background: var(--table); border-radius: 10px; overflow: hidden; aspect-ratio: 3 / 4; max-width: 100%; max-height: 560px; margin-inline: auto; width: 100%; }
+.stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: transform .25s ease; }
+.stage .cap { position: absolute; left: 10px; bottom: 10px; font-size: 12px; font-weight: 600; color: #F4EFE6; background: rgba(0,0,0,.45); padding: 3px 8px; border-radius: 6px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+
+.alert { display: flex; gap: 12px; padding: 14px 16px; border-radius: 10px; font-size: 15px; align-items: flex-start; }
+.alert svg { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.alert b { display: block; }
+.alert.err { background: var(--err-bg); color: var(--fg); border: 1px solid var(--err); }
+.alert.err svg { color: var(--err); }
+.alert.warn { background: var(--warn-bg); border: 1px solid var(--warn); }
+.alert.warn svg { color: var(--warn); }
+.alert.ok { background: var(--ok-bg); border: 1px solid var(--ok); }
+.alert.ok svg { color: var(--ok); }
+.origin { display: block; margin-top: 6px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.alert .row { margin-top: 10px; }
+.quad.bad { fill: rgba(255, 120, 110, .14); stroke: #FF7A70; }
+.front.na svg { opacity: .25; }
+.front .na-msg { position: absolute; inset: auto 14px 14px; text-align: center; font-size: 13px; font-weight: 600; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+#foto-carga.blurred { filter: blur(1.6px); }
+
+/* inicio */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: clamp(20px, 4vw, 40px); }
+.hero h1 { font-size: clamp(28px, 4.2vw, 44px); color: var(--primary); margin-block: 8px 12px; }
+.hero p { color: var(--muted); max-width: 52ch; }
+.hero .btn { margin-top: 20px; }
+.flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: f; }
+.flow li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: start; }
+.flow li::before { counter-increment: f; content: counter(f); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--accent-soft); color: var(--accent); }
+.flow b { display: block; }
+.flow span { color: var(--muted); font-size: 14px; }
+.scope { margin-top: 16px; font-size: 14px; color: var(--muted); }
+
+/* carga */
+.drop { border: 2px dashed var(--line); border-radius: 12px; padding: 28px 20px; display: grid; place-items: center; text-align: center; gap: 12px; background: var(--surface-2); min-height: 320px; }
+.drop svg.big { width: 56px; height: 56px; color: var(--accent); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* procesando */
+.proc { max-width: 560px; margin: 24px auto; text-align: left; }
+.spinner { width: 44px; height: 44px; border-radius: 50%; border: 4px solid var(--accent-soft); border-top-color: var(--accent); animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.stages li { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); }
+.stages .dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; }
+.stages li.run .dot { border-color: var(--accent); border-top-color: transparent; animation: spin .9s linear infinite; }
+.stages li.ok .dot { background: var(--ok); border-color: var(--ok); }
+.stages li.ok .dot::after { content: ""; width: 9px; height: 5px; border-left: 2px solid var(--surface); border-bottom: 2px solid var(--surface); transform: rotate(-45deg) translate(1px, -1px); }
+.stages small { color: var(--muted); display: block; font-size: 13px; }
+
+/* tipo de pieza */
+.probs { display: grid; gap: 12px; }
+.prob { display: grid; grid-template-columns: 110px minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: 15px; }
+.bar { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width .4s ease; }
+.prob.top .bar i { background: var(--primary); }
+.prob .v { text-align: right; }
+.classes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border: 0; padding: 0; margin: 0; }
+.classes legend { font-weight: 700; margin-bottom: 8px; padding: 0; }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.opt label { display: flex; flex-direction: column; gap: 6px; align-items: center; padding: 14px 8px; border: 2px solid var(--line); border-radius: 10px; text-align: center; font-weight: 600; min-height: 104px; justify-content: center; }
+.opt label svg { width: 36px; height: 36px; color: var(--muted); }
+.opt input:checked + label { border-color: var(--accent); background: var(--accent-soft); }
+.opt input:checked + label svg { color: var(--accent); }
+.opt input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 2px; }
+.preset { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; }
+.preset dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 14px; }
+.preset dt { color: var(--muted); }
+.preset dd { margin: 0; }
+
+/* esquinas */
+.handles circle { fill: var(--accent); stroke: #FFFFFF; stroke-width: 2.5; cursor: grab; }
+.handles circle:focus { outline: none; stroke: #FFD27A; stroke-width: 4; }
+.quad { fill: rgba(108, 194, 206, .12); stroke: #6CC2CE; stroke-width: 2; stroke-dasharray: 6 4; }
+.coords { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; font-size: 13px; }
+.coords span { color: var(--muted); }
+.front { background: var(--surface-2); border-radius: 10px; padding: 14px; display: grid; place-items: center; position: relative; }
+.front svg { width: min(100%, 260px); aspect-ratio: 200 / 260; height: auto; display: block; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+.recalc { position: absolute; top: 10px; right: 10px; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--surface); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--line); }
+
+/* ajuste */
+.compare { position: relative; aspect-ratio: 200 / 260; max-height: 600px; width: 100%; max-width: 460px; margin-inline: auto; border-radius: 8px; overflow: hidden; background: var(--table); }
+.compare svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.compare .after { clip-path: inset(0 0 0 50%); }
+.compare .divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(0,0,0,.3); pointer-events: none; }
+.compare .lab { position: absolute; top: 10px; font-size: 12px; font-weight: 700; color: #FFFFFF; background: rgba(0,0,0,.5); padding: 3px 8px; border-radius: 6px; }
+.compare .lab.l { left: 10px; } .compare .lab.r { right: 10px; }
+.cmp-ctl { display: grid; gap: 4px; max-width: 460px; margin-inline: auto; width: 100%; }
+.slider { display: grid; gap: 6px; }
+.slider .top-l { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+.slider label { font-weight: 600; }
+.slider small { color: var(--muted); font-size: 12px; }
+input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px; }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 14px; }
+.switch input { width: 22px; height: 22px; accent-color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 8px 14px; min-height: 40px; cursor: pointer; font-weight: 600; font-size: 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg button:disabled { opacity: .5; cursor: not-allowed; }
+.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.metric { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }
+.metric span { display: block; font-size: 12px; color: var(--muted); }
+.metric b { font-size: 18px; }
+.metric b.na { font-size: 14px; color: var(--muted); font-weight: 600; }
+.metric em { font-style: normal; font-size: 12px; color: var(--ok); margin-left: 4px; }
+
+/* exportación */
+.formats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; border: 0; margin: 0; padding: 0; }
+.formats legend { font-weight: 700; margin-bottom: 8px; padding: 0; }
+.formats .opt label { min-height: 84px; align-items: flex-start; text-align: left; padding: 14px; }
+.formats .opt label span { font-weight: 400; font-size: 13px; color: var(--muted); }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 600; font-size: 14px; }
+.field input[type="text"] { min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--surface); }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.check input { width: 22px; height: 22px; margin-top: 1px; accent-color: var(--accent); flex: none; }
+.summary { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; font-size: 15px; }
+.summary dt { color: var(--muted); }
+.summary dd { margin: 0; overflow-wrap: anywhere; }
+
+/* controles del prototipo */
+.proto { margin-top: 28px; border: 2px dashed var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 10px; }
+.proto h2 { font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.proto .row button { min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 14px; font-weight: 600; }
+.sc-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.sc-group h3 { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--sepia); margin-bottom: 6px; }
+.proto .row button[aria-pressed="true"] { background: var(--sepia); border-color: var(--sepia); color: var(--surface); }
+
+@media (max-width: 860px) {
+  .work, .hero { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .stepper { gap: 4px; }
+  .step { justify-content: center; padding: 8px 4px; }
+  .step .lbl { display: none; }
+  .classes { grid-template-columns: minmax(0, 1fr); }
+  .opt label { min-height: 64px; flex-direction: row; justify-content: flex-start; padding-inline: 14px; }
+  .prob { grid-template-columns: 92px minmax(0, 1fr) 46px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sombra" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A1C0C" stop-opacity="0"/>
+      <stop offset=".55" stop-color="#2A1C0C" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#2A1C0C" stop-opacity=".62"/>
+    </linearGradient>
+    <radialGradient id="reflejo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="pagina" viewBox="0 0 200 260">
+      <rect width="200" height="260" style="fill: var(--paper)"/>
+      <rect x="6" y="6" width="188" height="248" style="fill: none; stroke: #C9B994; stroke-width: 1"/>
+      <g id="renglones" style="fill: none; stroke: var(--hand); stroke-width: 1.5; stroke-linecap: round"></g>
+      <ellipse cx="150" cy="210" rx="22" ry="14" style="fill: #B89A62; opacity: .25"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <button class="brand" type="button" id="btn-home" aria-label="Ir al inicio de Palimpsesto">
+      <svg viewBox="0 0 34 34" aria-hidden="true"><rect x="6" y="3" width="22" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary)"/><path d="M11 11h12M11 16h12M11 21h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--accent)"/></svg>
+      <span><b>Palimpsesto</b><span>Restaurador digital asistido</span></span>
+    </button>
+    <span class="tag">Prototipo · datos de ejemplo</span>
+  </div>
+</header>
+
+<nav class="wrap steps-bar" aria-label="Pasos de la restauración">
+  <ol class="stepper">
+    <li><button class="step" type="button" id="st-carga" data-go="carga"><span class="n">1</span><span class="lbl">Carga<small>Foto original</small></span></button></li>
+    <li><button class="step" type="button" id="st-tipo" data-go="tipo"><span class="n">2</span><span class="lbl">Tipo de pieza<small>CNN · M2</small></span></button></li>
+    <li><button class="step" type="button" id="st-esquinas" data-go="esquinas"><span class="n">3</span><span class="lbl">Esquinas<small>M3 · M4</small></span></button></li>
+    <li><button class="step" type="button" id="st-ajuste" data-go="ajuste"><span class="n">4</span><span class="lbl">Ajuste<small>M5 · M6</small></span></button></li>
+    <li><button class="step" type="button" id="st-export" data-go="export"><span class="n">5</span><span class="lbl">Exportación<small>PNG o PDF</small></span></button></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+<!-- INICIO -->
+<section data-screen="inicio" aria-labelledby="h-inicio">
+  <div class="hero">
+    <div>
+      <p class="eyebrow">Archivo, museo o biblioteca</p>
+      <h1 id="h-inicio">Restaura la foto de una pieza antes de salir de la sala</h1>
+      <p>Sube la foto que tomaste con el celular. Palimpsesto identifica si es un manuscrito, un impreso o una pintura, endereza la pieza y mejora su lectura. Tú revisas cada paso y decides si la archivas o repites la foto.</p>
+      <button class="btn primary" type="button" id="btn-start">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Nueva restauración
+      </button>
+      <p class="scope">Funciona con piezas planas o casi planas y una pieza por foto. No transcribe texto ni reconstruye partes perdidas.</p>
+    </div>
+    <ol class="flow" aria-label="Cómo funciona">
+      <li><div><b>Carga</b><span>Sube la foto o tómala con la cámara.</span></div></li>
+      <li><div><b>Tipo de pieza</b><span>La red propone la clase; tú la confirmas.</span></div></li>
+      <li><div><b>Esquinas</b><span>Revisa el borde detectado y endereza la pieza.</span></div></li>
+      <li><div><b>Ajuste</b><span>Mejora luz, contraste y nitidez con vista previa.</span></div></li>
+      <li><div><b>Exportación</b><span>Guarda en PNG o PDF con reporte de calidad.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 1 CARGA -->
+<section data-screen="carga" hidden aria-labelledby="h-carga">
+  <div class="screen-head">
+    <div><p class="eyebrow">Paso 1 de 5 · Carga</p><h1 id="h-carga">Sube la foto de la pieza</h1></div>
+    <p>Usa una foto JPG o PNG con una sola pieza. Si quedó de lado, puedes girarla.</p>
+  </div>
+  <div class="work">
+    <div class="panel">
+      <div id="carga-error" class="alert err" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+        <div><b>No se pudo leer la imagen.</b>El archivo <span class="mono">scan_carta.heic</span> no es compatible. Formatos admitidos: JPG o PNG. Elige otra foto.<span class="origin">Origen: validación de la carga · la imagen no se puede leer</span></div>
+      </div>
+      <div id="carga-blur" class="alert warn" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>
+        <div><b>La foto está desenfocada.</b>La nitidez medida es <span class="mono">38</span> y lo recomendado es al menos <span class="mono">80</span>. Puedes repetirla ahora, mientras tienes la pieza delante, o continuar así.<span class="origin">Origen: M1 · varianza del Laplaciano</span>
+          <div class="row"><button class="btn" type="button" id="btn-blur-retake">Repetir la foto</button></div></div>
+      </div>
+      <div id="drop" class="drop">
+        <svg class="big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>
+        <p><b>Arrastra la foto aquí</b><br><span class="muted">o elige una de estas opciones</span></p>
+        <div class="row" style="justify-content:center">
+          <button class="btn" type="button" id="btn-file">Seleccionar archivo</button>
+          <button class="btn" type="button" id="btn-cam">Tomar foto</button>
+        </div>
+        <button class="btn ghost" type="button" id="btn-sample">Usar foto de ejemplo</button>
+      </div>
+      <div id="preview" hidden>
+        <div class="stage" id="stage-carga">
+          <svg viewBox="0 0 300 400" id="foto-carga" role="img" aria-label="Foto original: carta manuscrita tomada en ángulo, con sombra en una esquina">
+            <rect width="300" height="400" style="fill: var(--table)"/>
+            <g class="pieza"></g>
+          </svg>
+          <span class="cap">Foto original</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Detalles del archivo</h2>
+      <p class="muted" id="file-empty">Todavía no hay una foto cargada.</p>
+      <div id="file-info" hidden>
+        <div class="chips">
+          <span class="chip mono">carta_1890.jpg</span>
+          <span class="chip mono">3024 × 4032 px</span>
+          <span class="chip mono">JPG · 2,8 MB</span>
+        </div>
+        <p class="example" style="margin-top:8px">Datos de ejemplo</p>
+      </div>
+      <div class="field">
+        <span style="font-weight:600;font-size:14px">Orientación</span>
+        <div class="row">
+          <button class="btn" type="button" id="rot-l" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            Girar 90° a la izquierda
+          </button>
+          <button class="btn" type="button" id="rot-r" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            Girar 90° a la derecha
+          </button>
+        </div>
+      </div>
+      <p class="muted">Al continuar, el sistema prepara la imagen (M1) y la red identifica el tipo de pieza (M2).</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" type="button" data-go="inicio">Volver al inicio</button>
+    <div class="right">
+      <button class="btn" type="button" id="btn-change" hidden>Cambiar foto</button>
+      <button class="btn primary" type="button" id="btn-analyze" disabled>Analizar pieza</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESANDO -->
+<section data-screen="proc" hidden aria-labelledby="h-proc">
+  <div class="panel proc" role="status" aria-live="polite">
+    <div style="display:flex;gap:16px;align-items:center">
+      <div class="spinner" aria-hidden="true"></div>
+      <div><p class="eyebrow">Procesando</p><h1 id="h-proc" style="font-size:24px">Analizando la pieza…</h1></div>
+    </div>
+    <ol class="stages" id="stages">
+      <li data-s="0"><span class="dot"></span><div>Preparando la imagen<small>M1 · tamaño, ruido y copias</small></div></li>
+      <li data-s="1"><span class="dot"></span><div>Identificando el tipo de pieza<small>M2 · red convolucional</small></div></li>
+      <li data-s="2"><span class="dot"></span><div>Buscando el borde de la pieza<small>M3 · bordes y contornos</small></div></li>
+    </ol>
+    <p class="muted">Espera un momento. No hace falta volver a pulsar «Analizar».</p>
+    <div id="proc-slow" class="alert warn" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/></svg>
+      <div><b>Está tardando más de lo normal.</b>El análisis sigue en curso y no hace falta repetirlo. Si la conexión es lenta, puedes cancelar e intentarlo de nuevo.<span class="origin">Origen: tiempo de espera de la llamada a M2 (más de 10 s)</span>
+        <div class="row"><button class="btn" type="button" id="btn-cancel">Cancelar análisis</button></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 TIPO DE PIEZA -->
+<section data-screen="tipo" hidden aria-labelledby="h-tipo">
+  <div class="screen-head">
+    <div><p class="eyebrow">Paso 2 de 5 · Tipo de pieza</p><h1 id="h-tipo">Confirma qué tipo de pieza es</h1></div>
+    <p>La red propone una clase. Tu elección define el tratamiento inicial de la mejora.</p>
+  </div>
+  <div class="work">
+    <div class="panel">
+      <div id="tipo-low" class="alert warn" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>
+        <div><b>No estamos seguros del tipo de pieza.</b>La confianza es de <span class="mono">48 %</span>, por debajo del umbral de <span class="mono">60 %</span>. Elige la clase para continuar.<span class="origin">Origen: posproceso de la CNN · umbral de confianza</span></div>
+      </div>
+      <h2 id="sug-title">La red sugiere: <span style="color:var(--accent)">Manuscrito</span></h2>
+      <div class="probs" id="probs" aria-label="Probabilidad por clase"></div>
+      <p class="example">Probabilidades de ejemplo, no medidas</p>
+      <fieldset class="classes">
+        <legend>Tipo de pieza</legend>
+        <div class="opt"><input type="radio" name="clase" id="c-manuscrito" value="manuscrito"><label for="c-manuscrito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11c2-1.5 3 1.5 5 0s3 1 3 1M8 15c2-1.5 3 1.5 5 0"/></svg>Manuscrito</label></div>
+        <div class="opt"><input type="radio" name="clase" id="c-impreso" value="impreso"><label for="c-impreso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/><path d="M8 10h8M8 13h8M8 16h5"/></svg>Impreso</label></div>
+        <div class="opt"><input type="radio" name="clase" id="c-pintura" value="pintura"><label for="c-pintura">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.6"/></svg>Pintura</label></div>
+      </fieldset>
+    </div>
+    <div class="panel">
+      <h2>Tratamiento inicial que se cargará</h2>
+      <div class="preset" id="preset" aria-live="polite"></div>
+      <p class="muted">Podrás cambiar estos valores en el paso 4. Cambiar la clase no modifica la red: solo cambia el tratamiento inicial.</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" type="button" data-go="carga">Atrás</button>
+    <div class="right"><button class="btn primary" type="button" id="btn-tipo-ok">Confirmar tipo de pieza</button></div>
+  </div>
+</section>
+
+<!-- 3 ESQUINAS -->
+<section data-screen="esquinas" hidden aria-labelledby="h-esq">
+  <div class="screen-head">
+    <div><p class="eyebrow">Paso 3 de 5 · Esquinas</p><h1 id="h-esq">Revisa el borde de la pieza</h1></div>
+    <p>Arrastra un punto azul si una esquina quedó mal ubicada. La vista frontal se recalcula al soltarlo.</p>
+  </div>
+  <div class="work">
+    <div class="panel">
+      <div id="esq-none" class="alert warn" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>
+        <div><b>No se detectó el borde de la pieza.</b>Coloca las 4 esquinas sobre los vértices de la pieza para enderezarla.<span class="origin">Origen: M3 · ningún contorno de 4 vértices</span></div>
+      </div>
+      <div id="esq-bad" class="alert err" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+        <div><b>Las esquinas se cruzan.</b>Con este orden no se puede enderezar la pieza. Mueve los puntos para que formen un cuadrilátero sin cruces.<span class="origin">Origen: M4 · validación de la homografía</span></div>
+      </div>
+      <div class="stage">
+        <svg viewBox="0 0 300 400" id="foto-esq" role="img" aria-label="Foto original con el cuadrilátero detectado y cuatro esquinas movibles">
+          <rect width="300" height="400" style="fill: var(--table)"/>
+          <g class="pieza"></g>
+          <polygon class="quad" id="quad"/>
+          <g class="handles" id="handles"></g>
+        </svg>
+        <span class="cap">Foto original · esquinas</span>
+      </div>
+      <p class="muted">Con el teclado: selecciona un punto con Tab y muévelo con las flechas.</p>
+    </div>
+    <div class="panel">
+      <h2>Vista frontal</h2>
+      <div class="front" id="front">
+        <svg viewBox="0 0 200 260" role="img" aria-label="Vista frontal de la carta, ya enderezada"><use href="#pagina"/><rect width="200" height="260" fill="url(#sombra)"/></svg>
+        <span class="recalc" id="recalc" hidden>Recalculando…</span>
+        <span class="na-msg" id="front-na" hidden>Sin vista frontal hasta corregir las esquinas</span>
+      </div>
+      <h2 style="font-size:15px">Esquinas en la foto original <span class="muted" style="font-weight:400">(px)</span></h2>
+      <div class="coords mono" id="coords"></div>
+      <p class="example">Coordenadas de ejemplo</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" type="button" data-go="tipo">Atrás</button>
+    <div class="right">
+      <button class="btn" type="button" id="btn-reset-esq">Restablecer detección</button>
+      <button class="btn primary" type="button" id="btn-esq-ok">Aceptar esquinas</button>
+    </div>
+  </div>
+</section>
+
+<!-- 4 AJUSTE -->
+<section data-screen="ajuste" hidden aria-labelledby="h-aj">
+  <div class="screen-head">
+    <div><p class="eyebrow">Paso 4 de 5 · Ajuste</p><h1 id="h-aj">Mejora la lectura de la pieza</h1></div>
+    <p>Los controles parten del tratamiento de <b id="aj-clase">Manuscrito</b>. Mueve la línea blanca para comparar.</p>
+  </div>
+  <div class="work">
+    <div class="panel">
+      <div class="compare" id="compare">
+        <svg viewBox="0 0 200 260" aria-hidden="true"><use href="#pagina"/><rect width="200" height="260" fill="url(#sombra)"/></svg>
+        <svg viewBox="0 0 200 260" class="after" id="after" aria-hidden="true"><use href="#pagina"/><rect id="after-shade" width="200" height="260" fill="url(#sombra)"/></svg>
+        <div class="divider" id="divider"></div>
+        <span class="lab l">Antes</span><span class="lab r">Después</span>
+      </div>
+      <div class="cmp-ctl">
+        <label for="cmp" class="muted">Comparar antes y después</label>
+        <input type="range" id="cmp" min="0" max="100" value="50">
+      </div>
+    </div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2>Controles de mejora</h2>
+        <span class="chip" id="aj-chip">Tratamiento: Manuscrito</span>
+      </div>
+      <div class="slider">
+        <div class="top-l"><label for="s-ilum">Uniformar iluminación</label><span class="mono" id="v-ilum"></span></div>
+        <input type="range" id="s-ilum" min="0" max="100" step="5">
+        <small>Corrige la sombra dividiendo entre el fondo estimado</small>
+      </div>
+      <div class="slider">
+        <div class="top-l"><label for="s-clahe">CLAHE · límite de contraste</label><span class="mono" id="v-clahe"></span></div>
+        <input type="range" id="s-clahe" min="1" max="4" step="0.1">
+        <small>Ecualización adaptativa sobre la luminancia</small>
+      </div>
+      <div class="slider">
+        <div class="top-l"><label for="s-filt">Filtrado · suavizado</label><span class="mono" id="v-filt"></span></div>
+        <input type="range" id="s-filt" min="0" max="10" step="1">
+        <small>Reduce el ruido del celular</small>
+      </div>
+      <div class="slider">
+        <div class="top-l"><label for="s-nit">Nitidez · máscara de enfoque</label><span class="mono" id="v-nit"></span></div>
+        <input type="range" id="s-nit" min="0" max="3" step="0.1">
+        <small>Refuerza los trazos y los bordes</small>
+      </div>
+      <div class="switch">
+        <label for="s-bin">Binarización (solo documentos)</label>
+        <input type="checkbox" id="s-bin">
+      </div>
+      <div class="seg" role="group" aria-label="Método de binarización">
+        <button type="button" id="m-otsu" aria-pressed="false">Otsu · global</button>
+        <button type="button" id="m-sauvola" aria-pressed="true">Sauvola · local</button>
+      </div>
+      <p class="muted" id="bin-note" hidden>Con sombra en la pieza, Otsu puede oscurecer esa zona; Sauvola la conserva.</p>
+      <div class="row">
+        <button class="btn" type="button" id="btn-undo" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>Deshacer</button>
+        <button class="btn" type="button" id="btn-reset-aj">Reiniciar al tratamiento inicial</button>
+      </div>
+      <h2 style="font-size:15px">Métricas de calidad</h2>
+      <div class="metrics">
+        <div class="metric"><span>Nitidez (var. del Laplaciano)</span><b class="mono" id="m-nitidez"></b></div>
+        <div class="metric"><span>Contraste (RMS)</span><b class="mono" id="m-contraste"></b></div>
+        <div class="metric"><span>SSIM</span><b class="na">No disponible</b></div>
+        <div class="metric"><span>PSNR</span><b class="na">No disponible</b></div>
+      </div>
+      <p class="example">Valores simulados del prototipo. SSIM y PSNR solo se calculan cuando hay una imagen de referencia.</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" type="button" data-go="esquinas">Atrás</button>
+    <div class="right">
+      <button class="btn" type="button" id="btn-retake">Descartar y repetir la foto</button>
+      <button class="btn primary" type="button" data-go="export">Continuar a exportación</button>
+    </div>
+  </div>
+</section>
+
+<!-- 5 EXPORTACIÓN -->
+<section data-screen="export" hidden aria-labelledby="h-ex">
+  <div class="screen-head">
+    <div><p class="eyebrow">Paso 5 de 5 · Exportación</p><h1 id="h-ex">Guarda la pieza restaurada</h1></div>
+    <p>Elige el formato y si incluyes el reporte de calidad para el repositorio digital.</p>
+  </div>
+  <div id="ex-form" class="work">
+    <div class="panel">
+      <div id="ex-error" class="alert err" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+        <div><b>No se pudo generar el PDF.</b>Tus ajustes se conservaron. Intenta de nuevo o guarda la pieza en PNG.<span class="origin">Origen: módulo de exportación · error al escribir el archivo</span>
+          <div class="row"><button class="btn" type="button" id="btn-ex-retry">Reintentar</button><button class="btn" type="button" id="btn-ex-png">Guardar en PNG</button></div></div>
+      </div>
+      <fieldset class="formats">
+        <legend>Formato del archivo</legend>
+        <div class="opt"><input type="radio" name="fmt" id="f-png" value="png"><label for="f-png">PNG<span>Imagen sin pérdida, para seguir trabajando</span></label></div>
+        <div class="opt"><input type="radio" name="fmt" id="f-pdf" value="pdf" checked><label for="f-pdf">PDF<span>Documento listo para archivar y citar</span></label></div>
+      </fieldset>
+      <label class="check" for="f-rep"><input type="checkbox" id="f-rep" checked><span><b>Incluir reporte de calidad</b><br><span class="muted">Clase confirmada, ajustes aplicados y métricas</span></span></label>
+      <div class="field">
+        <label for="f-name">Nombre del archivo</label>
+        <input type="text" id="f-name" value="carta_1890_restaurada" spellcheck="false" class="mono">
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Resumen de la restauración</h2>
+      <dl class="summary" id="summary"></dl>
+      <p class="example">Datos de ejemplo</p>
+    </div>
+  </div>
+  <div id="ex-done" hidden>
+    <div class="panel" style="max-width:640px;margin-inline:auto">
+      <div class="alert ok" role="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 10"/></svg>
+        <div><b>Archivo listo para el repositorio digital.</b><span class="mono" id="done-name"></span></div>
+      </div>
+      <p class="muted">En este prototipo no se genera ningún archivo: la pantalla representa el resultado.</p>
+      <div class="row">
+        <button class="btn primary" type="button" id="btn-new">Restaurar otra pieza</button>
+        <button class="btn" type="button" data-go="ajuste">Volver al ajuste</button>
+      </div>
+    </div>
+  </div>
+  <div class="actions" id="ex-actions">
+    <button class="btn ghost" type="button" data-go="ajuste">Atrás</button>
+    <div class="right"><button class="btn primary" type="button" id="btn-gen">Generar archivo</button></div>
+  </div>
+</section>
+
+<section class="proto" aria-labelledby="h-proto">
+  <h2 id="h-proto">Controles del prototipo</h2>
+  <p class="muted">Simulan estados para la presentación. No forman parte de la interfaz.</p>
+  <div class="sc-groups" id="scenarios">
+    <div class="sc-group"><h3>Flujo</h3><div class="row">
+      <button type="button" id="sc-normal" data-sc="normal" aria-pressed="true">Flujo normal</button></div></div>
+    <div class="sc-group"><h3>Estado: entrada</h3><div class="row">
+      <button type="button" id="sc-invalid" data-sc="invalid" aria-pressed="false">Archivo inválido</button>
+      <button type="button" id="sc-blur" data-sc="blur" aria-pressed="false">Foto borrosa</button></div></div>
+    <div class="sc-group"><h3>Estado: ejecución</h3><div class="row">
+      <button type="button" id="sc-slow" data-sc="slow" aria-pressed="false">Análisis lento</button></div></div>
+    <div class="sc-group"><h3>Estado: resultado</h3><div class="row">
+      <button type="button" id="sc-nocorner" data-sc="nocorner" aria-pressed="false">Sin borde detectado</button>
+      <button type="button" id="sc-crossed" data-sc="crossed" aria-pressed="false">Esquinas cruzadas</button></div></div>
+    <div class="sc-group"><h3>Estado: excepción</h3><div class="row">
+      <button type="button" id="sc-low" data-sc="low" aria-pressed="false">Confianza baja</button>
+      <button type="button" id="sc-exporterr" data-sc="exporterr" aria-pressed="false">Error al exportar</button></div></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function () {
+  document.documentElement.lang = 'es';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // renglones de "escritura a mano" en la página
+  const g = document.getElementById('renglones');
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for (let y = 34; y < 236; y += 15) {
+    const x0 = 18 + rnd() * 6, len = y > 210 ? 90 : 150 + rnd() * 20;
+    let d = 'M' + x0.toFixed(1) + ' ' + y;
+    for (let x = x0; x < x0 + len; x += 8) d += ' q4 ' + (-3 - rnd() * 3).toFixed(1) + ' 8 0';
+    const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); g.appendChild(p);
+  }
+
+  // foto original: la página en ángulo, con sombra y reflejo
+  const M = [0.95, 0.07, -0.10, 0.97, 68, 52];
+  const tp = (x, y) => [M[0] * x + M[2] * y + M[4], M[1] * x + M[3] * y + M[5]];
+  $$('.pieza').forEach((el) => {
+    el.innerHTML = '<g transform="matrix(' + M.join(' ') + ')"><use href="#pagina" width="200" height="260"/><rect width="200" height="260" fill="url(#sombra)"/></g>' +
+      '<ellipse cx="205" cy="120" rx="38" ry="22" fill="url(#reflejo)"/>';
+  });
+  const DETECT = [tp(0, 0), tp(200, 0), tp(200, 260), tp(0, 260)].map((p) => [Math.round(p[0]), Math.round(p[1])]);
+  const BORDERS = [[22, 22], [278, 22], [278, 378], [22, 378]];
+
+  const ORDER = ['carga', 'tipo', 'esquinas', 'ajuste', 'export'];
+  const S = { screen: 'inicio', sc: 'normal', loaded: false, rot: 0, clase: null, corners: DETECT.map((p) => p.slice()), moved: false, visited: new Set(), timer: null, timer2: null, blurFixed: false, exTried: false };
+
+  const PRESETS = {
+    manuscrito: { nombre: 'Manuscrito', ilum: 70, clahe: 2.0, filt: 3, nit: 1.2, bin: false, met: 'sauvola',
+      filas: [['Iluminación', 'Uniformar al 70 %'], ['CLAHE', 'Límite 2,0 · bloques de 8 × 8'], ['Nitidez', 'Media (1,2)'], ['Binarización', 'Sauvola sugerida, apagada al inicio'], ['Color', 'Escala de grises opcional']] },
+    impreso: { nombre: 'Impreso', ilum: 60, clahe: 1.8, filt: 2, nit: 1.6, bin: true, met: 'sauvola',
+      filas: [['Iluminación', 'Uniformar al 60 %'], ['CLAHE', 'Límite 1,8 · bloques de 8 × 8'], ['Nitidez', 'Alta (1,6)'], ['Binarización', 'Sauvola, activada'], ['Color', 'Escala de grises']] },
+    pintura: { nombre: 'Pintura', ilum: 40, clahe: 1.4, filt: 2, nit: 0.8, bin: false, met: 'sauvola',
+      filas: [['Iluminación', 'Uniformar al 40 %'], ['CLAHE', 'Límite 1,4, solo en luminancia'], ['Nitidez', 'Suave (0,8)'], ['Binarización', 'No disponible'], ['Color', 'Se conserva el color']] },
+  };
+  const PROBS = { normal: [['Manuscrito', 72], ['Impreso', 21], ['Pintura', 7]], low: [['Manuscrito', 48], ['Impreso', 41], ['Pintura', 11]] };
+
+  function go(name) {
+    clearTimeout(S.timer); clearTimeout(S.timer2);
+    S.screen = name;
+    $$('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
+    if (ORDER.includes(name)) S.visited.add(name);
+    const cur = name === 'proc' ? 'carga' : name;
+    ORDER.forEach((k, i) => {
+      const b = $('#st-' + k);
+      b.disabled = !S.visited.has(k);
+      b.classList.toggle('done', S.visited.has(k) && ORDER.indexOf(cur) > i);
+      if (k === cur) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    if (name === 'tipo') renderTipo();
+    if (name === 'esquinas') renderEsq();
+    if (name === 'ajuste') enterAjuste();
+    if (name === 'export') renderExport();
+    if (name === 'proc') runProc();
+    window.scrollTo(0, 0);
+  }
+  $$('[data-go]').forEach((b) => b.addEventListener('click', () => go(b.dataset.go)));
+  $('#btn-home').addEventListener('click', () => go('inicio'));
+  $('#btn-start').addEventListener('click', () => { resetAll(); go('carga'); });
+
+  // 1 CARGA
+  function setLoaded(on, error) {
+    S.loaded = on;
+    $('#drop').hidden = on; $('#preview').hidden = !on;
+    $('#file-info').hidden = !on; $('#file-empty').hidden = on;
+    $('#rot-l').disabled = $('#rot-r').disabled = !on;
+    $('#btn-analyze').disabled = !on; $('#btn-change').hidden = !on;
+    $('#carga-error').hidden = !error;
+    const blur = on && S.sc === 'blur' && !S.blurFixed;
+    $('#carga-blur').hidden = !blur; $('#foto-carga').classList.toggle('blurred', blur);
+  }
+  $('#btn-blur-retake').addEventListener('click', () => { S.blurFixed = true; setLoaded(false, false); });
+  ['#btn-file', '#btn-cam', '#btn-sample'].forEach((id) => $(id).addEventListener('click', () => {
+    if (S.sc === 'invalid') { setLoaded(false, true); return; }
+    setLoaded(true, false);
+  }));
+  $('#btn-change').addEventListener('click', () => setLoaded(false, false));
+  const drop = $('#drop');
+  drop.addEventListener('dragover', (e) => e.preventDefault());
+  drop.addEventListener('drop', (e) => { e.preventDefault(); $('#btn-sample').click(); });
+  function rotate(d) { S.rot = (S.rot + d + 360) % 360; const odd = S.rot % 180 !== 0; $('#foto-carga').style.transform = 'rotate(' + S.rot + 'deg) scale(' + (odd ? 0.75 : 1) + ')'; }
+  $('#rot-l').addEventListener('click', () => rotate(-90));
+  $('#rot-r').addEventListener('click', () => rotate(90));
+  $('#btn-analyze').addEventListener('click', () => go('proc'));
+
+  // PROCESANDO
+  function runProc() {
+    const items = $$('#stages li'); items.forEach((li) => li.className = '');
+    const slow = S.sc === 'slow';
+    $('#proc-slow').hidden = true;
+    if (slow) S.timer2 = setTimeout(() => { $('#proc-slow').hidden = false; }, 2200);
+    let i = 0;
+    const tick = () => {
+      items.forEach((li, k) => { li.className = k < i ? 'ok' : k === i ? 'run' : ''; });
+      if (i < items.length) { i++; S.timer = setTimeout(tick, slow && i === 2 ? 5200 : 700); }
+      else S.timer = setTimeout(() => go('tipo'), 450);
+    };
+    tick();
+  }
+
+  $('#btn-cancel').addEventListener('click', () => go('carga'));
+
+  // 2 TIPO
+  function renderTipo() {
+    const low = S.sc === 'low';
+    const probs = PROBS[low ? 'low' : 'normal'];
+    $('#tipo-low').hidden = !low;
+    $('#sug-title').innerHTML = low ? 'Resultado incierto: elige la clase' : 'La red sugiere: <span style="color:var(--accent)">' + probs[0][0] + '</span>';
+    $('#probs').innerHTML = probs.map((p, i) => '<div class="prob' + (i === 0 && !low ? ' top' : '') + '"><span>' + p[0] + '</span><div class="bar" role="img" aria-label="' + p[0] + ' ' + p[1] + ' por ciento"><i style="width:' + p[1] + '%"></i></div><span class="v mono">' + p[1] + ' %</span></div>').join('');
+    if (S.clase === null && !low) S.clase = 'manuscrito';
+    $$('input[name="clase"]').forEach((r) => { r.checked = r.value === S.clase; });
+    renderPreset();
+  }
+  function renderPreset() {
+    const box = $('#preset');
+    if (!S.clase) { box.innerHTML = '<p class="muted">Elige un tipo de pieza para ver su tratamiento inicial.</p>'; $('#btn-tipo-ok').disabled = true; return; }
+    const p = PRESETS[S.clase];
+    box.innerHTML = '<b>' + p.nombre + '</b><dl>' + p.filas.map((f) => '<dt>' + f[0] + '</dt><dd>' + f[1] + '</dd>').join('') + '</dl><p class="example">Valores iniciales de ejemplo</p>';
+    $('#btn-tipo-ok').disabled = false;
+  }
+  $$('input[name="clase"]').forEach((r) => r.addEventListener('change', () => { S.clase = r.value; renderPreset(); }));
+  $('#btn-tipo-ok').addEventListener('click', () => { loadPreset(); go('esquinas'); });
+
+  // 3 ESQUINAS
+  const NAMES = ['Sup. izq.', 'Sup. der.', 'Inf. der.', 'Inf. izq.'];
+  const svgE = $('#foto-esq'), hG = $('#handles');
+  function drawQuad() {
+    $('#quad').setAttribute('points', S.corners.map((p) => p.join(',')).join(' '));
+    hG.querySelectorAll('circle').forEach((c, i) => { c.setAttribute('cx', S.corners[i][0]); c.setAttribute('cy', S.corners[i][1]); });
+    const valid = convex(S.corners);
+    $('#quad').classList.toggle('bad', !valid);
+    $('#esq-bad').hidden = valid; $('#btn-esq-ok').disabled = !valid;
+    $('#front').classList.toggle('na', !valid); $('#front-na').hidden = valid;
+    const k = 3024 / 300;
+    $('#coords').innerHTML = S.corners.map((p, i) => '<div><span>' + NAMES[i] + '</span> (' + Math.round(p[0] * k) + ', ' + Math.round(p[1] * k) + ')</div>').join('');
+  }
+  NAMES.forEach((n, i) => {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('r', '9'); c.setAttribute('tabindex', '0'); c.setAttribute('role', 'button');
+    c.setAttribute('aria-label', 'Esquina ' + n + '. Usa las flechas para moverla');
+    hG.appendChild(c);
+    let drag = false;
+    c.addEventListener('pointerdown', (e) => { drag = true; c.setPointerCapture(e.pointerId); });
+    c.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(svgE.getScreenCTM().inverse());
+      S.corners[i] = [Math.max(4, Math.min(296, Math.round(pt.x))), Math.max(4, Math.min(396, Math.round(pt.y)))];
+      drawQuad();
+    });
+    const end = () => { if (drag) { drag = false; S.moved = true; recalc(); } };
+    c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end);
+    c.addEventListener('keydown', (e) => {
+      const d = { ArrowLeft: [-2, 0], ArrowRight: [2, 0], ArrowUp: [0, -2], ArrowDown: [0, 2] }[e.key];
+      if (!d) return; e.preventDefault();
+      S.corners[i] = [S.corners[i][0] + d[0], S.corners[i][1] + d[1]]; S.moved = true; drawQuad(); recalc();
+    });
+  });
+  function convex(c) {
+    let sign = 0;
+    for (let i = 0; i < 4; i++) {
+      const a = c[i], b = c[(i + 1) % 4], d = c[(i + 2) % 4];
+      const cr = (b[0] - a[0]) * (d[1] - b[1]) - (b[1] - a[1]) * (d[0] - b[0]);
+      if (cr === 0) return false;
+      if (sign === 0) sign = Math.sign(cr); else if (Math.sign(cr) !== sign) return false;
+    }
+    return true;
+  }
+  function recalc() { const r = $('#recalc'); r.hidden = false; clearTimeout(recalc.t); recalc.t = setTimeout(() => { r.hidden = true; }, 600); }
+  function renderEsq() {
+    const none = S.sc === 'nocorner';
+    $('#esq-none').hidden = !none;
+    if (none && !S.moved) S.corners = BORDERS.map((p) => p.slice());
+    if (S.sc === 'crossed' && !S.moved) S.corners = [DETECT[0], DETECT[2], DETECT[1], DETECT[3]].map((p) => p.slice());
+    drawQuad();
+  }
+  $('#btn-reset-esq').addEventListener('click', () => { S.corners = (S.sc === 'nocorner' ? BORDERS : DETECT).map((p) => p.slice()); S.moved = false; drawQuad(); recalc(); });
+  $('#btn-esq-ok').addEventListener('click', () => go('ajuste'));
+
+  // 4 AJUSTE
+  const ctl = { ilum: $('#s-ilum'), clahe: $('#s-clahe'), filt: $('#s-filt'), nit: $('#s-nit') };
+  let P = {}, hist = [];
+  function loadPreset() {
+    const p = PRESETS[S.clase || 'manuscrito'];
+    P = { ilum: p.ilum, clahe: p.clahe, filt: p.filt, nit: p.nit, bin: p.bin, met: p.met };
+    hist = [];
+  }
+  function enterAjuste() {
+    if (!P.ilum && P.ilum !== 0) loadPreset();
+    const nombre = PRESETS[S.clase || 'manuscrito'].nombre;
+    $('#aj-clase').textContent = nombre; $('#aj-chip').textContent = 'Tratamiento: ' + nombre;
+    syncControls();
+  }
+  function syncControls() {
+    Object.keys(ctl).forEach((k) => { ctl[k].value = P[k]; });
+    const pint = S.clase === 'pintura';
+    $('#s-bin').checked = P.bin && !pint; $('#s-bin').disabled = pint;
+    $('#m-otsu').disabled = $('#m-sauvola').disabled = !P.bin || pint;
+    $('#m-otsu').setAttribute('aria-pressed', P.met === 'otsu'); $('#m-sauvola').setAttribute('aria-pressed', P.met === 'sauvola');
+    $('#btn-undo').disabled = hist.length === 0;
+    paint();
+  }
+  function paint() {
+    const fmt = (v, d) => Number(v).toFixed(d).replace('.', ',');
+    $('#v-ilum').textContent = P.ilum + ' %'; $('#v-clahe').textContent = fmt(P.clahe, 1); $('#v-filt').textContent = P.filt; $('#v-nit').textContent = fmt(P.nit, 1);
+    const bin = P.bin && S.clase !== 'pintura';
+    let f = 'contrast(' + (1 + (P.clahe - 1) * 0.18 + P.nit * 0.05).toFixed(2) + ') brightness(' + (1 + P.ilum * 0.0012).toFixed(3) + ') blur(' + (P.filt * 0.06).toFixed(2) + 'px)';
+    if (bin) f = 'grayscale(1) contrast(5) brightness(1.15)';
+    $('#after').style.filter = f;
+    const shade = bin && P.met === 'otsu' ? 1 : Math.max(0, 1 - P.ilum / 100);
+    $('#after-shade').style.opacity = shade.toFixed(2);
+    $('#bin-note').hidden = !bin;
+    const nit = Math.round(96 + P.nit * 95 + (P.clahe - 1) * 22 - P.filt * 9 + (bin ? 140 : 0));
+    const con = (0.17 + (P.clahe - 1) * 0.035 + P.ilum * 0.0005 + (bin ? 0.2 : 0));
+    $('#m-nitidez').innerHTML = nit + '<em>antes 96</em>';
+    $('#m-contraste').innerHTML = fmt(con, 2) + '<em>antes 0,17</em>';
+  }
+  function push() { hist.push(JSON.stringify(P)); if (hist.length > 30) hist.shift(); $('#btn-undo').disabled = false; }
+  Object.keys(ctl).forEach((k) => {
+    ctl[k].addEventListener('pointerdown', push); ctl[k].addEventListener('keydown', (e) => { if (e.key.startsWith('Arrow')) push(); });
+    ctl[k].addEventListener('input', () => { P[k] = Number(ctl[k].value); paint(); });
+  });
+  $('#s-bin').addEventListener('change', () => { push(); P.bin = $('#s-bin').checked; syncControls(); });
+  $('#m-otsu').addEventListener('click', () => { push(); P.met = 'otsu'; syncControls(); });
+  $('#m-sauvola').addEventListener('click', () => { push(); P.met = 'sauvola'; syncControls(); });
+  $('#btn-undo').addEventListener('click', () => { if (hist.length) { P = JSON.parse(hist.pop()); syncControls(); } });
+  $('#btn-reset-aj').addEventListener('click', () => { push(); const h = hist; loadPreset(); hist = h; syncControls(); });
+  $('#cmp').addEventListener('input', (e) => { const v = e.target.value; $('#after').style.clipPath = 'inset(0 0 0 ' + v + '%)'; $('#divider').style.left = v + '%'; });
+  $('#btn-retake').addEventListener('click', () => { const sc = S.sc; resetAll(); S.sc = sc; go('carga'); });
+
+  // 5 EXPORTACIÓN
+  function renderExport() {
+    $('#ex-form').hidden = false; $('#ex-actions').hidden = false; $('#ex-done').hidden = true; $('#ex-error').hidden = true; S.exTried = false;
+    $('#btn-gen').disabled = false; $('#btn-gen').textContent = 'Generar archivo';
+    const p = PRESETS[S.clase || 'manuscrito'];
+    const bin = P.bin && S.clase !== 'pintura';
+    const rows = [
+      ['Pieza', '<span class="mono">carta_1890.jpg</span>'],
+      ['Tipo confirmado', p.nombre + (S.sc === 'low' ? ' (elegido por la usuaria)' : ' (sugerido por la red)')],
+      ['Esquinas', S.moved ? 'Ajustadas a mano' : 'Detectadas automáticamente'],
+      ['Mejora', 'Iluminación ' + P.ilum + ' % · CLAHE ' + Number(P.clahe).toFixed(1).replace('.', ',') + ' · nitidez ' + Number(P.nit).toFixed(1).replace('.', ',') + (bin ? ' · binarización ' + (P.met === 'otsu' ? 'Otsu' : 'Sauvola') : '')],
+      ['Métricas', 'Nitidez y contraste; SSIM y PSNR no disponibles'],
+    ];
+    $('#summary').innerHTML = rows.map((r) => '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>').join('');
+  }
+  function generate() {
+    const btn = $('#btn-gen'); btn.disabled = true; btn.textContent = 'Generando…'; $('#ex-error').hidden = true;
+    S.timer = setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Generar archivo';
+      if (S.sc === 'exporterr' && !S.exTried && $('#f-pdf').checked) { S.exTried = true; $('#ex-error').hidden = false; return; }
+      finishExport();
+    }, 800);
+  }
+  $('#btn-gen').addEventListener('click', generate);
+  $('#btn-ex-retry').addEventListener('click', generate);
+  $('#btn-ex-png').addEventListener('click', () => { $('#f-png').checked = true; generate(); });
+  function finishExport() {
+    const fmt = $('#f-pdf').checked ? 'pdf' : 'png';
+    const name = ($('#f-name').value.trim() || 'pieza_restaurada') + '.' + fmt;
+    $('#done-name').textContent = name + ($('#f-rep').checked ? (fmt === 'pdf' ? ' · reporte incluido' : ' + reporte_calidad.pdf') : '');
+    $('#ex-form').hidden = true; $('#ex-actions').hidden = true; $('#ex-done').hidden = false;
+    $('#st-export').classList.add('done');
+  }
+  $('#btn-new').addEventListener('click', () => { const sc = S.sc; resetAll(); S.sc = sc; go('carga'); });
+
+  // escenarios del prototipo
+  function resetAll() {
+    S.loaded = false; S.rot = 0; S.clase = null; S.moved = false; S.visited = new Set(); S.blurFixed = false; S.exTried = false;
+    S.corners = DETECT.map((p) => p.slice()); P = {}; hist = [];
+    $('#foto-carga').style.transform = ''; setLoaded(false, false);
+  }
+  $$('#scenarios button').forEach((b) => b.addEventListener('click', () => {
+    S.sc = b.dataset.sc;
+    $$('#scenarios button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    resetAll();
+    if (S.sc === 'normal') { go('inicio'); return; }
+    if (S.sc === 'invalid') { go('carga'); setLoaded(false, true); return; }
+    S.visited = new Set(['carga']); setLoaded(true, false);
+    if (S.sc === 'blur') { go('carga'); return; }
+    if (S.sc === 'slow') { go('proc'); return; }
+    if (S.sc === 'low') { go('tipo'); return; }
+    S.visited.add('tipo'); S.clase = 'manuscrito'; loadPreset();
+    if (S.sc === 'exporterr') { S.visited.add('esquinas'); S.visited.add('ajuste'); go('export'); return; }
+    go('esquinas');
+  }));
+
+  go('inicio');
+})();
+</script>
+
+</body>
+</html>

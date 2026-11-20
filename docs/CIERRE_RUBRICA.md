@@ -13,7 +13,7 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 | Metodología | README §3 |
 | Implementación explicada | README §4; código, scripts y notebook |
 | Datos descritos, visualizados y accesibles | README §5: Drive, ZIP, manifiesto y figuras |
-| GUI, prototipo, instrucciones y evidencias | README §6; `docs/img/`; flujo de cinco pasos |
+| GUI, prototipo, instrucciones y evidencias | README §6; prototipo navegable en `docs/prototipo/` (con estados de excepción); capturas de la app en `docs/img/`; flujo de cinco pasos |
 | Resultados | README §7 y fuentes numéricas en `results/` |
 | Conclusiones, límites y oportunidades | README §8 |
 | Instalación y ejecución reproducibles | README §9, pesos con hashes, lanzadores y dependencias |

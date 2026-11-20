@@ -40,7 +40,7 @@ Esta matriz delimita lo implementado. Ningún conjunto finito de pruebas demuest
 
 ## Qué se ejecutó
 
-`python scripts/check.py`: 83 tests, incluyendo contratos parametrizados, homografía, EXIF, sesión, concurrencia y recuperación. Los tests API unitarios usan stubs: no miden calidad de red.
+`python scripts/check.py`: 87 tests (incluye `tests/test_public_demo.py`), incluyendo contratos parametrizados, homografía, EXIF, sesión, concurrencia y recuperación. Los tests API unitarios usan stubs: no miden calidad de red.
 
 `python scripts/verify_real_pipeline.py --root RUTA`: nueve imágenes, una por bloque de prueba y tres por clase, con ambos checkpoints reales; comprueba salida PNG/PDF/JSON/ZIP y original. No sustituye revisión de trazos. `results/integration/real_pipeline.json` contiene cada caso.
 

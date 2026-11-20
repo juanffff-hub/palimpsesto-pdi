@@ -225,7 +225,23 @@ Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artifi
 
 ## 6. Interfaz gráfica de usuario
 
-**Prototipo.** El flujo de cinco pasos de la Tabla 2 de la propuesta se diseñó primero como prototipo navegable (Momento 3, con estados alternativos y excepciones) y luego se implementó en la aplicación real.
+### Prototipo
+
+Antes de programar la aplicación, el flujo de cinco pasos de la Tabla 2 de la propuesta se diseñó como un **prototipo navegable** (Momento 3). Representa las pantallas, la conexión entre ellas y los estados alternativos, con datos de ejemplo y sin ejecutar ninguna función real. Se abre con doble clic en cualquier navegador: [`docs/prototipo/palimpsesto_prototipo.html`](docs/prototipo/palimpsesto_prototipo.html).
+
+| Inicio | Tipo de pieza | Esquinas | Ajuste |
+|---|---|---|---|
+| ![](docs/prototipo/proto_01_inicio.png) | ![](docs/prototipo/proto_02_tipo.png) | ![](docs/prototipo/proto_03_esquinas.png) | ![](docs/prototipo/proto_04_ajuste.png) |
+
+En la parte inferior del prototipo hay unos **controles de estados** que simulan las excepciones del flujo, cada una con el componente que la produce: archivo inválido y foto borrosa (entrada), análisis lento (ejecución), borde no detectado y esquinas cruzadas (resultado), y confianza baja y error al exportar (excepción).
+
+| Esquinas cruzadas (M4) | Confianza baja de la CNN |
+|---|---|
+| ![](docs/prototipo/proto_05_excepcion_esquinas.png) | ![](docs/prototipo/proto_06_excepcion_confianza.png) |
+
+**Del prototipo a la aplicación.** La aplicación real conserva el mismo flujo y las mismas excepciones; cambian la identidad visual (verde y papel, con el logo del proyecto) y algunos detalles que surgieron al implementar: la confirmación explícita de que la foto es una pieza admitida, el control de alcance, la U-Net para proponer el borde y la exportación en ZIP con el original intacto.
+
+### Aplicación implementada
 
 | Paso | Qué hace el usuario | Qué responde el sistema |
 |---|---|---|
@@ -320,7 +336,7 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación | 83/83 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación y acceso remoto | 87/87 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
 | `npm run test:ui`: navegador en 320–1440 px, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 22/22 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |

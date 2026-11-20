@@ -8,7 +8,7 @@ Repositorio único: https://github.com/juanffff-hub/palimpsesto-pdi
 
 ## Evidencia existente
 
-- 83 comprobaciones Python, nueve recorridos con modelos reales y 22 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
+- 87 comprobaciones Python, nueve recorridos con modelos reales y 22 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
 - Diagnóstico secundario: 70/72 clasificaciones correctas; es un conjunto reutilizado, no un test ciego.
 - CV macro-F1 0,9581 en vistas derechas y 0,9548 en vistas giradas, con grupos provisionales.
 - U-Net: IoU de cuadrilátero 0,968 en las 12 fotos de prueba histórica.
