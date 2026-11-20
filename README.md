@@ -58,7 +58,7 @@ Palimpsesto actúa como un **restaurador digital asistido** en cinco pasos:
 1. **Cargar** la foto (JPG/PNG). Se valida el archivo, se corrige la orientación EXIF y se comprueba si el contenido parece una pieza admitida. Un **semáforo de la captura** revisa nitidez, luz, reflejos, encuadre y tamaño de la pieza y dice si conviene repetir la foto.
 2. **Identificar**: una CNN sugiere el tipo de pieza y el usuario lo confirma o lo cambia.
 3. **Encuadrar**: una U-Net, entrenada con impresos, manuscritos y pinturas, propone las cuatro esquinas e indica si el borde es **seguro o dudoso**; el usuario puede ver la máscara que predijo la red, y revisa, arrastra o marca a mano las esquinas.
-4. **Mejorar**: homografía a vista frontal y mejora clásica ajustable (iluminación, CLAHE, suavizado, nitidez, binarización solo en documentos), con comparación antes/después y detalle a resolución real.
+4. **Mejorar**: homografía a vista frontal y mejora clásica ajustable (iluminación, CLAHE, suavizado, nitidez, binarización solo en documentos), con comparación antes/después y detalle a resolución real. Un **histograma de luminancia** muestra el efecto del ajuste y avisa si quema u oscurece detalle, señalando dónde.
 5. **Guardar**: PNG, PDF, registro JSON de todas las decisiones y un ZIP que incluye el **original byte a byte**.
 
 > **La CNN no restaura la imagen: decide cómo debe restaurarse.** La geometría y la calidad se corrigen con técnicas clásicas de PDI vistas en el curso, y la persona supervisa cada etapa.
@@ -85,7 +85,7 @@ flowchart TB
     M3 --> M4[M4 · Rectificación<br/>homografía + warpPerspective sobre el RGB original]
     M4 --> M5[M5 · Mejora clásica<br/>iluminación, CLAHE en luminancia, suavizado,<br/>máscara de enfoque, Otsu / Sauvola]
     P --> M5
-    M5 --> M6[M6 · Evaluación<br/>nitidez Laplaciano, contraste RMS<br/>SSIM/PSNR solo con referencia]
+    M5 --> M6[M6 · Evaluación<br/>nitidez Laplaciano, contraste RMS,<br/>histograma y tonos recortados<br/>SSIM/PSNR solo con referencia]
     M6 --> X[Exportación<br/>PNG · PDF · JSON · ZIP con original]
   end
   U1 -- JPG/PNG --> V
@@ -119,7 +119,7 @@ flowchart TB
 | M3 Borde | RGB 256×256 → máscara → 4 puntos + confianza (segura / dudosa) | U-Net de 3 clases (encoder ResNet18); encaje de los 4 puntos con la máscara y ancho de la franja incierta; contornos; manual | `models.py`, `imaging.py` |
 | M4 Rectificación | RGB + 4 puntos → vista frontal | homografía (`getPerspectiveTransform`, `warpPerspective`) | `imaging.py` |
 | M5 Mejora | vista frontal + parámetros → resultado | en el canal L de Lab: filtro bilateral, división por fondo gaussiano, CLAHE, máscara de enfoque; Otsu/Sauvola en documentos | `imaging.py` |
-| M6 Evaluación | antes/después → métricas | varianza del Laplaciano, contraste RMS; SSIM/PSNR con referencia | `imaging.py` |
+| M6 Evaluación | antes/después → métricas | varianza del Laplaciano, contraste RMS; histograma de luminancia (64 niveles) y píxeles que el ajuste llevó a negro o blanco puros; SSIM/PSNR con referencia | `imaging.py` |
 | Exportación | resultado + registro → archivos | PNG, PDF (ReportLab), JSON, ZIP con original | `palimpsesto/exporting.py` |
 | Interfaz | — | HTML/CSS/JS sin compilación, canvas de esquinas, avisos | `templates/`, `static/` |
 
@@ -148,6 +148,7 @@ flowchart TB
 - **Frecuencia:** filtro *high-boost* con FFT, evaluado en `notebooks/Palimpsesto_experimentos.ipynb` y `results/quality/`, pero no desplegado porque no superó a los filtros espaciales.
 - **Confianza del borde:** IoU entre el cuadrilátero y la máscara de la propia U-Net, y ancho medio de la franja de probabilidad incierta (0,1 < p < 0,9) del contorno; la máscara se muestra superpuesta para que la persona vea en qué se basó la red.
 - **Calidad de la captura:** nitidez como varianza de la segunda derivada en *x* y en *y* por bloques de la pieza (el temblor borra una sola dirección), exposición por histograma de luminancia (percentil 95), reflejos como componentes conexas saturadas y compactas, y encuadre a partir de la máscara de la U-Net.
+- **Histograma:** histograma de luminancia antes y después del ajuste, y recorte de tonos medido píxel a píxel (lo que el ajuste llevó a ≤ 2 o ≥ 253 y antes no lo estaba); se muestra dónde ocurre.
 - **Métricas:** SSIM (Wang et al., 2004) y PSNR solo cuando hay referencia alineada; nitidez (varianza del Laplaciano) y contraste RMS como descriptores, no como notas de fidelidad.
 
 ### Modelos
@@ -206,6 +207,7 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 | Avisar a tiempo | Al cargar la foto, un semáforo (verde, amarillo o rojo) explica qué falla y ofrece cargar otra; se recalcula si cambias el tipo de pieza y queda en el registro JSON. |
 | Esquinas revisables | Canvas con arrastre, selección de punto y flechas del teclado; la geometría inválida (cruzada, repetida, fuera de la foto) se rechaza. |
 | Ajustes reversibles | Deshacer, mejoras en cero y comparación antes/después con la misma geometría. |
+| Ver el efecto en los tonos | Histograma antes/después en el paso 4. Si el ajuste quema u oscurece más del 1 % de la imagen, avisa y puede pintar en magenta (blancos) o cian (negros) los píxeles recortados sobre el «después». |
 | Avisos y recuperación | `feedback.js`: avisos dentro de la ventana con icono, título y acción (Reintentar, Ir al campo, Cargar otra foto). |
 
 ---
@@ -266,6 +268,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 | ![](docs/img/gui_03_encuadrar.png) **3 · Encuadrar** | Arrastra las 4 esquinas, vuelve a detectar, marca a mano o gira 90° | Cuadrilátero sobre la foto y método usado (U-Net, contornos, manual) |
 | ![](docs/img/gui_03b_mascara.png) **3 · Borde dudoso** | Mira la máscara de la red y lleva los puntos a las esquinas reales | Etiqueta «borde dudoso» con el motivo, máscara superpuesta y acceso al borde manual |
 | ![](docs/img/gui_04_mejorar.png) **4 · Mejorar** | Mueve deslizadores, deshace, pone en cero o amplía el detalle | Vista previa, comparación antes/después y métricas |
+| ![](docs/img/gui_04b_tonos.png) **4 · Tonos recortados** | Lee el histograma y, si hay recorte, mira dónde y baja el control que lo causa | Histograma antes/después, porcentaje recortado y zonas en magenta |
 | ![](docs/img/gui_05_guardar.png) **5 · Guardar** | Descarga ZIP, PNG, PDF o JSON | Resumen de las decisiones; el original va intacto |
 | ![](docs/img/gui_06_aviso_error.png) **Avisos** | Corrige o reintenta desde el propio aviso | Error, advertencia, información o éxito, siempre visibles |
 
@@ -276,7 +279,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 1. Abre la aplicación (ver [instalación](#9-instalación-y-ejecución)) y pulsa **Seleccionar JPG o PNG**, arrastra una foto o usa el **ejemplo sintético**.
 2. Mira el **semáforo de la captura**: en verde, sigue; en amarillo, revisa el punto señalado; en rojo, repite la foto ahora con **Repetir la foto**. Luego revisa la categoría sugerida, marca la casilla de confirmación y pulsa **Confirmar y revisar borde**.
 3. Lee la etiqueta del borde: si dice **borde dudoso**, mira la máscara de la red (en naranja, donde duda). Puedes verla siempre con **Ver lo que vio la red**. Comprueba que los cuatro puntos caen en las esquinas de la pieza. Si no, arrástralos o pulsa **Volver a detectar** o **Marcar manualmente**. Si conoces las medidas, escribe la proporción ancho/alto; si no, deja 0.
-4. Ajusta las mejoras mirando la comparación. Usa **Ver detalle** para revisar trazos finos. Si algo empeora, **Deshacer** o **Sin mejoras**.
+4. Ajusta las mejoras mirando la comparación y el histograma: si aparece **Tonos recortados**, pulsa **Ver tonos recortados** y reduce el control que lo causa. Usa **Ver detalle** para revisar trazos finos. Si algo empeora, **Deshacer** o **Sin mejoras**.
 5. Pulsa **Revisado, continuar** y descarga el ZIP completo o el formato que necesites.
 
 **Comportamientos clave:** la interfaz funciona en escritorio y celular (de 320 a 1440 px); los errores permanecen hasta resolverse y ofrecen la acción que los corrige; descartar una foto con trabajo hecho pide confirmación; respeta la preferencia de *movimiento reducido* y se puede usar con teclado.
@@ -402,6 +405,27 @@ En prueba, los bordes «seguros» tienen IoU media de 0,970 y los «dudosos», d
 
 No existe un ajuste universal: cada defecto pide una técnica distinta, y por eso la mejora es ajustable y reversible. En fotos reales no hay referencia limpia, así que **la interfaz no inventa SSIM ni PSNR**: los muestra como no disponibles y usa nitidez y contraste solo como descriptores.
 
+### Histograma y tonos recortados
+
+**Qué resuelve.** Las métricas de nitidez y contraste suben con cualquier ajuste, así que no dicen si el ajuste destruyó información. El histograma de luminancia (clase S5 del curso) muestra cómo se redistribuyen los tonos. Además, la app cuenta **píxel a píxel cuántos llevó el ajuste a negro (≤ 2) o blanco (≥ 253) puros, que antes no lo eran**: ese detalle ya no se recupera. Si pasa del 1 % de la imagen, lo avisa y puede marcar dónde en el «después». En la versión en blanco y negro (Otsu/Sauvola) el recorte es intencional y no se cuenta.
+
+**Cómo se comprobó** (`scripts/evaluate_tones.py`, `results/tones/`). Se tomaron 240 fotos reales (80 por clase), se rectificaron con el borde de la U-Net y se aplicaron seis ajustes con la función de la aplicación:
+
+![Fotos en las que el ajuste recorta detalle](results/figures/tonos_recortados.png)
+
+| Ajuste (240 fotos) | Fotos con aviso | Recorte máximo |
+|---|---:|---:|
+| Preajuste de cada clase | **0** | 0,45 % |
+| Iluminación, contraste y nitidez al 50 % | 4 (todas manuscritos) | 2,7 % |
+| Iluminación al 100 % | 8 (todas manuscritos) | 5,4 % |
+| Contraste local (CLAHE) al 100 % | 0 | 0,03 % |
+| Nitidez al 100 % | 1 | 1,0 % |
+| Los tres al 100 % | 14 (todas manuscritos, 18 % de ellos) | 5,4 % |
+
+**Análisis.** Es una buena noticia para el diseño: con los preajustes ninguna foto pierde detalle por recorte, y CLAHE nunca recorta gracias a su límite de amplificación. El riesgo está en **uniformar la iluminación al máximo en manuscritos**. La división por el fondo estimado quema la hoja cerca de bordes oscuros o quemados. En el peor caso quedó quemada la última palabra escrita junto al borde, justo donde la marca magenta la señala. Ahí el aviso aporta: dice cuánto, dónde y qué control bajar.
+
+**Límites.** El aviso mide solo el recorte a negro o blanco puros. No detecta otras pérdidas, como compresión de tonos medios, halos o ruido amplificado. El umbral del 1 % es una convención, no una medida de legibilidad. Se calcula sobre la vista de 960 px.
+
 ### Semáforo de la captura
 
 **Qué resuelve.** El escenario de uso pide saber *antes de salir de la sala* si la foto sirve. Hasta ahora había tres avisos genéricos calculados sobre la foto entera, fondo incluido, con umbrales fijos. El semáforo mide **la pieza**: usa la máscara de la U-Net y revisa cinco puntos.
@@ -444,9 +468,9 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos, semáforo de la captura y confianza del borde | 102/102 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos, semáforo de la captura, confianza del borde, histograma y tonos recortados | 108/108 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
-| `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, confianza del borde y máscara, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 24/24 |
+| `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, confianza del borde y máscara, histograma, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 25/25 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
 
 Las pruebas automáticas verifican los contratos del software. La evaluación experimental del modelo se describe por separado, con sus protocolos y limitaciones.
@@ -462,6 +486,7 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 - Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
 - La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos). Al reentrenarla con 160 máscaras nuevas de manuscritos y pinturas, con una regla de adopción fijada de antemano, el borde propuesto en prueba subió de 0,811 a 0,937 de IoU media (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963) sin empeorar los impresos.
 - La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
+- El histograma del paso 4 muestra el efecto real de cada ajuste en los tonos. Con los preajustes ninguna de 240 fotos pierde detalle por recorte; cuando un ajuste extremo quema detalle (sobre todo iluminación alta en manuscritos), la app lo dice y marca dónde.
 - La etiqueta de confianza del borde avisa cuándo dudar de la U-Net: en las fotos de prueba marcó como dudosos los 21 bordes malos (6 de 6 con la U-Net desplegada), y ningún borde «seguro» resultó malo. La máscara superpuesta muestra en qué se basó la red.
 - El semáforo de la captura lleva a la práctica el escenario de uso: dice en el momento si conviene repetir la foto. Frente a los avisos anteriores, detecta defectos controlados en el 80–100 % de los casos (antes 2–23 %) y marcó en rojo las 23 fotos reales que lo merecían, de las que antes se detectaban 5.
 
@@ -514,6 +539,7 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 .\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_capture.py --root "C:\ruta\datos" --seg "C:\ruta\segmentacion_3clases"   # semáforo de la captura
 .\.venv\Scripts\python.exe scripts/evaluate_border_confidence.py --seg "C:\ruta\segmentacion_3clases" --root "C:\ruta\datos"   # confianza del borde
+.\.venv\Scripts\python.exe scripts/evaluate_tones.py --root "C:\ruta\datos"   # histograma y tonos recortados
 .\.venv\Scripts\python.exe scripts/benchmark_quality.py
 .\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 42 --save   # U-Net v0.4.0
 .\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 7          # semillas de control (también 2026)
