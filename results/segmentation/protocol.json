@@ -1,0 +1,23 @@
+{
+  "fixed_before_training": "2026-11-20, antes de entrenar ningún modelo de 3 clases",
+  "hypothesis": "Entrenar la misma U-Net del Parcial 3 con impresos, manuscritos y pinturas mejora el borde que propone Palimpsesto en manuscritos y pinturas sin empeorar los impresos.",
+  "data": "data/segmentation_manifest.csv: 240 fotos (80 por clase) con máscara. Partición por bloque de pieza: train 160, val 40, test 40. Los impresos conservan la partición del Parcial 3 (test D01, D09, D16).",
+  "model": "smp.Unet, encoder ResNet18 ImageNet, 1 canal, entrada 256x256. Misma receta del Parcial 3: volteo horizontal y giro de hasta 12 grados (p=0,5), pérdida Soft Dice, Adam 5e-4, ReduceLROnPlateau (0,5; paciencia 3), lote 8, 35 épocas, checkpoint con menor pérdida de validación. La prueba no interviene en ninguna elección.",
+  "seeds": [42, 7, 2026],
+  "deployed_seed": 42,
+  "compared_systems": {
+    "sistema_actual": "Comportamiento de la v0.3.0 en modo automático: U-Net de impresos en impresos y manuscritos; contornos clásicos en pinturas (la U-Net anterior no se usaba en pinturas).",
+    "unet_anterior": "U-Net del Parcial 3 (solo impresos) aplicada a todas las clases.",
+    "contornos": "Canny con varios umbrales + puntuación de bordes (classical_quad).",
+    "unet_3clases": "U-Net nueva aplicada a todas las clases."
+  },
+  "primary_metric": "IoU media del cuadrilátero propuesto (imaging.detect_quad, 960 px) frente a la máscara de referencia, por clase, en las 40 fotos de prueba. Si no se propone un borde válido, IoU = 0.",
+  "secondary_metrics": ["Dice e IoU de la máscara a 256x256", "fotos con borde propuesto", "fotos con IoU >= 0,90 y >= 0,95", "tiempo mediano"],
+  "adoption_rule": {
+    "macro": "media de las 3 clases de la U-Net nueva >= sistema actual + 0,03",
+    "per_class": "en cada clase, U-Net nueva >= sistema actual - 0,01",
+    "detections": "en cada clase, fotos con borde propuesto de la U-Net nueva >= sistema actual",
+    "seeds": "la regla macro también se cumple con la media de las 3 semillas"
+  },
+  "if_rejected": "Se conserva la U-Net anterior y el comportamiento v0.3.0, y el resultado se informa igual."
+}
