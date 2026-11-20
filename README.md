@@ -1,21 +1,361 @@
 # Palimpsesto
 
-**Una nueva mirada. La misma pieza.** Asistente local de PDI para mejorar fotografías de manuscritos, documentos impresos y pinturas planas. Proyecto académico de Neira, Gómez y Fajardo.
+**Una nueva mirada. La misma pieza.** Asistente local de procesamiento digital de imágenes que convierte la foto de celular de un manuscrito, un documento impreso o una pintura plana en una copia frontal y legible, sin perder el control humano sobre cada paso.
 
-Carga una foto → confirma la clase sugerida por una CNN → revisa cuatro esquinas → corrige perspectiva y mejora → compara y exporta PNG/PDF/JSON con el original intacto. La inferencia ocurre en CPU; no requiere API ni GPU. La aplicación pide supervisión porque una imagen plausible no garantiza fidelidad documental.
+Proyecto final de **Procesamiento Digital de Imágenes** · Universidad Autónoma de Occidente · Profesor Nicolás Llanos Neuta
+Equipo: **David Neira Conde · Juan Sebastián Gómez Muñoz · Juan Felipe Fajardo Valencia**
+Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (línea de patrimonio cultural, obras de arte y museos).
 
-## Estado comprobado
+![Interfaz de Palimpsesto](docs/img/gui_01_cargar.png)
 
-- Clasificador **real** ResNet18 congelada con cabeza entrenada sobre las fotografías del equipo. Pesos completos, preprocesamiento y manifiesto identificados por hash.
-- CNN propia del curso, cinco variantes y ANN de descriptores entrenadas y conservadas como comparación.
-- U-Net propia del tercer parcial cargada para sugerir bordes documentales. Contornos y cuatro puntos manuales como alternativas.
-- Homografía sobre RGB original, controles reversibles, comparación de igual geometría, exportación PNG/PDF/JSON/ZIP y conservación exacta de bytes del original.
-- Pruebas de funciones, API, modelos reales y navegador; evidencias en `results/` y protocolo en `docs/`.
-- **Validación científica provisional:** falta confirmar identidades físicas de los grupos y realizar prueba externa/usabilidad humana. No se inventaron resultados humanos.
+| Sección de la rúbrica | Dónde está |
+|---|---|
+| Descripción del proyecto | [1. Descripción](#1-descripción-del-proyecto) |
+| Arquitectura del sistema | [2. Arquitectura](#2-arquitectura-del-sistema) |
+| Metodología | [3. Metodología](#3-metodología) |
+| Implementación | [4. Implementación](#4-implementación) |
+| Datos | [5. Datos](#5-datos) |
+| Interfaz gráfica de usuario | [6. Interfaz](#6-interfaz-gráfica-de-usuario) |
+| Resultados | [7. Resultados](#7-resultados) |
+| Conclusiones | [8. Conclusiones](#8-conclusiones) |
+| Instalación y ejecución | [9. Instalación](#9-instalación-y-ejecución) |
 
-## Inicio rápido en Windows
+---
 
-Entorno comprobado: Python **3.12.14**, Windows, PyTorch CPU. Para una instalación nueva, usa Python 3.12 y abre PowerShell dentro de la carpeta del proyecto:
+## 1. Descripción del proyecto
+
+### Problemática
+
+Gran parte del patrimonio documental y artístico (manuscritos, cartas, diplomas, pinturas) circula únicamente en fotografías que visitantes, estudiantes e investigadores toman con su celular en archivos, bibliotecas y museos. Esas capturas rara vez cumplen las condiciones de una digitalización profesional: la pieza aparece torcida, con distorsión de perspectiva, iluminación desigual, sombras, reflejos o desenfoque, lo que dificulta leerla, archivarla y analizarla después (Liang et al., 2005).
+
+**Escenario de uso.** Una investigadora en historia consulta manuscritos en la sala de un archivo. No tiene escáner: solo su celular, sin trípode ni luz controlada, y un horario de consulta limitado. Con frecuencia descubre días después, en su computador, que parte del texto no se lee; corregirlo implica volver al archivo, pedir la pieza otra vez y manipular un original que la conservación busca proteger.
+
+**Pregunta guía:** ¿cómo corregir la perspectiva y mejorar la legibilidad de una fotografía imperfecta de una pieza cultural, adaptando el tratamiento al tipo de pieza y permitiendo que el usuario lo supervise, mediante procesamiento digital de imágenes y redes neuronales convolucionales?
+
+### Justificación
+
+- La UNESCO (2003) reconoce como patrimonio digital los recursos que se convierten a formato digital a partir de material analógico y llama a conservarlos. Una captura ilegible no sirve para citar la fuente ni para incorporarla a un archivo digital.
+- **Un mismo tratamiento no sirve para todo:** binarizar un manuscrito puede borrar trazos débiles, y "mejorar" el color de una pintura altera la obra. Por eso una red identifica el tipo de pieza y ese tipo define el tratamiento inicial.
+- **La persona que conoce la pieza debe decidir.** Una imagen "bonita" no garantiza fidelidad documental; el sistema propone y el usuario confirma, corrige o rechaza en cada etapa.
+- **Valor práctico:** permite descubrir *antes de salir de la sala* que la foto no sirve y repetirla mientras la pieza sigue sobre la mesa.
+
+### Objetivos
+
+**General.** Desarrollar un sistema interactivo de procesamiento digital de imágenes y aprendizaje profundo que, a partir de una fotografía imperfecta de una pieza de valor cultural, identifique su tipo, corrija su perspectiva y mejore su iluminación y nitidez, permitiendo al usuario supervisar y ajustar cada etapa, para producir una imagen legible y apta para el archivo digital.
+
+**Específicos y estado**
+
+| Objetivo específico (propuesta) | Estado en esta versión |
+|---|---|
+| 1. Construir un conjunto de imágenes reales de celular y versiones con distorsión sintética, e implementar la corrección geométrica (esquinas + homografía). | ✅ 480 fotos reales etiquetadas; perturbaciones y referencias sintéticas; U-Net + contornos + borde manual; homografía sobre RGB original. |
+| 2. Diseñar, entrenar y validar una CNN que clasifique la pieza (manuscrito, impreso, pintura) controlando el sobreajuste con *data augmentation*, Dropout y L2; implementar la mejora con preajuste por clase y conservando el color en pinturas. | ✅ CNN del curso con 5 variantes (base, Dropout, L2, aumentos, combinada) + ANN de descriptores; clasificador operativo por transferencia (ResNet18); preajustes por clase; pinturas sin binarización. |
+| 3. Integrar los módulos en un prototipo web interactivo y evaluar con métricas cuantitativas y una prueba de usabilidad. | ✅ Prototipo web de cinco pasos con métricas de clasificación, segmentación y calidad. ⏳ **La prueba de usabilidad con personas está pendiente** (ver [trabajo humano](#trabajo-humano-pendiente)). |
+
+### Solución propuesta
+
+Palimpsesto actúa como un **restaurador digital asistido** en cinco pasos:
+
+1. **Cargar** la foto (JPG/PNG). Se valida el archivo, se corrige la orientación EXIF y se comprueba si el contenido parece una pieza admitida.
+2. **Identificar**: una CNN sugiere el tipo de pieza y el usuario lo confirma o lo cambia.
+3. **Encuadrar**: una U-Net propone las cuatro esquinas; el usuario las revisa, las arrastra o las marca a mano.
+4. **Mejorar**: homografía a vista frontal y mejora clásica ajustable (iluminación, CLAHE, suavizado, nitidez, binarización solo en documentos), con comparación antes/después y detalle a resolución real.
+5. **Guardar**: PNG, PDF, registro JSON de todas las decisiones y un ZIP que incluye el **original byte a byte**.
+
+> **La CNN no restaura la imagen: decide cómo debe restaurarse.** La geometría y la calidad se corrigen con técnicas clásicas de PDI vistas en el curso, y la persona supervisa cada etapa.
+
+**Alcance.** Imágenes estáticas de una pieza plana o casi plana por foto. No transcribe texto (OCR), no reconstruye partes perdidas, no aplana páginas curvas y no certifica colorimetría patrimonial.
+
+---
+
+## 2. Arquitectura del sistema
+
+```mermaid
+flowchart TB
+  subgraph U[Usuario · navegador]
+    U1([1 Cargar]) --> U2([2 Confirmar tipo y alcance]) --> U3([3 Revisar 4 esquinas]) --> U4([4 Ajustar y comparar]) --> U5([5 Aceptar y exportar])
+  end
+  subgraph S[Servidor local Flask · palimpsesto/server.py]
+    direction TB
+    V[Validación de archivo<br/>formato real, tamaño, EXIF, alfa] --> M1[M1 · Preproceso<br/>RGB, vistas reducidas 1200/960 px, hash]
+    M1 --> AL[Control de alcance<br/>similitud de embeddings]
+    M1 --> M2[M2 · Clasificación<br/>ResNet18 congelada + cabeza lineal<br/>224×224 → 3 puntuaciones]
+    M2 --> P[Preajuste por clase]
+    M1 --> M3[M3 · Borde<br/>U-Net 256×256 → máscara → cuadrilátero<br/>respaldo: contornos Canny / manual]
+    M3 --> M4[M4 · Rectificación<br/>homografía + warpPerspective sobre el RGB original]
+    M4 --> M5[M5 · Mejora clásica<br/>iluminación, CLAHE en luminancia, suavizado,<br/>máscara de enfoque, Otsu / Sauvola]
+    P --> M5
+    M5 --> M6[M6 · Evaluación<br/>nitidez Laplaciano, contraste RMS<br/>SSIM/PSNR solo con referencia]
+    M6 --> X[Exportación<br/>PNG · PDF · JSON · ZIP con original]
+  end
+  U1 -- JPG/PNG --> V
+  AL -- alerta --> U2
+  M2 -- clase + puntuaciones --> U2
+  U2 -- clase confirmada --> P
+  M3 -- 4×2 puntos --> U3
+  U3 -- esquinas corregidas --> M4
+  U4 -- parámetros --> M5
+  M6 -- imagen + métricas --> U4
+  U5 --> X
+  subgraph T[Entrenamiento fuera de línea · scripts/]
+    D[(data/manifest.csv<br/>480 fotos · bloques)] --> TR[train_transfer.py /<br/>experiment_rotation.py]
+    TR --> W[(models/classifier.pt)]
+    D --> CS[calibrate_scope.py] --> SB[(scope_reference.npz)]
+  end
+  W -.-> M2
+  SB -.-> AL
+```
+
+| Módulo | Entrada → salida | Técnica | Archivo |
+|---|---|---|---|
+| Validación | bytes → RGB uint8 | decodificación real, límites de tamaño/píxeles, EXIF, alfa sobre blanco | `palimpsesto/imaging.py` |
+| M1 Preproceso | RGB → vista previa (1200 px), vista de detección (960 px), hash | redimensión INTER_AREA, SHA-256 | `imaging.py` |
+| Alcance | RGB → alerta sí/no | similitud coseno con 408 embeddings de desarrollo | `palimpsesto/models.py` |
+| M2 Clasificación | RGB 224×224 → 3 puntuaciones | ResNet18 ImageNet congelada + cabeza lineal | `models.py` |
+| M3 Borde | RGB 256×256 → máscara → 4 puntos | U-Net (encoder ResNet18); contornos; manual | `models.py`, `imaging.py` |
+| M4 Rectificación | RGB + 4 puntos → vista frontal | homografía (`getPerspectiveTransform`, `warpPerspective`) | `imaging.py` |
+| M5 Mejora | vista frontal + parámetros → resultado | en el canal L de Lab: filtro bilateral, división por fondo gaussiano, CLAHE, máscara de enfoque; Otsu/Sauvola en documentos | `imaging.py` |
+| M6 Evaluación | antes/después → métricas | varianza del Laplaciano, contraste RMS; SSIM/PSNR con referencia | `imaging.py` |
+| Exportación | resultado + registro → archivos | PNG, PDF (ReportLab), JSON, ZIP con original | `palimpsesto/exporting.py` |
+| Interfaz | — | HTML/CSS/JS sin compilación, canvas de esquinas, avisos | `templates/`, `static/` |
+
+---
+
+## 3. Metodología
+
+### Etapas del desarrollo
+
+| Fase | Qué se hizo | Evidencia |
+|---|---|---|
+| 1. Planeación | Problemática, escenario, alcance y arquitectura (documento de definición). | Propuesta del equipo |
+| 2. Datos | 480 fotos reales con celular (160 por clase), manifiesto con hash y **bloques por pieza** para evitar fuga entre entrenamiento y prueba. | `data/manifest.csv`, `docs/DATA_CARD.md` |
+| 3. Geometría | Comparación de detección clásica (Canny + contornos) frente a U-Net; homografía sobre el original. | `results/research/` |
+| 4. Mejora | Comparación de técnicas en referencias sintéticas alineadas (iluminación, CLAHE, suavizado, nitidez, FFT). | `results/quality/` |
+| 5. Clasificación | CNN del curso (5 variantes) y ANN de descriptores; luego transferencia ResNet18 con validación cruzada por bloques; experimento de rotación. | `results/classification/`, `results/transfer/`, `results/rotation/` |
+| 6. Interfaz | Aplicación web de cinco pasos con supervisión, avisos y recuperación de errores. | `templates/`, `static/` |
+| 7. Evaluación | Pruebas automáticas (Python, modelos reales, navegador) y diagnósticos de robustez y alcance. | `tests/`, `results/` |
+
+### Técnicas de PDI y visión por computador
+
+- **Espacio de color y geometría:** conversión RGB, orientación EXIF, homografía de cuatro puntos y remuestreo (Hartley & Zisserman, 2004).
+- **Detección de bordes y contornos:** Canny (1986), morfología y aproximación poligonal como alternativa a la U-Net.
+- **Segmentación:** U-Net con encoder ResNet18 entrenada en el tercer parcial (80 fotos y 80 máscaras); de su máscara se extrae el cuadrilátero.
+- **Mejora (en el canal L de Lab, para no alterar el tono):** filtro bilateral contra el ruido; estimación de iluminación con filtro gaussiano grande y división; CLAHE (Zuiderveld, 1994); máscara de enfoque; binarización global de Otsu (1979) y local de Sauvola (2000) solo en documentos.
+- **Frecuencia:** filtro *high-boost* con FFT, evaluado en `notebooks/Palimpsesto_experimentos.ipynb` y `results/quality/`, pero no desplegado porque no superó a los filtros espaciales.
+- **Métricas:** SSIM (Wang et al., 2004) y PSNR solo cuando hay referencia alineada; nitidez (varianza del Laplaciano) y contraste RMS como descriptores, no como notas de fidelidad.
+
+### Modelos
+
+| Modelo | Arquitectura | Papel en el sistema |
+|---|---|---|
+| **CNN del curso** | 4 convoluciones (16/32/64/128) + pooling + FC 64 → 3; 5 variantes: base, Dropout, L2, aumentos, combinada | Línea base académica; se conserva con sus resultados. |
+| **ANN de descriptores** | 50 descriptores (histograma RGB, bordes, nitidez) → 32 → 3 | Línea base sin convoluciones. |
+| **Clasificador operativo v0.3.0** | ResNet18 ImageNet congelada + cabeza lineal (regresión logística L2) entrenada con vistas de brillo, giros de ±8° y **giros de 90°/180°/270°** | Sugiere el tipo de pieza en la interfaz. |
+| **U-Net** | Encoder ResNet18, entrada 256×256 | Propone el borde de la pieza. |
+
+**Protocolo de evaluación.** Las fotos de una misma pieza física son muy parecidas, así que dividir al azar infla los resultados. Por eso las particiones se hacen por **bloques** (41 en desarrollo y 9 en el diagnóstico) con `StratifiedGroupKFold` (5 folds, semilla 2026). Los hiperparámetros se eligen solo con validación cruzada en desarrollo. Las 72 fotos de diagnóstico ya se habían usado con la CNN del curso, así que **se reportan como diagnóstico secundario y no como prueba ciega**.
+
+### Cambios respecto a la propuesta inicial
+
+| Propuesta | Implementación | Motivo |
+|---|---|---|
+| Interfaz en Gradio | Flask + HTML/JS propios | Canvas de esquinas con arrastre y teclado, avisos accesibles y control fino de la sesión y del original. |
+| CNN de 128×128 como clasificador final | La CNN del curso se conserva como línea base; el clasificador operativo es transferencia ResNet18 | La CNN propia alcanzó 52/72 (macro-F1 0,705), por debajo de la puerta de despliegue. |
+| Esquinas con Canny + contornos | U-Net + contornos + manual | Con contornos, la IoU media fue 0,64; con la U-Net, 0,968 en fotos de prueba (ver Resultados). |
+| Partición aleatoria 80/10/10 | Partición por bloques de pieza | Evita evaluar con fotos de la misma pieza que se usó para entrenar. |
+
+---
+
+## 4. Implementación
+
+```
+palimpsesto/        Núcleo del sistema
+  server.py         API Flask local: carga, detección, rotación, proceso, exportación; sesiones aisladas
+  imaging.py        Validación, EXIF, homografía, mejora clásica, métricas
+  models.py         Carga estricta de pesos (weights_only=True), clasificación, alcance, U-Net
+  exporting.py      PNG, PDF, JSON y ZIP con el original y sus hashes
+templates/index.html  Interfaz de cinco pasos
+static/app.js       Flujo de la interfaz (carga → identificar → encuadrar → mejorar → guardar)
+static/feedback.js  Sistema de avisos: éxito, información, advertencia, error, mensajes de campo, diálogos
+static/*.css        Identidad visual (papel + verde bosque), avisos y animaciones
+scripts/            Entrenamiento, calibración, evaluación, figuras y verificación
+tests/              83 pruebas Python + 22 de navegador
+notebooks/          Recorrido académico con FFT y evaluación
+data/manifest.csv   480 fotos, clase, bloque, partición y hash
+results/            Fuente numérica de todas las cifras del README
+docs/               Fichas de modelo y datos, validación, guía de sustentación
+```
+
+| Funcionalidad | Cómo se implementa |
+|---|---|
+| El original nunca se modifica | Se guardan sus bytes y su SHA-256; las transformaciones trabajan sobre copias y el ZIP incluye el archivo exacto. |
+| Resultados que no se mezclan | Cada imagen tiene una clave y cada procesamiento una revisión; un enlace viejo o una pestaña con otra foto se rechazan. |
+| Clasificación con supervisión | Si la puntuación es baja, si falta el modelo o si el contenido parece ajeno, la interfaz no impone la clase. |
+| Esquinas revisables | Canvas con arrastre, selección de punto y flechas del teclado; la geometría inválida (cruzada, repetida, fuera de la foto) se rechaza. |
+| Ajustes reversibles | Deshacer, mejoras en cero y comparación antes/después con la misma geometría. |
+| Avisos y recuperación | `feedback.js`: avisos dentro de la ventana con icono, título y acción (Reintentar, Ir al campo, Cargar otra foto). |
+
+---
+
+## 5. Datos
+
+| Conjunto | Contenido | Uso |
+|---|---|---|
+| **Fotos de clasificación** | 480 fotografías propias tomadas con celular, 160 por clase (impreso, manuscrito, pintura); 50 bloques provisionales de pieza | Entrenamiento y evaluación del clasificador y calibración del alcance |
+| **Segmentación** | 80 fotos + 80 máscaras de documentos (18 grupos), del tercer parcial | U-Net |
+| **Referencias sintéticas** | Página construida con sombra, ruido y desenfoque controlados | Comparar técnicas de mejora con SSIM/PSNR |
+| **Negativos de alcance** | 10 imágenes públicas de scikit-image (gato, astronauta, monedas…) | Probar la alerta de contenido ajeno |
+
+![Distribución del dataset](results/figures/dataset_distribution.png)
+
+![Muestra del dataset](results/figures/dataset_muestras.jpg)
+
+Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artificial, reflejos y ángulos. Las miniaturas de documentos aparecen difuminadas porque algunos contienen nombres de personas.
+
+**Acceso a los datos**
+
+- **Enlace de Google Drive (consulta del docente): ⏳ pendiente.** Debe subirlo el equipo con permisos de lectura para el profesor y pegarlo aquí. Ver [trabajo humano](#trabajo-humano-pendiente).
+- Para el equipo: la release privada del repositorio incluye `Palimpsesto_Claude_Code_COMPLETO.zip` (los 804 archivos originales con su manifiesto SHA-256) y el ZIP de pesos.
+- `data/manifest.csv` relaciona cada foto con su clase, bloque, partición y hash. `group_verified=false` indica que **la identidad física de las piezas aún no se ha certificado**: los 50 bloques son una agrupación automática conservadora, no 50 piezas confirmadas.
+- Detalle de procedencia, sesgos y licencias: `docs/DATA_CARD.md`.
+
+---
+
+## 6. Interfaz gráfica de usuario
+
+**Prototipo.** El flujo de cinco pasos de la Tabla 2 de la propuesta se diseñó primero como prototipo navegable (Momento 3, con estados alternativos y excepciones) y luego se implementó en la aplicación real.
+
+| Paso | Qué hace el usuario | Qué responde el sistema |
+|---|---|---|
+| ![](docs/img/gui_02_identificar.png) **2 · Identificar** | Confirma que la foto es una pieza admitida y confirma o cambia el tipo | Puntuaciones por clase, preajuste y alerta de alcance |
+| ![](docs/img/gui_03_encuadrar.png) **3 · Encuadrar** | Arrastra las 4 esquinas, vuelve a detectar, marca a mano o gira 90° | Cuadrilátero sobre la foto y método usado (U-Net, contornos, manual) |
+| ![](docs/img/gui_04_mejorar.png) **4 · Mejorar** | Mueve deslizadores, deshace, pone en cero o amplía el detalle | Vista previa, comparación antes/después y métricas |
+| ![](docs/img/gui_05_guardar.png) **5 · Guardar** | Descarga ZIP, PNG, PDF o JSON | Resumen de las decisiones; el original va intacto |
+| ![](docs/img/gui_06_aviso_error.png) **Avisos** | Corrige o reintenta desde el propio aviso | Error, advertencia, información o éxito, siempre visibles |
+
+<img src="docs/img/gui_07_movil.png" alt="Vista en celular" width="260" align="right">
+
+**Instrucciones de uso**
+
+1. Abre la aplicación (ver [instalación](#9-instalación-y-ejecución)) y pulsa **Seleccionar JPG o PNG**, arrastra una foto o usa el **ejemplo sintético**.
+2. Revisa la categoría sugerida, marca la casilla de confirmación y pulsa **Confirmar y revisar borde**.
+3. Comprueba que los cuatro puntos caen en las esquinas de la pieza. Si no, arrástralos o pulsa **Volver a detectar** o **Marcar manualmente**. Si conoces las medidas, escribe la proporción ancho/alto; si no, deja 0.
+4. Ajusta las mejoras mirando la comparación. Usa **Ver detalle** para revisar trazos finos. Si algo empeora, **Deshacer** o **Sin mejoras**.
+5. Pulsa **Revisado, continuar** y descarga el ZIP completo o el formato que necesites.
+
+**Comportamientos clave:** la interfaz funciona en escritorio y celular (de 320 a 1440 px); los errores permanecen hasta resolverse y ofrecen la acción que los corrige; descartar una foto con trabajo hecho pide confirmación; respeta la preferencia de *movimiento reducido* y se puede usar con teclado.
+
+---
+
+## 7. Resultados
+
+### Clasificación del tipo de pieza
+
+| Modelo | Evaluación | Aciertos | Macro-F1 | Alcance de la evidencia |
+|---|---|---:|---:|---|
+| ANN de 50 descriptores | prueba de 72 | 47/72 | 0,646 | Línea base |
+| CNN del curso, variante L2 (elegida por validación) | prueba de 72 | 52/72 | 0,705 | Generalización insuficiente |
+| Transferencia v0.2.0 | fuera de fold, 408 | 389/408 | 0,953 | 5 folds por 41 bloques |
+| Transferencia v0.2.0 | diagnóstico secundario, 72 | 67/72 | 0,930 | Test ya abierto |
+| **Transferencia v0.3.0 (desplegada)** | **fuera de fold, 408** | **391/408** | **0,958** | 5 folds por 41 bloques |
+| **Transferencia v0.3.0 (desplegada)** | diagnóstico secundario, 72 | 70/72 | 0,972 | Test ya abierto; **no** es prueba ciega |
+
+![Matrices de confusión](results/figures/confusion.png)
+
+![Ablación de la CNN propia](results/figures/ablation.png)
+
+**Análisis.** La CNN entrenada desde cero con unas 340 fotos no logra separar bien impresos de manuscritos y pinturas (10 de 24 impresos acertados): con tan pocos datos memoriza el fondo y la luz. La regularización (L2, Dropout, aumentos) mejora la validación, pero no basta. La transferencia aprovecha rasgos aprendidos en ImageNet y solo entrena la última capa, lo que reduce mucho el riesgo de sobreajuste. El error que se repite es **manuscrito sugerido como impreso** en documentos con letra muy regular. Por eso la interfaz siempre pide confirmar la clase.
+
+### Experimento de rotación (v0.2.0 → v0.3.0)
+
+**Hipótesis.** La v0.2.0 caía de 0,93 a 0,80 de macro-F1 cuando la foto llegaba girada 90°. Entrenar la cabeza también con giros rectos debería corregirlo sin empeorar las fotos derechas.
+
+**Regla de adopción, fijada antes de ejecutar** (`results/rotation/protocol.json`): en validación cruzada por bloques, macro-F1 en fotos derechas ≥ base − 0,01; recall ≥ 0,80 en cada clase; y macro-F1 medio en fotos giradas ≥ base + 0,05.
+
+![Experimento de rotación](results/figures/rotation_experiment.png)
+
+| Variante | C | Macro-F1 OOF derechas | Macro-F1 OOF giradas (media 90/180/270°) | ¿Cumple la regla? |
+|---|---:|---:|---:|---|
+| Base (v0.2.0) | 0,01 | 0,953 | 0,880 | — |
+| **Giros de la vista original (v0.3.0)** | 0,1 | **0,958** | **0,955** | ✅ elegida |
+| Giros de todas las vistas | 0,01 | 0,956 | 0,960 | ✅ |
+
+La variante base reproduce exactamente la cifra publicada (0,9531), lo que confirma que el experimento usa el mismo encoder y los mismos folds. El modelo anterior se conserva en `models/classifier_v0.2.0.pt`. Script: `scripts/experiment_rotation.py`.
+
+### Robustez a perturbaciones
+
+![Robustez](results/figures/robustness.png)
+
+Con giro de 90°, la v0.3.0 pasa de 0,798 a 0,958. Al aclarar un 25 %, en cambio, baja de 0,972 a 0,958: un error más. Son perturbaciones sintéticas sobre fotos ya vistas, no fotos nuevas. La clasificación tarda una mediana de 56 ms en CPU.
+
+### Detección del borde
+
+| Método (fotos de documentos con máscara de referencia) | Fotos | Detecta | IoU media del cuadrilátero | IoU ≥ 0,95 |
+|---|---:|---:|---:|---:|
+| Canny (50, 150) + cierre + cuadrilátero mayor | 80 | 25 | 0,28 | 16 |
+| Canny con varios umbrales + puntuación de bordes | 80 | 69 | 0,64 | 32 |
+| **U-Net + cuadrilátero, fotos de prueba** | 12 | 12 | **0,968** (Dice de máscara 0,993) | 11 |
+| U-Net + cuadrilátero, las 80 (incluye las 56 de entrenamiento) | 80 | 80 | 0,969 | 68 |
+
+Los métodos clásicos no se entrenan, así que se miden sobre las 80 fotos. La cifra justa de la U-Net es la de las 12 fotos de prueba, porque la fila de 80 incluye fotos que vio durante el entrenamiento. Aun así, la diferencia frente a los contornos es grande. La U-Net se entrenó con documentos, así que en pinturas o en fondos muy distintos su sugerencia puede fallar. Por eso siempre hay contornos y borde manual como alternativa, y el usuario revisa los cuatro puntos.
+
+### Calidad de la mejora (referencia sintética alineada)
+
+| Caso | Sin mejora: PSNR / SSIM | Preajuste de impreso: PSNR / SSIM | Mejor técnica individual |
+|---|---|---|---|
+| Página limpia | ∞ / 1,000 | 33,6 / 0,997 | Hacer nada es lo correcto; los ajustes en cero conservan los píxeles |
+| Sombra | 10,5 / 0,883 | 11,0 / 0,908 | Iluminación: SSIM 0,914 |
+| Ruido | 28,3 / 0,543 | 26,1 / 0,501 | Suavizado: SSIM 0,614 |
+| Desenfoque | 19,6 / 0,835 | 19,8 / 0,843 | FFT *high-boost*: SSIM 0,853 |
+
+No existe un ajuste universal: cada defecto pide una técnica distinta, y por eso la mejora es ajustable y reversible. En fotos reales no hay referencia limpia, así que **la interfaz no inventa SSIM ni PSNR**: los muestra como no disponibles y usa nitidez y contraste solo como descriptores.
+
+### Control de alcance
+
+Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 fotos de diagnóstico. **El retrato del astronauta pasó sin alerta:** no es un detector universal. Por eso la confirmación humana de que la foto es una pieza admitida es obligatoria.
+
+### Pruebas del sistema
+
+| Conjunto | Resultado |
+|---|---|
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación | 83/83 |
+| `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
+| `npm run test:ui`: navegador en 320–1440 px, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 22/22 |
+| Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
+
+Las pruebas automáticas comprueban que el software hace lo que debe. **No reemplazan una prueba de uso con personas ni una evaluación con piezas nuevas.**
+
+---
+
+## 8. Conclusiones
+
+**Principales resultados**
+
+- Se construyó un sistema funcional de extremo a extremo (cargar → identificar → encuadrar → mejorar → exportar) que integra clasificación, segmentación y PDI clásico, corre en CPU sin conexión y conserva el original byte a byte.
+- La transferencia (ResNet18 congelada) superó con claridad a la CNN del curso (macro-F1 0,958 frente a 0,705) con los mismos datos. Con pocos datos, reutilizar rasgos aprendidos supera a entrenar desde cero.
+- Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
+- La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos).
+- La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
+
+**Limitaciones**
+
+- Las identidades físicas de las piezas no están certificadas y el diagnóstico de 72 fotos ya se había usado, así que **las métricas son provisionales y no prueban generalización a piezas nuevas**.
+- Manuscritos de letra muy regular todavía se confunden con impresos; la U-Net es menos fiable fuera de los documentos.
+- No hay referencia real para medir la fidelidad de la mejora; la homografía no corrige páginas curvas.
+- La prueba de usabilidad con personas está pendiente.
+
+**Oportunidades de mejora**
+
+- Certificar las piezas y capturar 6–9 piezas nuevas para una evaluación realmente independiente.
+- Ampliar la U-Net con máscaras de manuscritos y pinturas.
+- Ajustar el modelo completo (*fine-tuning*) una vez exista una partición certificada.
+- Incorporar dewarping para páginas curvas y OCR como herramienta externa de evaluación.
+- Hacer la prueba de usabilidad (SUS, Brooke, 1996) con 3–5 personas.
+
+---
+
+## 9. Instalación y ejecución
+
+Entorno comprobado: Python 3.12, PyTorch 2.15 CPU, en Windows (equipo de desarrollo) y Linux (revisión). No requiere GPU ni conexión a Internet para la inferencia.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -24,120 +364,67 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Descarga y extrae los pesos de la [release del proyecto](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.2.0) en la raíz. Deben existir `models/classifier.pt` y `models/unet_resnet18_imagenet.pth`. La release es privada y requiere acceso al repositorio.
+Descarga y extrae en la raíz los pesos de la [release del proyecto](https://github.com/juanffff-hub/palimpsesto-pdi/releases) (privada; requiere acceso al repositorio). Deben existir `models/classifier.pt` y `models/unet_resnet18_imagenet.pth`; sus hashes están en `models/checksums.json`.
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
 ```
 
-Abre **http://127.0.0.1:8765**. También puedes ejecutar `Iniciar_Palimpsesto.cmd` una vez instalado. Ctrl+C detiene el servidor. En la copia preparada en el equipo original, el lanzador también reconoce las dependencias locales ya instaladas; una descarga nueva debe seguir la instalación anterior.
+Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. El servidor escucha solo en localhost: es para demostración local, no para alojamiento público.
 
-En Linux/macOS, crea `.venv` con Python 3.12 y utiliza `.venv/bin/python` en los comandos equivalentes. Esa ruta es compatible con el código, pero no se declara probada en ambos sistemas. Para cambiar el puerto, define `PALIMPSESTO_PORT`. El servidor escucha únicamente en localhost y está pensado para la demostración local, no para alojamiento público.
+Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
 
-Si faltan pesos, la interfaz permite selección y borde manual, pero **ese modo no constituye una demostración del componente de IA**. Comprueba `/api/status`: `classifier`, `segmenter` y `scope_screen` deben ser `true` para demostrar todas las funciones de la entrega.
+### Reproducir entrenamiento, evaluación y figuras
 
-## Datos, pesos y acceso del docente
-
-Los datos originales no se incluyen en el historial Git. La [release v0.2.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.2.0) ofrece `modelos_palimpsesto_v0.2.0.zip` para inferencia y `Palimpsesto_Claude_Code_COMPLETO.zip` con el proyecto, todos los originales y el contexto de continuidad. Los hashes de los pesos están en `models/checksums.json`. No muevas los archivos de imagen individualmente: el manifiesto conserva rutas relativas para reproducir la procedencia.
-
-`data/manifest.csv` contiene 480 fotografías y las particiones nuevas; las etiquetas de carpeta antiguas no fijan el split. `group_verified=false` indica que la identidad física sigue sin certificarse. Los 50 bloques automáticos son conservadores y no equivalen a 50 objetos físicos confirmados. Revisa la herramienta HTML de la entrega antes de declarar evaluación final. No incluyas imágenes LoRA ni máscaras como fotografías independientes de prueba.
-
-El repositorio privado debe compartirse con el docente o el equipo debe acordar otra vía de acceso. **Un enlace privado sin permisos no satisface el requisito de acceso.** Confirmar ese acceso es una tarea humana de entrega. Las imágenes contienen documentos identificables y obras; revisar su difusión antes de hacer público el repositorio o los archivos.
-
-## Resultados y límites
-
-| Experimento | Resultado | Alcance de la evidencia |
-|---|---:|---|
-| CNN del curso, L2 elegida por validación | 52/72 aciertos; macro-F1 0,7050 | Split provisional; mostró generalización insuficiente |
-| ANN de 50 descriptores | 47/72 aciertos; macro-F1 0,6455 | Baseline del mismo split de la CNN |
-| Transferencia, predicciones fuera de fold | 389/408 aciertos; macro-F1 0,9531 | 5 folds por 41 bloques; usada para seleccionar C; grupos pendientes |
-| Transferencia, diagnóstico secundario | 67/72 aciertos; macro-F1 0,9298 | Test ya abierto con la CNN anterior; no es confirmación ciega nueva |
-| U-Net, 12 fotos de prueba histórica | Dice 0,9931; IoU máscara 0,9864 | Dominio estrecho de documentos impresos; 256×256 |
-| U-Net + cuadrilátero, mismas 12 | IoU media 0,9681; 11/12 ≥0,95 | Comparación con máscara a escala máxima 960 |
-
-Los cinco errores del clasificador final son manuscritos sugeridos como impresos. En el diagnóstico de giros de 90° el rendimiento baja: consulta `results/robustness/evaluation.json`. Confirma siempre la clase y orienta la foto. Las perturbaciones sintéticas no son fotos nuevas independientes. No interpretar una puntuación softmax alta como certeza calibrada.
-
-La comparación CNN/transferencia cambia preentrenamiento y cantidad de desarrollo: no aísla causalmente una sola mejora. No hay ground truth de mejora patrimonial real. Los experimentos de SSIM/PSNR usan referencias sintéticas alineadas; en fotos habituales la interfaz muestra esas métricas como no disponibles. Varianza del Laplaciano y contraste RMS son descriptores, no puntuaciones de fidelidad.
-
-## Arquitectura y relación con el curso
-
-```mermaid
-flowchart LR
- A[Foto JPG / PNG] --> B[RGB + EXIF + hash]
- B --> C[CNN: clase sugerida]
- C --> D[Confirmación humana]
- D --> E[U-Net / contornos / manual]
- E --> F[Cuatro esquinas revisadas]
- F --> G[Homografía]
- G --> H[Mejora clásica ajustable]
- H --> I[Comparación y aceptación]
- I --> J[PNG + PDF + JSON + original]
-```
-
-`palimpsesto/models.py`: CNN propia, ResNet18 y U-Net; pesos cargados estrictamente con `weights_only=True`.
-
-`palimpsesto/imaging.py`: RGB, homografía, filtros espaciales, estimación de iluminación, CLAHE, Otsu/Sauvola y descriptores. Derivadas y mezclas se calculan en flotante.
-
-`palimpsesto/server.py`: API Flask local y sesiones aisladas. `templates/` y `static/`: interfaz de cinco pasos, canvas de esquinas con teclado, deshacer y comparación.
-
-`palimpsesto/exporting.py`: registro de parámetros, esquinas, homografía, hash y original. `notebooks/Palimpsesto_experimentos.ipynb`: recorrido académico con FFT y evaluación. `docs/02_Investigacion_y_decisiones.md`: revisión del curso completo, antecedentes, alternativas y justificación del alcance.
-
-Las pinturas empiezan sin mejoras. La binarización se limita a documentos. Una homografía supone una pieza plana; no corrige páginas curvas ni conoce medidas físicas sin información adicional. No se usa difusión para reconstruir letras, eliminar firmas o inventar textura.
-
-## Reproducir entrenamiento y evaluación
-
-El argumento `--root` apunta a la carpeta que contiene las rutas del manifiesto, por ejemplo la carpeta original del material o `material_original/Material Proyecto de PDI` dentro del paquete completo.
+`--root` apunta a la carpeta con las rutas del manifiesto (por ejemplo `material_original/Material Proyecto de PDI` del paquete completo).
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/train_classifier.py --root "C:\ruta\datos"
-.\.venv\Scripts\python.exe scripts/train_transfer.py --root "C:\ruta\datos"
+.\.venv\Scripts\python.exe scripts/train_classifier.py --root "C:\ruta\datos"      # CNN del curso y ANN
+.\.venv\Scripts\python.exe scripts/train_transfer.py --root "C:\ruta\datos"        # transferencia v0.2.0
+.\.venv\Scripts\python.exe scripts/experiment_rotation.py --root "C:\ruta\datos"   # experimento v0.3.0 (añade --promote para desplegar)
 .\.venv\Scripts\python.exe scripts/calibrate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_model.py --root "C:\ruta\datos"
+.\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/benchmark_quality.py
+.\.venv\Scripts\python.exe scripts/make_figures.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/verify_real_pipeline.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/check.py
 ```
 
-**El entrenamiento escribe nuevos checkpoints y resultados.** Conserva una copia de la release antes de repetir. El primer script establece una CNN del curso como `classifier.pt`; el segundo la reemplaza por transferencia solo si supera el criterio de CV registrado. En esta entrega lo superó. La primera ejecución de transferencia descarga los pesos ImageNet oficiales; la inferencia normal con los pesos finales funciona sin Internet. Semillas fijas reducen variación, pero no garantizan igualdad binaria entre hardware, versiones y plataformas.
+**El entrenamiento sobrescribe checkpoints y resultados:** conserva una copia de la release antes de repetirlo. `experiment_rotation.py --promote` guarda siempre el modelo anterior como `classifier_v0.2.0.pt`. Después de cambiar el clasificador, ejecuta `calibrate_scope.py` y actualiza `models/checksums.json`. Las semillas fijas reducen la variación, pero no garantizan resultados idénticos bit a bit entre equipos.
 
-Para revisar piezas: abrir el HTML de revisión, corregir IDs para que todas las vistas de la misma pieza compartan identidad, marcar solo fotos realmente inspeccionadas y guardar CSV. Después:
+**Pruebas de navegador:** con el servidor activo, `npm install` y `npm run test:ui` (Node y Chrome; `CHROME_PATH` es opcional). Las capturas del README se regeneran con `node scripts/capture_gui.cjs`.
 
-```powershell
-.\.venv\Scripts\python.exe scripts/resplit_manifest.py manifest_revisado.csv --output data/manifest_verificado.csv
-```
+---
 
-Conserva el manifiesto original, inspecciona el nuevo resumen y adopta la nueva separación antes de reentrenar. Una partición nueva no convierte el checkpoint anterior de U-Net en un modelo independiente de sus piezas históricas. Para cerrar la evaluación integral se recomienda capturar 6–9 piezas nuevas, dos vistas cada una, congelando pesos antes de verlas.
+## Trabajo humano pendiente
 
-## Pruebas y evidencias
+1. **Enlace de datos para el docente:** subir el dataset a Google Drive con permiso de lectura para el profesor y pegar el enlace en la [sección 5](#5-datos).
+2. **Acceso del docente** al repositorio privado y a la release.
+3. **Certificar piezas:** confirmar con la herramienta de revisión qué fotos son de la misma pieza física y regenerar la partición con `scripts/resplit_manifest.py`.
+4. **Piezas nuevas:** fotografiar 6–9 piezas no vistas (dos vistas cada una) y evaluarlas sin tocar los pesos.
+5. **Usabilidad:** prueba con 3–5 personas (plantilla en `docs/validacion_humana.csv`) y revisión visual de trazos y color.
+6. **Póster, video de máximo 3 minutos y sustentación** (guía en `docs/GUIA_SUSTENTACION.md`).
 
-`tests/test_pipeline.py` y `tests/test_validation.py` (83 pruebas) comprueban transformaciones, original intacto, manejo de errores, sesión y exportaciones. Utiliza un stub de modelos para aislar comportamiento de software. `scripts/verify_real_pipeline.py` añade nueve recorridos con **ambos modelos reales**, uno por bloque de prueba y tres por clase; reporta ejecución y exportación, no aceptación humana. La interfaz completa se comprobó con 22 validaciones de navegador, incluyendo anchos 320, 390, 768, 1024 y 1440 px, página desplazada en celular, movimiento reducido y el sistema de avisos (`static/feedback.js`); el control de grupos carga 480 tarjetas.
+No hay resultados humanos inventados en este repositorio.
 
-`results/classification/`: curvas y comparación CNN/ANN. `results/transfer/`: protocolo, cinco folds, C y predicciones. `results/robustness/`: perturbaciones, errores y latencias. `results/research/`: experimentos iniciales de geometría/U-Net/mejora. `results/quality/`: funciones de mejora de la aplicación contra referencia construida. `results/integration/`: prueba con modelos reales. No deben sumarse estas muestras como un único test independiente.
+## Referencias
 
-## Trabajo humano que sigue siendo necesario
+- Brooke, J. (1996). SUS: A "quick and dirty" usability scale. En *Usability evaluation in industry* (pp. 189–194). Taylor & Francis.
+- Canny, J. (1986). A computational approach to edge detection. *IEEE TPAMI, 8*(6), 679–698. https://doi.org/10.1109/TPAMI.1986.4767851
+- Gonzalez, R. C., & Woods, R. E. (2018). *Digital image processing* (4.ª ed.). Pearson.
+- Hartley, R., & Zisserman, A. (2004). *Multiple view geometry in computer vision* (2.ª ed.). Cambridge University Press.
+- He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. *CVPR*, 770–778.
+- Liang, J., Doermann, D., & Li, H. (2005). Camera-based analysis of text and documents: A survey. *IJDAR, 7*(2–3), 84–104. https://doi.org/10.1007/s10032-004-0138-z
+- Otsu, N. (1979). A threshold selection method from gray-level histograms. *IEEE TSMC, 9*(1), 62–66.
+- Ronneberger, O., Fischer, P., & Brox, T. (2015). U-Net: Convolutional networks for biomedical image segmentation. *MICCAI*, 234–241.
+- Sauvola, J., & Pietikäinen, M. (2000). Adaptive document image binarization. *Pattern Recognition, 33*(2), 225–236.
+- Srivastava, N., et al. (2014). Dropout: A simple way to prevent neural networks from overfitting. *JMLR, 15*(56), 1929–1958.
+- UNESCO. (2003). *Carta sobre la preservación del patrimonio digital*.
+- Wang, Z., Bovik, A. C., Sheikh, H. R., & Simoncelli, E. P. (2004). Image quality assessment: From error visibility to structural similarity. *IEEE TIP, 13*(4), 600–612.
+- Zuiderveld, K. (1994). Contrast limited adaptive histogram equalization. En *Graphics gems IV* (pp. 474–485). Academic Press.
+- Documentación: [OpenCV · homografía](https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html), [PyTorch · transferencia](https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html), [scikit-image · métricas](https://scikit-image.org/docs/stable/api/skimage.metrics.html), [scikit-learn · StratifiedGroupKFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedGroupKFold.html).
 
-1. Confirmar IDs de piezas y corregir agrupaciones automáticas.
-2. Capturar piezas nuevas para una evaluación externa del sistema completo, si se quiere certificar esa generalización.
-3. Revisar bordes, trazos finos y color; realizar la prueba de uso con 3–5 personas reales.
-4. Verificar autores, permisos de acceso del docente y material que puede compartirse.
-5. Leer, ensayar y sustentar. Los documentos no sustituyen la comprensión del equipo.
+**Derechos.** No se presupone una licencia pública para las fotografías, las obras ni el material docente. El código y los modelos se entregan para este proyecto académico; revisa las autorizaciones antes de redistribuir. Las bibliotecas y el preentrenamiento conservan sus propias licencias.
 
-Hay plantillas en `docs/validacion_humana.csv` y `docs/GUIA_SUSTENTACION.md`. No hay registros humanos ficticios. La programación, entrenamiento, pruebas de software, gráficos y preparación documental están automatizados.
-
-## Referencias y derechos
-
-Material del curso y propuesta suministrados por el equipo; implementación propia de integración. Referencias principales: [OpenCV: homografía](https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html), [PyTorch: transferencia](https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html), [scikit-image: métricas](https://scikit-image.org/docs/stable/api/skimage.metrics.html), [scikit-learn: validación por grupos](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedGroupKFold.html). La investigación ampliada enlaza los artículos y repositorios primarios contrastados.
-
-No se presupone una licencia pública para las fotografías, las obras o el material docente. El código y los modelos se entregan para este proyecto académico; revisar autorizaciones antes de redistribuir. Las licencias de las bibliotecas y del preentrenamiento conservan sus propios términos.
-
-## Interfaz y control de alcance de la versión 0.2
-
-Logo original generado para Palimpsesto, identidad de archivo en verde/papel, ejemplo sintético, vista al tamaño de salida, controles de recuperación y avisos de entrada. El filtro de alcance alertó en 9/10 ejemplos ajenos al dominio y no alertó en 72 fotos del diagnóstico ni en un escaneo externo. Un retrato pasó sin alerta: no es detección universal. Siempre se confirma el contenido; las alertas ocultan la clasificación forzada y permiten cambiar de foto o confirmar una pieza válida atípica.
-
-Consulta `docs/VALIDACION_Y_FALLOS.md`, `docs/MODEL_CARD.md` y `docs/DATA_CARD.md`. Los enlaces a resultados viejos se rechazan y las operaciones locales sobre imágenes se serializan para evitar mezcla de estados.
-
-Para probar navegador: con servidor activo, ejecutar `npm install` y `npm run test:ui` (Node y Chrome; opcional `CHROME_PATH`). Node no es necesario para usar la aplicación. `scripts/evaluate_scope.py --root RUTA` reproduce las pruebas del filtro.
-
-## Continuar en Claude Code
-
-Extrae `Palimpsesto_Claude_Code_COMPLETO.zip` en una ruta corta, abre la carpeta extraída en Claude Code y pega `01_PROMPT_PARA_CLAUDE.txt`. Incluye `CLAUDE.md`, todas las fuentes, pesos, resultados, investigaciones e inventario de integridad. No necesitas este chat. La infografía/video y comunicación final se posponen por petición del usuario; cualquier póster previo del paquete es un borrador, no la entrega final.
+**Continuidad.** `CLAUDE.md` y `docs/ESTADO_PARA_CLAUDE.md` registran las decisiones, los comandos y los pendientes para continuar el trabajo en otra sesión.

@@ -21,3 +21,4 @@ node_modules/
 results/browser/*.png
 results/browser/*.pdf
 results/browser/browser_export.*
+results/rotation/features_rot.npz

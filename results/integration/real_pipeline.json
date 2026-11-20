@@ -5,11 +5,11 @@
       "image_id": "I0018",
       "group_id": "DOC001",
       "true_class": "documento_impreso",
-      "suggested_class": "documento_impreso",
+      "suggested_class": "manuscrito",
       "geometry": "unet",
       "width": 1535,
       "height": 2400,
-      "end_to_end_seconds": 5.565832199994475,
+      "end_to_end_seconds": 3.528170839999916,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -21,7 +21,7 @@
       "geometry": "unet",
       "width": 2400,
       "height": 1667,
-      "end_to_end_seconds": 4.066140900016762,
+      "end_to_end_seconds": 2.0688604230000465,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -33,7 +33,7 @@
       "geometry": "unet",
       "width": 2400,
       "height": 1777,
-      "end_to_end_seconds": 6.345831100014038,
+      "end_to_end_seconds": 3.281788459999916,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -45,7 +45,7 @@
       "geometry": "unet",
       "width": 729,
       "height": 1034,
-      "end_to_end_seconds": 0.7411363000283018,
+      "end_to_end_seconds": 0.47603050600002916,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -57,7 +57,7 @@
       "geometry": "unet",
       "width": 692,
       "height": 814,
-      "end_to_end_seconds": 0.6551665000151843,
+      "end_to_end_seconds": 0.4862461089999215,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -65,11 +65,11 @@
       "image_id": "I0290",
       "group_id": "MAN014",
       "true_class": "manuscrito",
-      "suggested_class": "documento_impreso",
+      "suggested_class": "manuscrito",
       "geometry": "unet",
       "width": 679,
       "height": 712,
-      "end_to_end_seconds": 0.5884909000014886,
+      "end_to_end_seconds": 0.4506854699999394,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -81,7 +81,7 @@
       "geometry": "contornos",
       "width": 2400,
       "height": 1709,
-      "end_to_end_seconds": 2.769325500004925,
+      "end_to_end_seconds": 2.3235649129999274,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -93,7 +93,7 @@
       "geometry": "contornos",
       "width": 2163,
       "height": 2400,
-      "end_to_end_seconds": 4.487651199975517,
+      "end_to_end_seconds": 4.267658667999967,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     },
@@ -105,7 +105,7 @@
       "geometry": "contornos",
       "width": 1595,
       "height": 1997,
-      "end_to_end_seconds": 2.9537294000037946,
+      "end_to_end_seconds": 2.6514882310000303,
       "export_valid": true,
       "visual_acceptance": "not assessed by a human"
     }
