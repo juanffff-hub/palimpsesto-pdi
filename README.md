@@ -47,7 +47,7 @@ Gran parte del patrimonio documental y artístico (manuscritos, cartas, diplomas
 
 | Objetivo específico | Estado en esta versión |
 |---|---|
-| 1. Construir un conjunto de imágenes reales de celular y versiones con distorsión sintética, e implementar la corrección geométrica (esquinas + homografía). | ✅ 480 fotos reales etiquetadas; perturbaciones y referencias sintéticas; U-Net + contornos + borde manual; homografía sobre RGB original. |
+| 1. Construir un conjunto de imágenes reales de celular y versiones con distorsión sintética, e implementar la corrección geométrica (esquinas + homografía). | ✅ 480 fotos reales etiquetadas; perturbaciones y referencias sintéticas; U-Net de 3 clases (240 fotos con máscara: impresos, manuscritos y pinturas) + contornos + borde manual; homografía sobre RGB original. |
 | 2. Diseñar, entrenar y validar una CNN que clasifique la pieza (manuscrito, impreso, pintura) controlando el sobreajuste con *data augmentation*, Dropout y L2; implementar la mejora con preajuste por clase y conservando el color en pinturas. | ✅ CNN del curso con 5 variantes (base, Dropout, L2, aumentos, combinada) + ANN de descriptores; clasificador operativo por transferencia (ResNet18); preajustes por clase; pinturas sin binarización. |
 | 3. Integrar los módulos en un prototipo web interactivo y evaluar el sistema mediante datos reales, métricas cuantitativas y pruebas de funcionamiento. | ✅ Prototipo de cinco pasos; clasificación, segmentación, mejora y exportación evaluadas. |
 
@@ -57,7 +57,7 @@ Palimpsesto actúa como un **restaurador digital asistido** en cinco pasos:
 
 1. **Cargar** la foto (JPG/PNG). Se valida el archivo, se corrige la orientación EXIF y se comprueba si el contenido parece una pieza admitida.
 2. **Identificar**: una CNN sugiere el tipo de pieza y el usuario lo confirma o lo cambia.
-3. **Encuadrar**: una U-Net propone las cuatro esquinas; el usuario las revisa, las arrastra o las marca a mano.
+3. **Encuadrar**: una U-Net, entrenada con impresos, manuscritos y pinturas, propone las cuatro esquinas; el usuario las revisa, las arrastra o las marca a mano.
 4. **Mejorar**: homografía a vista frontal y mejora clásica ajustable (iluminación, CLAHE, suavizado, nitidez, binarización solo en documentos), con comparación antes/después y detalle a resolución real.
 5. **Guardar**: PNG, PDF, registro JSON de todas las decisiones y un ZIP que incluye el **original byte a byte**.
 
@@ -80,7 +80,7 @@ flowchart TB
     M1 --> AL[Control de alcance<br/>similitud de embeddings]
     M1 --> M2[M2 · Clasificación<br/>ResNet18 congelada + cabeza lineal<br/>224×224 → 3 puntuaciones]
     M2 --> P[Preajuste por clase]
-    M1 --> M3[M3 · Borde<br/>U-Net 256×256 → máscara → cuadrilátero<br/>respaldo: contornos Canny / manual]
+    M1 --> M3[M3 · Borde<br/>U-Net de 3 clases 256×256 → máscara → cuadrilátero<br/>respaldo: contornos Canny / manual]
     M3 --> M4[M4 · Rectificación<br/>homografía + warpPerspective sobre el RGB original]
     M4 --> M5[M5 · Mejora clásica<br/>iluminación, CLAHE en luminancia, suavizado,<br/>máscara de enfoque, Otsu / Sauvola]
     P --> M5
@@ -100,8 +100,10 @@ flowchart TB
     D[(data/manifest.csv<br/>480 fotos · bloques)] --> TR[train_transfer.py /<br/>experiment_rotation.py]
     TR --> W[(models/classifier.pt)]
     D --> CS[calibrate_scope.py] --> SB[(scope_reference.npz)]
+    DS[(data/segmentation_manifest.csv<br/>240 fotos + máscaras · bloques)] --> TU[train_unet.py] --> WU[(models/unet_resnet18_3clases.pth)]
   end
   W -.-> M2
+  WU -.-> M3
   SB -.-> AL
 ```
 
@@ -111,7 +113,7 @@ flowchart TB
 | M1 Preproceso | RGB → vista previa (1200 px), vista de detección (960 px), hash | redimensión INTER_AREA, SHA-256 | `imaging.py` |
 | Alcance | RGB → alerta sí/no | similitud coseno con 408 embeddings de desarrollo | `palimpsesto/models.py` |
 | M2 Clasificación | RGB 224×224 → 3 puntuaciones | ResNet18 ImageNet congelada + cabeza lineal | `models.py` |
-| M3 Borde | RGB 256×256 → máscara → 4 puntos | U-Net (encoder ResNet18); contornos; manual | `models.py`, `imaging.py` |
+| M3 Borde | RGB 256×256 → máscara → 4 puntos | U-Net de 3 clases (encoder ResNet18); contornos; manual | `models.py`, `imaging.py` |
 | M4 Rectificación | RGB + 4 puntos → vista frontal | homografía (`getPerspectiveTransform`, `warpPerspective`) | `imaging.py` |
 | M5 Mejora | vista frontal + parámetros → resultado | en el canal L de Lab: filtro bilateral, división por fondo gaussiano, CLAHE, máscara de enfoque; Otsu/Sauvola en documentos | `imaging.py` |
 | M6 Evaluación | antes/después → métricas | varianza del Laplaciano, contraste RMS; SSIM/PSNR con referencia | `imaging.py` |
@@ -128,7 +130,7 @@ flowchart TB
 |---|---|---|
 | 1. Planeación | Problemática, escenario, alcance y arquitectura (documento de definición). | Propuesta del equipo |
 | 2. Datos | 480 fotos reales con celular (160 por clase), manifiesto con hash y **bloques por pieza** para evitar fuga entre entrenamiento y prueba. | `data/manifest.csv`, `docs/DATA_CARD.md` |
-| 3. Geometría | Comparación de detección clásica (Canny + contornos) frente a U-Net; homografía sobre el original. | `results/research/` |
+| 3. Geometría | Comparación de detección clásica (Canny + contornos) frente a U-Net; homografía sobre el original. Después, ampliación de la U-Net a manuscritos y pinturas con 160 máscaras nuevas (v0.4.0). | `results/research/`, `results/segmentation/` |
 | 4. Mejora | Comparación de técnicas en referencias sintéticas alineadas (iluminación, CLAHE, suavizado, nitidez, FFT). | `results/quality/` |
 | 5. Clasificación | CNN del curso (5 variantes) y ANN de descriptores; luego transferencia ResNet18 con validación cruzada por bloques; experimento de rotación. | `results/classification/`, `results/transfer/`, `results/rotation/` |
 | 6. Interfaz | Aplicación web de cinco pasos con supervisión, avisos y recuperación de errores. | `templates/`, `static/` |
@@ -138,7 +140,7 @@ flowchart TB
 
 - **Espacio de color y geometría:** conversión RGB, orientación EXIF, homografía de cuatro puntos y remuestreo (Hartley & Zisserman, 2004).
 - **Detección de bordes y contornos:** Canny (1986), morfología y aproximación poligonal como alternativa a la U-Net.
-- **Segmentación:** U-Net con encoder ResNet18 entrenada en el tercer parcial (80 fotos y 80 máscaras); de su máscara se extrae el cuadrilátero.
+- **Segmentación:** U-Net con encoder ResNet18, con la receta del tercer parcial (Soft Dice, Adam, volteo y giro). En el parcial se entrenó solo con documentos impresos (80 fotos); en la v0.4.0 se reentrenó con **240 fotos de las tres clases** (80 impresos, 80 manuscritos y 80 pinturas anotados con polígonos en makesense.ai). De su máscara se extrae el cuadrilátero.
 - **Mejora (en el canal L de Lab, para no alterar el tono):** filtro bilateral contra el ruido; estimación de iluminación con filtro gaussiano grande y división; CLAHE (Zuiderveld, 1994); máscara de enfoque; binarización global de Otsu (1979) y local de Sauvola (2000) solo en documentos.
 - **Frecuencia:** filtro *high-boost* con FFT, evaluado en `notebooks/Palimpsesto_experimentos.ipynb` y `results/quality/`, pero no desplegado porque no superó a los filtros espaciales.
 - **Métricas:** SSIM (Wang et al., 2004) y PSNR solo cuando hay referencia alineada; nitidez (varianza del Laplaciano) y contraste RMS como descriptores, no como notas de fidelidad.
@@ -150,7 +152,8 @@ flowchart TB
 | **CNN del curso** | 4 convoluciones (16/32/64/128) + pooling + FC 64 → 3; 5 variantes: base, Dropout, L2, aumentos, combinada | Línea base académica; se conserva con sus resultados. |
 | **ANN de descriptores** | 50 descriptores (histograma RGB, bordes, nitidez) → 32 → 3 | Línea base sin convoluciones. |
 | **Clasificador operativo v0.3.0** | ResNet18 ImageNet congelada + cabeza lineal (regresión logística L2) entrenada con vistas de brillo, giros de ±8° y **giros de 90°/180°/270°** | Sugiere el tipo de pieza en la interfaz. |
-| **U-Net** | Encoder ResNet18, entrada 256×256 | Propone el borde de la pieza. |
+| **U-Net de 3 clases (v0.4.0)** | Encoder ResNet18 ImageNet, entrada 256×256, 1 canal; entrenada con impresos, manuscritos y pinturas | Propone el borde de la pieza en las tres clases. |
+| U-Net del Parcial 3 | La misma arquitectura, entrenada solo con impresos | Línea base de la comparación; se conserva en la release. |
 
 **Protocolo de evaluación.** Las fotos de una misma pieza física son muy parecidas, así que dividir al azar infla los resultados. Por eso las particiones se hacen por **bloques** (41 en desarrollo y 9 en el diagnóstico) con `StratifiedGroupKFold` (5 folds, semilla 2026). Los hiperparámetros se eligen solo con validación cruzada en desarrollo. Las 72 fotos de diagnóstico ya se habían usado con la CNN del curso, así que **se reportan como diagnóstico secundario y no como prueba ciega**.
 
@@ -161,6 +164,7 @@ flowchart TB
 | Interfaz en Gradio | Flask + HTML/JS propios | Canvas de esquinas con arrastre y teclado, avisos accesibles y control fino de la sesión y del original. |
 | CNN de 128×128 como clasificador final | La CNN del curso se conserva como línea base; el clasificador operativo es transferencia ResNet18 | La CNN propia alcanzó 52/72 (macro-F1 0,705), por debajo de la puerta de despliegue. |
 | Esquinas con Canny + contornos | U-Net + contornos + manual | Con contornos, la IoU media fue 0,64; con la U-Net, 0,968 en fotos de prueba (ver Resultados). |
+| U-Net del parcial, solo para documentos; contornos en pinturas | U-Net de 3 clases para todas las piezas | La U-Net de impresos fallaba en pinturas. Con 160 máscaras nuevas, la IoU media del borde en prueba pasó de 0,811 a 0,937 (ver Resultados). |
 | Partición aleatoria 80/10/10 | Partición por bloques de pieza | Evita evaluar con fotos de la misma pieza que se usó para entrenar. |
 
 ---
@@ -173,6 +177,7 @@ palimpsesto/        Núcleo del sistema
   imaging.py        Validación, EXIF, homografía, mejora clásica, métricas
   models.py         Carga estricta de pesos (weights_only=True), clasificación, alcance, U-Net
   exporting.py      PNG, PDF, JSON y ZIP con el original y sus hashes
+  weights.py        Al iniciar, comprueba los pesos por SHA-256 y descarga los de la release vigente
 templates/index.html  Interfaz de cinco pasos
 static/app.js       Flujo de la interfaz (carga → identificar → encuadrar → mejorar → guardar)
 static/feedback.js  Sistema de avisos: éxito, información, advertencia, error, mensajes de campo, diálogos
@@ -181,6 +186,7 @@ scripts/            Entrenamiento, calibración, evaluación, figuras y verifica
 tests/              Pruebas Python de contratos y acceso remoto + 22 de navegador
 notebooks/          Recorrido académico con FFT y evaluación
 data/manifest.csv   480 fotos, clase, bloque, partición y hash
+data/segmentation_manifest.csv  240 fotos con máscara, clase, bloque, partición y hash (U-Net)
 results/            Fuente numérica de todas las cifras del README
 docs/               Fichas de modelo y datos, validación, guía de sustentación
 ```
@@ -201,7 +207,7 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 | Conjunto | Contenido | Uso |
 |---|---|---|
 | **Fotos de clasificación** | 480 fotografías propias tomadas con celular, 160 por clase (impreso, manuscrito, pintura); 50 bloques provisionales de pieza | Entrenamiento y evaluación del clasificador y calibración del alcance |
-| **Segmentación** | 80 fotos + 80 máscaras de documentos (18 grupos), del tercer parcial | U-Net |
+| **Segmentación** | 240 fotos con máscara, 80 por clase: 80 impresos del tercer parcial (18 documentos) + 80 manuscritos (10 piezas) y 80 pinturas (13 bloques) anotados con polígonos en makesense.ai; partición por pieza (160 / 40 / 40) | Entrenar y evaluar la U-Net |
 | **Referencias sintéticas** | Página construida con sombra, ruido y desenfoque controlados | Comparar técnicas de mejora con SSIM/PSNR |
 | **Negativos de alcance** | 10 imágenes públicas de scikit-image (gato, astronauta, monedas…) | Probar la alerta de contenido ajeno |
 
@@ -215,9 +221,11 @@ Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artifi
 
 - **Google Drive:** [480 fotos de clasificación](https://drive.google.com/drive/folders/1x-kLwxyBtguRjrFI5dU6oVQEYpr3U4Ay) y [fotos, máscaras y anotaciones de segmentación](https://drive.google.com/drive/folders/1a8JVuc3vZH-Qbuj92hRyBT6S9kvS6V3K). Son las carpetas originales de trabajo; sus etiquetas históricas train/test/val no sustituyen las particiones del manifiesto.
 - **Descarga reproducible recomendada:** [dataset_palimpsesto_v1.zip · 820 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.3.0/dataset_palimpsesto_v1.zip). Contiene las 480 fotos del manifiesto, 80 fotos de segmentación, 80 máscaras, cinco extras y dos archivos de anotación: **647 archivos de datos**, más manifiesto, instrucciones y hashes. Se comprobaron los 480 hashes contra el manifiesto y los 647 archivos dentro del ZIP. No incluye material docente ni pesos.
+- **Segmentación de 3 clases:** [segmentacion_3clases_v1.zip · 209 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/segmentacion_3clases_v1.zip), en la release v0.4.0. Contiene las 240 fotos, sus 240 máscaras, `segmentation_manifest.csv`, las anotaciones COCO de makesense.ai y los hashes de sus 485 archivos. Las fotos de manuscritos y pinturas son las mismas del ZIP principal, elegidas entre las 160 de cada clase. SHA-256 del ZIP: `7fec6df5bcccc27344bd0a65746cd2306f1c4d93eee2fe5c9f817c10dc9b4000`.
 - Extrae el ZIP y usa su carpeta `datos/` como `--root`. Incluye `LEEME_DATASET.txt`, `manifest.csv` y `SHA256_ARCHIVOS.json`. SHA-256 del ZIP: `1b00cb28f0490d1247b7f11874b0542dd3d73e1f3b590ef163a7768ca72d8820`.
-- **Código y pesos para el docente:** [repositorio principal](https://github.com/juanffff-hub/palimpsesto-pdi) y [release v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.3.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. Este es el único repositorio principal y de entrega. El material completo del curso se conserva fuera de la publicación.
+- **Código y pesos para el docente:** [repositorio principal](https://github.com/juanffff-hub/palimpsesto-pdi) y [release v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. Este es el único repositorio principal y de entrega. El material completo del curso se conserva fuera de la publicación.
 - Las carpetas originales de Drive permiten actualmente editar a cualquiera con el enlace. Para una copia estable de consulta, usa el ZIP de la release; no modifiques los originales.
+- `data/segmentation_manifest.csv` hace lo mismo con las 240 fotos de segmentación. Los manuscritos y las pinturas usan los bloques de `data/manifest.csv`, así que una pieza nunca queda repartida entre entrenamiento y prueba.
 - `data/manifest.csv` relaciona cada foto con su clase, bloque, partición y hash. `group_verified=false` indica que **la identidad física de las piezas aún no se ha certificado**: los 50 bloques son una agrupación automática conservadora, no 50 piezas confirmadas.
 - Detalle de procedencia, sesgos y licencias: `docs/DATA_CARD.md`.
 
@@ -308,14 +316,50 @@ Con giro de 90°, la v0.3.0 pasa de 0,798 a 0,958. Al aclarar un 25 %, en cambio
 
 ### Detección del borde
 
-| Método (fotos de documentos con máscara de referencia) | Fotos | Detecta | IoU media del cuadrilátero | IoU ≥ 0,95 |
+**Línea base: U-Net del tercer parcial (solo documentos impresos).**
+
+| Método (fotos de documentos impresos con máscara de referencia) | Fotos | Detecta | IoU media del cuadrilátero | IoU ≥ 0,95 |
 |---|---:|---:|---:|---:|
 | Canny (50, 150) + cierre + cuadrilátero mayor | 80 | 25 | 0,28 | 16 |
 | Canny con varios umbrales + puntuación de bordes | 80 | 69 | 0,64 | 32 |
-| **U-Net + cuadrilátero, fotos de prueba** | 12 | 12 | **0,968** (Dice de máscara 0,993) | 11 |
-| U-Net + cuadrilátero, las 80 (incluye las 56 de entrenamiento) | 80 | 80 | 0,969 | 68 |
+| U-Net del parcial + cuadrilátero, fotos de prueba | 12 | 12 | 0,968 (Dice de máscara 0,993) | 11 |
+| U-Net del parcial + cuadrilátero, las 80 (incluye las 56 de entrenamiento) | 80 | 80 | 0,969 | 68 |
 
-Los métodos clásicos no se entrenan, así que se miden sobre las 80 fotos. La cifra justa de la U-Net es la de las 12 fotos de prueba, porque la fila de 80 incluye fotos que vio durante el entrenamiento. Aun así, la diferencia frente a los contornos es grande. La U-Net se entrenó con documentos, así que en pinturas o en fondos muy distintos su sugerencia puede fallar. Por eso siempre hay contornos y borde manual como alternativa, y el usuario revisa los cuatro puntos.
+Los métodos clásicos no se entrenan, así que se miden sobre las 80 fotos. La cifra justa de la U-Net es la de las 12 fotos de prueba, porque la fila de 80 incluye fotos que vio durante el entrenamiento. Esa U-Net se entrenó solo con impresos: en pinturas su máscara apenas coincidía con la pieza (Dice 0,59 en prueba), así que la v0.3.0 proponía el borde de las pinturas con contornos.
+
+### Ampliación de la U-Net a manuscritos y pinturas (v0.3.0 → v0.4.0)
+
+**Hipótesis.** Entrenar la misma U-Net con impresos, manuscritos y pinturas mejora el borde que propone Palimpsesto en manuscritos y pinturas, sin empeorar los impresos.
+
+**Datos y entrenamiento.** Se anotaron con polígonos en makesense.ai 80 fotos de manuscritos y 80 de pinturas, elegidas entre las 160 de cada clase: piezas de borde recto (sin bordes quemados o rasgados), con la pieza completa y nítida. En las pinturas la máscara incluye el marco. Con los 80 impresos del parcial suman 240 fotos. La partición es **por pieza** (`data/segmentation_manifest.csv`): 160 de entrenamiento, 40 de validación y 40 de prueba, y los impresos conservan exactamente la prueba del parcial. Se usó la **misma receta del tercer parcial**: encoder ResNet18 ImageNet, 256×256, volteo y giro de hasta 12°, pérdida Soft Dice, Adam 5·10⁻⁴, 35 épocas y el checkpoint con menor pérdida de validación. Tarda poco más de un minuto en una GPU portátil.
+
+**Regla de adopción, fijada antes de entrenar** (`results/segmentation/protocol.json`). Se compara con lo que hacía la v0.3.0 en modo automático: U-Net de impresos en impresos y manuscritos, y contornos en pinturas. La U-Net nueva debía cumplir cuatro condiciones en las fotos de prueba. Primera, una IoU media de las 3 clases de al menos +0,03. Segunda, que ninguna clase bajara más de 0,01. Tercera, que propusiera borde en al menos tantas fotos como antes. Cuarta, que la mejora media se mantuviera con 3 semillas. **Se cumplieron las cuatro.**
+
+![Comparación del borde propuesto](results/figures/unet_3clases_comparacion.png)
+
+| Sistema · 40 fotos de prueba de piezas no vistas | Impreso (12) | Manuscrito (16) | Pintura (12) | Media de las 3 clases |
+|---|---:|---:|---:|---:|
+| Contornos clásicos | 0,876 | 0,912 | 0,583 | 0,790 |
+| U-Net del parcial (solo impresos) en todas las clases | 0,968 | 0,881 | 0,553 | 0,801 |
+| Sistema v0.3.0 en modo automático | 0,968 | 0,881 | 0,583 | 0,811 |
+| **U-Net de 3 clases (v0.4.0, desplegada)** | **0,970** | **0,963** | **0,877** | **0,937** |
+
+*IoU media del cuadrilátero que propone la aplicación (`imaging.detect_quad`, 960 px) frente a la máscara de referencia. Si no hay borde válido, cuenta como 0.*
+
+| Detalle en prueba: v0.3.0 → v0.4.0 | Impreso | Manuscrito | Pintura |
+|---|---|---|---|
+| Fotos con borde propuesto | 12 → 12 | 16 → 16 | 10 → **12** |
+| Fotos con IoU ≥ 0,90 | 12 → 12 | 11 → **15** | 5 → **7** |
+| Dice de la máscara a 256 px (U-Net del parcial → U-Net nueva) | 0,993 → 0,994 | 0,941 → **0,975** | 0,589 → **0,933** |
+| Semillas 42 / 7 / 2026 (IoU media del borde) | 0,970 / 0,966 / 0,972 | 0,963 / 0,923 / 0,967 | 0,877 / 0,818 / 0,833 |
+
+![Ejemplos de prueba](results/figures/unet_3clases_ejemplos.jpg)
+
+![Curvas de aprendizaje](results/figures/unet_3clases_aprendizaje.png)
+
+**Análisis.** La mayor ganancia está donde la v0.3.0 era más débil. En pinturas, la U-Net nueva propone borde en las 12 fotos, y en cuatro de ellas pasa de no tener un borde útil (IoU entre 0 y 0,37) a 0,55–0,94. En manuscritos corrige casos con sombras de mano o sobre fondos verdes, y pasa de 11 a 15 fotos con IoU ≥ 0,90. En impresos no empeora (0,968 → 0,970). Con las otras dos semillas, la media de las 3 clases queda entre 0,902 y 0,937 (media 0,921 ± 0,014), siempre por encima de la v0.3.0 (0,811). El tiempo no cambia: 49 ms de mediana en CPU. La validación deja de mejorar hacia la época 18 y ese es el checkpoint elegido; en esa época la pérdida de entrenamiento es 0,009 y la de validación 0,019, una brecha moderada.
+
+**Límites de esta evaluación.** Son 40 fotos de prueba de 8 piezas o bloques (3 de impresos, 2 de manuscritos y 3 de pinturas), así que cada cifra depende de pocas piezas. Las pinturas siguen siendo la clase más difícil. Un lienzo sin marco, de tonos rojos y fotografiado sobre una silla roja (bloque PIN008), baja su media porque casi no contrasta con el fondo; solo 4 de 12 pinturas superan IoU 0,95. Los manuscritos elegidos tienen bordes rectos: con bordes rasgados o quemados la reducción a cuatro esquinas es una aproximación. Por eso los cuatro puntos siguen siendo editables y los contornos y el modo manual siguen disponibles.
 
 ### Calidad de la mejora (referencia sintética alineada)
 
@@ -336,7 +380,7 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación y acceso remoto | 87/87 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto y descarga verificada de pesos | 90/90 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
 | `npm run test:ui`: navegador en 320–1440 px, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 22/22 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
@@ -352,19 +396,19 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 - Se construyó un sistema funcional de extremo a extremo (cargar → identificar → encuadrar → mejorar → exportar) que integra clasificación, segmentación y PDI clásico, corre en CPU sin conexión y conserva el original byte a byte.
 - En el diagnóstico secundario de las mismas 72 fotos, el clasificador operativo acertó 70/72 y la CNN del curso 52/72. La validación cruzada del clasificador operativo obtuvo macro-F1 0,958; corresponde a otro protocolo y no se compara directamente con el F1 del diagnóstico de la CNN. Los resultados favorecen la transferencia en este conjunto, con las limitaciones de separación descritas.
 - Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
-- La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos).
+- La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos). Al reentrenarla con 160 máscaras nuevas de manuscritos y pinturas, con una regla de adopción fijada de antemano, el borde propuesto en prueba subió de 0,811 a 0,937 de IoU media (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963) sin empeorar los impresos.
 - La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
 
 **Limitaciones**
 
 - Las identidades físicas de las piezas no están certificadas y el diagnóstico de 72 fotos ya se había usado, así que **las métricas son provisionales y no prueban generalización a piezas nuevas**.
-- Manuscritos de letra muy regular todavía se confunden con impresos; la U-Net es menos fiable fuera de los documentos.
+- Manuscritos de letra muy regular todavía se confunden con impresos. La U-Net acierta menos en pinturas que en documentos (IoU 0,877 frente a 0,96–0,97), sobre todo cuando la pintura y el fondo tienen colores parecidos, y su prueba tiene solo 8 piezas o bloques.
 - No hay referencia real para medir la fidelidad de la mejora; la homografía no corrige páginas curvas.
 
 **Oportunidades de mejora**
 
 - Certificar las piezas y capturar 6–9 piezas nuevas para una evaluación realmente independiente.
-- Ampliar la U-Net con máscaras de manuscritos y pinturas.
+- Anotar más pinturas sobre fondos de colores parecidos y manuscritos de borde irregular, para seguir ampliando la U-Net.
 - Ajustar el modelo completo (*fine-tuning*) una vez exista una partición certificada.
 - Incorporar dewarping para páginas curvas y OCR como herramienta externa de evaluación.
 
@@ -381,7 +425,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Descarga `modelos_palimpsesto_v0.3.0.zip` de la [release pública v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.3.0) y extráelo en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_imagenet.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP es idéntico al publicado por el equipo (SHA-256 `9880804e55312b0cc0556a52c2ff94f03a7ef4ed08ceb820a680e4221006e577`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
+**Los pesos se instalan solos.** Al iniciar (`run.py`, `Iniciar_Palimpsesto.cmd`, el instalador o la demo pública), `palimpsesto/weights.py` comprueba por SHA-256 que los pesos sean los que pide el código. Si faltan o son de otra versión, descarga `modelos_palimpsesto_v0.4.0.zip` de la [release pública v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0) (236 MB, solo la primera vez), verifica el ZIP y cada archivo y los coloca en `models/`. La dirección y el hash del ZIP están en `models/release.json`. Sin conexión no se borra nada: la aplicación arranca con los pesos que haya. También se puede hacer a mano con `python scripts/fetch_models.py` o extrayendo el ZIP en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_3clases.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP trae además los modelos anteriores (CNN del curso, clasificador v0.2.0 y la U-Net del parcial, `unet_resnet18_imagenet.pth`) para reproducir las comparaciones (SHA-256 del ZIP `bf9d44bb8face5437155fc0c4acf9aaa3d02087a481cb5d77d6e5ede75ddf393`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
@@ -389,11 +433,11 @@ Descarga `modelos_palimpsesto_v0.3.0.zip` de la [release pública v0.3.0](https:
 
 Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. Este lanzador escucha solo en localhost. Para compartir una demo HTTPS gratuita, consulta «Demo compartida gratuita».
 
-Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
+Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
 
 ### Reproducir entrenamiento, evaluación y figuras
 
-`--root` apunta a `datos/` al extraer el ZIP de la sección 5. También admite la carpeta `material_original/Material Proyecto de PDI` del paquete privado original.
+`--root` apunta a `datos/` al extraer el ZIP de la sección 5, y `--data` a la carpeta `segmentacion_3clases/` del ZIP de segmentación. `scripts/build_segmentation_dataset.py` reconstruye esa carpeta a partir de las fotos y las anotaciones de makesense.ai. También admite la carpeta `material_original/Material Proyecto de PDI` del paquete privado original.
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/train_classifier.py --root "C:\ruta\datos"      # CNN del curso y ANN
@@ -403,12 +447,16 @@ Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a 
 .\.venv\Scripts\python.exe scripts/evaluate_model.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/benchmark_quality.py
+.\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 42 --save   # U-Net v0.4.0
+.\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 7          # semillas de control (también 2026)
+.\.venv\Scripts\python.exe scripts/evaluate_unet.py --data "C:\ruta\segmentacion_3clases"
+.\.venv\Scripts\python.exe scripts/make_segmentation_figures.py --data "C:\ruta\segmentacion_3clases"
 .\.venv\Scripts\python.exe scripts/make_figures.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/verify_real_pipeline.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/check.py
 ```
 
-**El entrenamiento sobrescribe checkpoints y resultados:** conserva una copia de la release antes de repetirlo. `experiment_rotation.py --promote` guarda siempre el modelo anterior como `classifier_v0.2.0.pt`. Después de cambiar el clasificador, ejecuta `calibrate_scope.py` y actualiza `models/checksums.json`. Las semillas fijas reducen la variación, pero no garantizan resultados idénticos bit a bit entre equipos.
+**El entrenamiento sobrescribe checkpoints y resultados:** conserva una copia de la release antes de repetirlo. `experiment_rotation.py --promote` guarda siempre el modelo anterior como `classifier_v0.2.0.pt`. Después de cambiar el clasificador, ejecuta `calibrate_scope.py` y actualiza `models/checksums.json`. La U-Net se entrena en GPU si hay una disponible (en CPU tarda más, pero funciona). Las semillas fijas reducen la variación, pero no garantizan resultados idénticos bit a bit entre equipos.
 
 **Pruebas de navegador:** con el servidor activo, `npm install` y `npm run test:ui` (Node y Chrome; `CHROME_PATH` es opcional). Las capturas del README se regeneran con `node scripts/capture_gui.cjs`.
 

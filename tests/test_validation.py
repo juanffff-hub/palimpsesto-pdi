@@ -120,7 +120,7 @@ def test_recovery_after_error(client):
 
 def test_missing_and_corrupt_weights(tmp_path):
     model=ModelService(tmp_path);assert model.classifier is None and model.segmenter is None;assert len(model.errors)==2
-    (tmp_path/'classifier.pt').write_bytes(b'bad checkpoint');(tmp_path/'unet_resnet18_imagenet.pth').write_bytes(b'bad checkpoint')
+    (tmp_path/'classifier.pt').write_bytes(b'bad checkpoint');(tmp_path/'unet_resnet18_3clases.pth').write_bytes(b'bad checkpoint')
     model=ModelService(tmp_path);assert model.classifier is None and model.segmenter is None;assert len(model.errors)==2
 
 def test_private_preview_not_cached(client):assert client.get('/api/image/original').headers['Cache-Control']=='no-store'

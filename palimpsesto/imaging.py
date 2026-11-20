@@ -99,7 +99,7 @@ def classical_quad(rgb):
 
 def detect_quad(rgb,models,kind='documento_impreso',method='auto'):
     small=resize_long(rgb,960);h,w=small.shape[:2];q=None;multi=False;source='manual';warnings=[]
-    if method=='unet' or (method=='auto' and kind!='pintura'):
+    if method in ('unet','auto'):
         prob=models.segment(rgb)
         if prob is not None:
             mask=cv2.resize((prob>.5).astype(np.uint8),(w,h),interpolation=cv2.INTER_NEAREST)
@@ -113,7 +113,7 @@ def detect_quad(rgb,models,kind='documento_impreso',method='auto'):
     if q is None:
         q=np.array([[.08,.08],[.92,.08],[.92,.92],[.08,.92]],np.float32);source='manual'
         warnings.append('No hay un borde fiable. Coloca los cuatro puntos sobre la pieza.')
-    if source=='unet':warnings.append('Borde sugerido por una red entrenada con documentos impresos; confirma las cuatro esquinas.')
+    if source=='unet':warnings.append('Borde sugerido por una U-Net entrenada con impresos, manuscritos y pinturas; confirma las cuatro esquinas.')
     elif source=='contornos':warnings.append('Borde sugerido por contraste; puede corresponder al marco o al fondo. Confírmalo.')
     return {'points':q.tolist(),'method':source,'warnings':warnings,'manual_required':source=='manual'}
 

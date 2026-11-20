@@ -6,6 +6,7 @@ local_settings.json
 models/*.pt
 models/*.pth
 models/.download_cache/
+models/*.part
 results/transfer/features.npz
 results/screenshots/
 *.private.*

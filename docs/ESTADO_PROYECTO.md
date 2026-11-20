@@ -2,16 +2,16 @@
 
 ## Versión técnica
 
-Palimpsesto integra clasificación supervisada por la persona, segmentación de la pieza, corrección de perspectiva, mejora clásica ajustable, comparación y exportación PNG/PDF/JSON/ZIP con el original intacto. Clasificador operativo v0.3.0; baseline anterior conservado. Las redes, los pesos y las métricas de evaluación no se modifican en el cierre de publicación.
+Palimpsesto integra clasificación supervisada por la persona, segmentación de la pieza, corrección de perspectiva, mejora clásica ajustable, comparación y exportación PNG/PDF/JSON/ZIP con el original intacto. Clasificador operativo v0.3.0 y U-Net de 3 clases v0.4.0; modelos anteriores conservados como líneas base. Las redes, los pesos y las métricas de evaluación no se modifican en el cierre de publicación.
 
 Repositorio único: https://github.com/juanffff-hub/palimpsesto-pdi
 
 ## Evidencia existente
 
-- 87 comprobaciones Python, nueve recorridos con modelos reales y 22 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
+- 90 comprobaciones Python (incluida la descarga verificada de los pesos), nueve recorridos con modelos reales y 22 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
 - Diagnóstico secundario: 70/72 clasificaciones correctas; es un conjunto reutilizado, no un test ciego.
 - CV macro-F1 0,9581 en vistas derechas y 0,9548 en vistas giradas, con grupos provisionales.
-- U-Net: IoU de cuadrilátero 0,968 en las 12 fotos de prueba histórica.
+- U-Net v0.4.0 (impresos, manuscritos y pinturas): IoU media del borde propuesto 0,937 en 40 fotos de prueba por pieza, frente a 0,811 de la v0.3.0 (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963; impresos 0,968 → 0,970). Regla de adopción fijada antes de entrenar.
 - Filtro de alcance: nueve de diez negativos de conveniencia alertados; persiste un falso negativo.
 - Clasificación propia del curso y ANN conservadas como líneas base, incluidos sus fallos.
 
@@ -19,7 +19,7 @@ El cierre del acceso remoto añade ocho comprobaciones dirigidas a HTTPS, sesion
 
 ## Acceso y ejecución
 
-README sección 5 enlaza el dataset, los Drive y los pesos. La release v0.3.0 incluye los archivos descargables. `Iniciar_Palimpsesto.cmd` abre el modo local. `Iniciar_Enlace_Publico.cmd` crea una demo HTTPS temporal desde este computador, sin contratar servicios; `Detener_Enlace_Publico.cmd` cierra la publicación. Ver `DEMO_PUBLICA.md`.
+README sección 5 enlaza el dataset, los Drive y los pesos. La release v0.3.0 incluye el dataset de clasificación y la v0.4.0 los pesos actuales y el dataset de segmentación. `Iniciar_Palimpsesto.cmd` abre el modo local. `Iniciar_Enlace_Publico.cmd` crea una demo HTTPS temporal desde este computador, sin contratar servicios; `Detener_Enlace_Publico.cmd` cierra la publicación. Ver `DEMO_PUBLICA.md`.
 
 ## Coordinación de cambios
 

@@ -31,9 +31,11 @@ def main():
     from waitress import serve
     server.app.config.update(PUBLIC_DEMO=True, SESSION_COOKIE_SECURE=True,
                              SESSION_TTL_SECONDS=900, MAX_ACTIVE_SESSIONS=5)
+    from palimpsesto.weights import ensure_models
+    ensure_models(ROOT / 'models')
     server.models = server.ModelService(ROOT / 'models')
     if any(x is None for x in (server.models.classifier, server.models.segmenter, server.models.scope_bank)):
-        raise RuntimeError('No se publica una demo sin las dos redes y el filtro de alcance activos. Revisa los pesos v0.3.0.')
+        raise RuntimeError('No se publica una demo sin las dos redes y el filtro de alcance activos. Revisa los pesos v0.4.0.')
     threading.Thread(target=cleanup_loop, daemon=True).start()
     # Solo cloudflared en este mismo computador puede acceder al puerto.
     # Waitress reconoce HTTPS desde ese proxy, de modo que Origin y cookies

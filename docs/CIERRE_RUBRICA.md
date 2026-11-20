@@ -6,7 +6,7 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 |---|---|
 | Necesidad sobre arte y cultura, problemática y solución | README §1: captura documental y artística con supervisión humana |
 | PDI, visión computacional y GUI integrados | README §2–4; clasificación, U-Net, homografía, mejora y exportación |
-| Evaluar con datos reales registrados o capturados | 480 fotos reales; protocolos y métricas en README §5 y §7, `results/` |
+| Evaluar con datos reales registrados o capturados | 480 fotos reales y 240 con máscara (3 clases); protocolos y métricas en README §5 y §7, `results/` |
 | Métricas, ejemplos visuales y análisis de límites | Tablas, curvas, matrices, comparación geométrica y casos fallidos; fichas de modelo y datos |
 | Descripción | README §1 |
 | Arquitectura completa | Diagrama Mermaid y tabla de módulos, README §2 |

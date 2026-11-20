@@ -8,7 +8,7 @@ Equipo: Neira, Gómez y Fajardo. Confirmar nombres completos, institución y fec
 2. Datos: 480 fotos no son 480 piezas. Explicar bloques provisionales, derivados y fuga por objeto.
 3. Red: CNN propia y sus cinco variantes; por qué 97 % de validación no bastó. Mostrar la matriz de 72 fotos.
 4. Transferencia: ResNet18 congelada, 512 rasgos, cabeza lineal de tres clases. Solo se aprende esa cabeza; se exporta la red completa.
-5. Segmentación: U-Net predice máscara por píxel; el cuadrilátero se deriva y se revisa. No confundir máscara con caja.
+5. Segmentación: U-Net predice máscara por píxel; el cuadrilátero se deriva y se revisa. No confundir máscara con caja. Mostrar la ampliación a 3 clases: misma receta del parcial, 160 máscaras nuevas, regla fijada antes de entrenar y 0,811 → 0,937.
 6. Geometría: cuatro correspondencias, matriz 3×3 hasta escala; puntos no colineales, plano y proporción física opcional.
 7. Mejora: estimación de fondo, CLAHE, bilateral y unsharp; pintura inicia neutra. Explicar signo, flotantes y canales.
 8. Evaluación: macro-F1, confusión, Dice/IoU, SSIM/PSNR solo alineados. Presentar limitaciones antes de conclusiones.
@@ -22,6 +22,8 @@ Equipo: Neira, Gómez y Fajardo. Confirmar nombres completos, institución y fec
 - ¿Qué información recupera unsharp? Realza contraste local de bordes existentes; no conoce letras ausentes.
 - ¿Por qué dos imágenes del mismo tamaño no sirven automáticamente para SSIM? Pueden representar posiciones diferentes; hace falta registro y referencia pertinente.
 - ¿Por qué no se usa difusión? Puede producir contenido plausible sin fidelidad; no hay referencias para validarla en este alcance.
+- ¿Cómo saben que la U-Net nueva es mejor y no solo distinta? La regla de adopción se escribió antes de entrenar, la prueba es por pieza (piezas que la red no vio) y se compara con lo que hacía la v0.3.0 con la misma función de la aplicación; además se repitió con 3 semillas.
+- ¿Por qué la máscara de las pinturas incluye el marco? El marco forma parte de la pieza fotografiada y da un borde recto y estable para la homografía; quien quiera solo el lienzo puede mover las esquinas.
 - ¿Qué sucede si el modelo falla? La persona corrige clase o esquinas. Si la captura perdió información, hay que repetirla.
 - ¿La fotografía de una pintura conserva color exacto? No se dispone de calibración colorimétrica; se evita modificación automática pero no se certifica fidelidad.
 

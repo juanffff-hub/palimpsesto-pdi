@@ -1,4 +1,4 @@
-# Modelos de Palimpsesto 0.3.0
+# Modelos de Palimpsesto 0.4.0
 
 ## Clasificador operativo v0.3.0 (19 de noviembre de 2026)
 
@@ -24,11 +24,28 @@ ResNet18 preentrenada ImageNet-1K oficial de torchvision, encoder congelado, cab
 
 389/408 OOF; diagnóstico secundario 67/72, matriz [[24,0,0],[5,19,0],[0,0,24]]. Cinco errores manuscrito→impreso. El conjunto secundario se había observado al evaluar la CNN del curso, por lo que no es confirmación ciega. La CV participa en elección de hiperparámetro, por lo que tampoco equivale a evaluación externa sin selección. Una sola semilla, bloques sin certificación física. Las puntuaciones no están calibradas como probabilidades de certeza. Rotaciones de 90° empeoran el diagnóstico; ver robustez.
 
+## U-Net de 3 clases v0.4.0 (20 de noviembre de 2026)
+
+Misma arquitectura y receta del tercer parcial (`smp.Unet`, encoder ResNet18 ImageNet, 1 canal, 256×256; volteo y giro ≤12°, Soft Dice, Adam 5e-4, ReduceLROnPlateau, 35 épocas, checkpoint por pérdida de validación), entrenada con **240 fotos con máscara: 80 impresos del parcial, 80 manuscritos y 80 pinturas** anotados con polígonos en makesense.ai. En pinturas la máscara incluye el marco. Partición por bloque de pieza (`data/segmentation_manifest.csv`): 160/40/40; los impresos conservan la prueba del parcial. Checkpoint desplegado: semilla 42, época 18, Dice de validación 0,977 (`models/unet_resnet18_3clases.pth`).
+
+Protocolo y regla fijados antes de entrenar (`results/segmentation/protocol.json`, `scripts/train_unet.py`, `scripts/evaluate_unet.py`). Métrica: IoU del cuadrilátero que propone la aplicación frente a la máscara, en 40 fotos de prueba de piezas no vistas. Comparación con la v0.3.0 en modo automático (U-Net del parcial en documentos, contornos en pinturas):
+
+| Prueba (fotos) | v0.3.0 | v0.4.0 |
+|---|---:|---:|
+| Impreso (12) | 0,968 | 0,970 |
+| Manuscrito (16) | 0,881 | 0,963 |
+| Pintura (12) | 0,583 | 0,877 |
+| Media de las 3 clases | 0,811 | 0,937 |
+
+Se cumplieron las cuatro condiciones (media +0,03, ninguna clase −0,01, mismas o más detecciones, mejora con 3 semillas: 0,937 / 0,902 / 0,924). Tiempo mediano en CPU: 49 ms, igual que antes.
+
+Limitaciones: 8 piezas o bloques en prueba; pinturas con fondos del mismo color (PIN008) siguen siendo difíciles y solo 4/12 pinturas superan IoU 0,95. Los manuscritos elegidos tienen bordes rectos. La sugerencia de borde sigue exigiendo revisión humana. La U-Net del parcial se conserva (`unet_resnet18_imagenet.pth`) como línea base.
+
 ## Baselines y segmentación
 
 CNN del curso: cuatro convoluciones 16/32/64/128, pooling, AdaptiveAvgPool 4×4, FC64→3; cinco variantes base/dropout/L2/augmentación/combinada. L2 elegida por validación; test 52/72. ANN50→32→3 sobre histogramas RGB, bordes y nitidez; 47/72. Conservar como resultados, no sustituir sus cifras por las del modelo transferido.
 
-U-Net con encoder ResNet18, checkpoint del material suministrado y normalización ImageNet, entrada 256×256. Dice 0.9931 e IoU 0.9864 en 12 fotos de test histórico. No fue reentrenada como si tuviera partición nueva. Contornos/método manual cubren casos fuera de dominio. La sugerencia de borde exige revisión.
+U-Net del Parcial 3 (línea base de la v0.4.0): encoder ResNet18, checkpoint del material suministrado y normalización ImageNet, entrada 256×256, entrenada solo con impresos. Dice 0.9931 e IoU 0.9864 en 12 fotos de test histórico; en pinturas, Dice 0,589. No fue reentrenada como si tuviera partición nueva. Contornos/método manual cubren casos fuera de dominio. La sugerencia de borde exige revisión.
 
 ## Control de alcance
 

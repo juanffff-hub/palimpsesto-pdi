@@ -13,6 +13,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallo al instalar PyTorch CPU. Comprueba la co
 if ($LASTEXITCODE -ne 0) { throw 'Fallo al instalar dependencias. Conserva el mensaje y consulta README.md.' }
 & $palimpsestoVenv -m pip check
 if ($LASTEXITCODE -ne 0) { throw 'Hay dependencias incompatibles; revisa el resultado antes de continuar.' }
+& $palimpsestoVenv scripts/fetch_models.py
+if ($LASTEXITCODE -ne 0) { throw 'No se pudieron descargar los pesos de la release. Comprueba la conexion y vuelve a intentar.' }
 & $palimpsestoVenv scripts/check.py
 if ($LASTEXITCODE -ne 0) { throw 'La verificacion detecto un fallo. No declarar la instalacion validada.' }
 Write-Host 'Instalacion y pruebas completadas. Ejecuta Iniciar_Palimpsesto.cmd.'

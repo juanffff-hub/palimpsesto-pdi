@@ -13,3 +13,5 @@
 *.npz binary
 # Checkpoint provenance hashes the exact manifest bytes on every platform.
 data/manifest.csv -text
+# Los checkpoints de la U-Net registran el hash exacto de este manifiesto.
+data/segmentation_manifest.csv -text

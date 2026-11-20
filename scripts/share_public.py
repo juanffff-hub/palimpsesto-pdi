@@ -17,7 +17,7 @@ REMOTE = 'https://github.com/juanffff-hub/palimpsesto-pdi.git'
 PORT = 8766
 CF_URL = 'https://github.com/cloudflare/cloudflared/releases/download/2026.11.1/cloudflared-windows-amd64.exe'
 CF_SHA = '341deda3db5ec498a0482254d6c38c0b7cf01a30c37bb5dd95d2216d08955e35'
-MODEL_FILES = ('classifier.pt', 'unet_resnet18_imagenet.pth', 'scope_reference.npz')
+MODEL_FILES = ('classifier.pt', 'unet_resnet18_3clases.pth', 'scope_reference.npz')
 GIT = shutil.which('git') or r'C:\Program Files\Git\cmd\git.exe'
 CHILD_FLAGS = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
 
@@ -47,6 +47,13 @@ def digest(path):
 
 def install_models():
     checks = json.loads((SOURCE / 'models/checksums.json').read_text(encoding='utf-8'))
+    stale = [n for n in MODEL_FILES if not (ROOT / 'models' / n).exists() or digest(ROOT / 'models' / n) != checks[n]['sha256']]
+    fetch = SOURCE / 'scripts/fetch_models.py'
+    if stale and fetch.exists():
+        # Los pesos que pide main se bajan de su release y se verifican por SHA-256.
+        say('Preparando los pesos que pide main: ' + ', '.join(stale))
+        subprocess.run([sys.executable, str(fetch), str(ROOT / 'models'), str(SOURCE / 'models')],
+                       cwd=SOURCE, timeout=1800, creationflags=CHILD_FLAGS)
     for name in MODEL_FILES:
         target = SOURCE / 'models' / name
         expected = checks[name]['sha256']

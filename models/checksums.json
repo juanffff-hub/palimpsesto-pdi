@@ -39,6 +39,10 @@
     "bytes": 44792203,
     "sha256": "083e12513f63555723bc7d25f3c7220161cf30d1968007664fb4e3e0205f802a"
   },
+  "unet_resnet18_3clases.pth": {
+    "bytes": 57418331,
+    "sha256": "54f8cd5b08113eb9c8311ca4164ddce4c5eac87258a019bda41b14a1d6a20d3f"
+  },
   "unet_resnet18_imagenet.pth": {
     "bytes": 57427351,
     "sha256": "f12cdcc1022b224a3d0774a27898221883e0d7cb785de9e9c5d401801787bb0c"
