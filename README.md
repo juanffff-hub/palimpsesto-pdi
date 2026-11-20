@@ -177,6 +177,7 @@ palimpsesto/        Núcleo del sistema
   imaging.py        Validación, EXIF, homografía, mejora clásica, métricas
   models.py         Carga estricta de pesos (weights_only=True), clasificación, alcance, U-Net
   exporting.py      PNG, PDF, JSON y ZIP con el original y sus hashes
+  weights.py        Al iniciar, comprueba los pesos por SHA-256 y descarga los de la release vigente
 templates/index.html  Interfaz de cinco pasos
 static/app.js       Flujo de la interfaz (carga → identificar → encuadrar → mejorar → guardar)
 static/feedback.js  Sistema de avisos: éxito, información, advertencia, error, mensajes de campo, diálogos
@@ -379,7 +380,7 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación y acceso remoto | 87/87 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto y descarga verificada de pesos | 90/90 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
 | `npm run test:ui`: navegador en 320–1440 px, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 22/22 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
@@ -424,7 +425,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Descarga `modelos_palimpsesto_v0.4.0.zip` de la [release pública v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0) y extráelo en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_3clases.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP trae además los modelos anteriores (CNN del curso, clasificador v0.2.0 y la U-Net del parcial, `unet_resnet18_imagenet.pth`) para reproducir las comparaciones (SHA-256 del ZIP `bf9d44bb8face5437155fc0c4acf9aaa3d02087a481cb5d77d6e5ede75ddf393`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
+**Los pesos se instalan solos.** Al iniciar (`run.py`, `Iniciar_Palimpsesto.cmd`, el instalador o la demo pública), `palimpsesto/weights.py` comprueba por SHA-256 que los pesos sean los que pide el código. Si faltan o son de otra versión, descarga `modelos_palimpsesto_v0.4.0.zip` de la [release pública v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0) (236 MB, solo la primera vez), verifica el ZIP y cada archivo y los coloca en `models/`. La dirección y el hash del ZIP están en `models/release.json`. Sin conexión no se borra nada: la aplicación arranca con los pesos que haya. También se puede hacer a mano con `python scripts/fetch_models.py` o extrayendo el ZIP en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_3clases.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP trae además los modelos anteriores (CNN del curso, clasificador v0.2.0 y la U-Net del parcial, `unet_resnet18_imagenet.pth`) para reproducir las comparaciones (SHA-256 del ZIP `bf9d44bb8face5437155fc0c4acf9aaa3d02087a481cb5d77d6e5ede75ddf393`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
@@ -432,7 +433,7 @@ Descarga `modelos_palimpsesto_v0.4.0.zip` de la [release pública v0.4.0](https:
 
 Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. Este lanzador escucha solo en localhost. Para compartir una demo HTTPS gratuita, consulta «Demo compartida gratuita».
 
-Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
+Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
 
 ### Reproducir entrenamiento, evaluación y figuras
 

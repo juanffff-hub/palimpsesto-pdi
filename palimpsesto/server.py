@@ -161,6 +161,9 @@ def reset():
 
 def main():
     global models
+    from .weights import ensure_models
+    try:ensure_models(ROOT/'models')
+    except Exception as error:print('Aviso: no se pudieron preparar los pesos de la versión vigente:',error,'— la aplicación arranca con los que haya.',flush=True)
     models=ModelService(ROOT/'models')
     print('Palimpsesto local: http://127.0.0.1:8765',flush=True)
     app.run(host='127.0.0.1',port=int(os.environ.get('PALIMPSESTO_PORT','8765')),debug=False,threaded=True)

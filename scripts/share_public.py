@@ -47,6 +47,13 @@ def digest(path):
 
 def install_models():
     checks = json.loads((SOURCE / 'models/checksums.json').read_text(encoding='utf-8'))
+    stale = [n for n in MODEL_FILES if not (ROOT / 'models' / n).exists() or digest(ROOT / 'models' / n) != checks[n]['sha256']]
+    fetch = SOURCE / 'scripts/fetch_models.py'
+    if stale and fetch.exists():
+        # Los pesos que pide main se bajan de su release y se verifican por SHA-256.
+        say('Preparando los pesos que pide main: ' + ', '.join(stale))
+        subprocess.run([sys.executable, str(fetch), str(ROOT / 'models'), str(SOURCE / 'models')],
+                       cwd=SOURCE, timeout=1800, creationflags=CHILD_FLAGS)
     for name in MODEL_FILES:
         target = SOURCE / 'models' / name
         expected = checks[name]['sha256']
