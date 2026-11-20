@@ -2,7 +2,7 @@
 
 ## Iniciar y detener
 
-1. Instala el proyecto y extrae los pesos v0.3.0 según README. Deben funcionar las dos redes y el filtro de alcance.
+1. Instala el proyecto y extrae los pesos v0.4.0 según README. Deben funcionar las dos redes y el filtro de alcance.
 2. Ejecuta `Iniciar_Enlace_Publico.cmd`. Se añade Waitress si falta y se descarga el conector oficial Cloudflare 2026.11.1, verificando su SHA-256.
 3. Comparte el enlace `https://…trycloudflare.com` de la consola o `.public_runtime/enlace.txt`.
 4. Mantén el computador encendido, conectado y sin suspensión durante la prueba. No se modifica automáticamente la configuración energética del sistema.
