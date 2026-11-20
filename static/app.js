@@ -168,11 +168,42 @@ async function loadFile(file) {
       Feedback.notify({ type: 'info', key: 'capture', title: 'Observaciones de la captura',
         text: assessment.warnings.join(' '), detail: 'Puedes continuar; revisa el detalle al final o repite la foto.' });
     }
+    const capture = upload.capture?.by_kind?.[kind];
+    if (capture?.verdict === 'repetir') {
+      const problems = capture.checks.filter(c => c.level === 'bad').map(c => c.title.toLowerCase()).join(' y ');
+      Feedback.notify({ type: 'warning', key: 'capture-quality', title: 'Conviene repetir la foto',
+        text: `Problema de ${problems}. Si sigues, la copia final perderá detalle.`,
+        detail: 'Tomarla de nuevo ahora evita volver al archivo después.',
+        actions: [{ label: 'Cargar otra foto', onClick: () => resetImage(true) }] });
+    }
   } catch (e) {
     if (e.kind === 'invalid') fileProblem(e.message);
     else showError(e, { key: 'upload', effect: 'La foto no se cargó; sigues en el paso 1.', retry: () => loadFile(lastFile) });
   } finally { busy(false); }
 }
+
+const verdicts = {
+  ok: 'Buena captura: puedes continuar.',
+  revisar: 'Revisa estos puntos antes de seguir.',
+  repetir: 'Conviene repetir la foto ahora, mientras tienes la pieza.' };
+function renderCapture() {
+  const box = $('#capture-quality'), report = upload?.capture?.by_kind?.[kind];
+  box.hidden = !report;
+  if (!report) return;
+  box.dataset.verdict = report.verdict;
+  $('#cq-verdict').textContent = verdicts[report.verdict];
+  const icons = { ok: '✓', warn: '!', bad: '✕' };
+  $('#cq-checks').replaceChildren(...report.checks.map(c => {
+    const li = document.createElement('li'); li.className = 'cq-' + c.level;
+    const icon = document.createElement('span'); icon.className = 'cq-icon'; icon.textContent = icons[c.level]; icon.setAttribute('aria-hidden', 'true');
+    const text = document.createElement('span'); const t = document.createElement('b'); t.textContent = c.title;
+    text.append(t, c.level === 'ok' ? '' : ' · ' + c.message);
+    li.append(icon, text); li.setAttribute('aria-label', `${c.title}: ${c.level === 'ok' ? 'bien' : c.message}`);
+    return li;
+  }));
+  $('#cq-retake').hidden = report.verdict === 'ok';
+}
+$('#cq-retake').onclick = () => resetImage(true);
 
 function renderScores(scores) {
   $('#scores').replaceChildren();
@@ -217,6 +248,7 @@ function setKind(k) {
       ? 'Manuscrito: ajustes suaves. Comprueba que se mantienen trazos débiles, acentos y anotaciones.'
       : 'Impreso: iluminación y contraste moderados. El blanco y negro es opcional.';
   $('#kind-badge').textContent = names[k];
+  renderCapture();
   $('#binary').disabled = k === 'pintura';
   syncControls();
 }

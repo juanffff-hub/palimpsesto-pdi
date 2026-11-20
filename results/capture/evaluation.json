@@ -1,0 +1,149 @@
+{
+  "fotos_reales": {
+    "veredicto": {
+      "ok": 376,
+      "revisar": 81,
+      "repetir": 23
+    },
+    "con_aviso_anterior": 5,
+    "por_chequeo": {
+      "sharpness": {
+        "ok": 452,
+        "bad": 12,
+        "warn": 16
+      },
+      "light": {
+        "ok": 460,
+        "warn": 16,
+        "bad": 4
+      },
+      "glare": {
+        "ok": 478,
+        "warn": 2
+      },
+      "framing": {
+        "ok": 438,
+        "warn": 32,
+        "bad": 9
+      },
+      "size": {
+        "ok": 460,
+        "warn": 19
+      }
+    },
+    "por_clase": {
+      "documento_impreso": {
+        "ok": 141,
+        "revisar": 17,
+        "repetir": 2
+      },
+      "manuscrito": {
+        "ok": 130,
+        "revisar": 22,
+        "repetir": 8
+      },
+      "pintura": {
+        "ok": 105,
+        "revisar": 42,
+        "repetir": 13
+      }
+    }
+  },
+  "defectos_controlados": {
+    "desenfoque": {
+      "chequeo": "sharpness",
+      "fotos": 480,
+      "detectadas": 385,
+      "tasa": 0.802,
+      "tasa_avisos_anteriores": 0.113,
+      "por_clase": {
+        "documento_impreso": 0.838,
+        "manuscrito": 0.85,
+        "pintura": 0.719
+      }
+    },
+    "temblor_horizontal": {
+      "chequeo": "sharpness",
+      "fotos": 480,
+      "detectadas": 475,
+      "tasa": 0.99,
+      "tasa_avisos_anteriores": 0.077,
+      "por_clase": {
+        "documento_impreso": 0.988,
+        "manuscrito": 1.0,
+        "pintura": 0.981
+      }
+    },
+    "temblor_vertical": {
+      "chequeo": "sharpness",
+      "fotos": 480,
+      "detectadas": 479,
+      "tasa": 0.998,
+      "tasa_avisos_anteriores": 0.104,
+      "por_clase": {
+        "documento_impreso": 0.994,
+        "manuscrito": 1.0,
+        "pintura": 1.0
+      }
+    },
+    "poca_luz": {
+      "chequeo": "light",
+      "fotos": 480,
+      "detectadas": 480,
+      "tasa": 1.0,
+      "tasa_avisos_anteriores": 0.231,
+      "por_clase": {
+        "documento_impreso": 1.0,
+        "manuscrito": 1.0,
+        "pintura": 1.0
+      }
+    },
+    "exceso_de_luz": {
+      "chequeo": "light",
+      "fotos": 480,
+      "detectadas": 404,
+      "tasa": 0.842,
+      "tasa_avisos_anteriores": 0.017,
+      "por_clase": {
+        "documento_impreso": 0.875,
+        "manuscrito": 0.938,
+        "pintura": 0.713
+      }
+    },
+    "pieza_cortada": {
+      "chequeo": "framing",
+      "fotos": 479,
+      "detectadas": 434,
+      "tasa": 0.906,
+      "tasa_avisos_anteriores": 0.015,
+      "por_clase": {
+        "documento_impreso": 0.963,
+        "manuscrito": 0.824,
+        "pintura": 0.931
+      }
+    }
+  },
+  "pieza_completa_vs_referencia": {
+    "no_vistas_por_la_unet (val+test)": {
+      "fotos": 80,
+      "tocan_el_borde_segun_referencia": 5,
+      "avisos_correctos": 5,
+      "falsas_alarmas": 1,
+      "omitidas": 0,
+      "error_mediano_fraccion": 0.0037,
+      "pequenas_referencia": 0,
+      "pequenas_unet": 0
+    },
+    "todas": {
+      "fotos": 240,
+      "tocan_el_borde_segun_referencia": 21,
+      "avisos_correctos": 19,
+      "falsas_alarmas": 1,
+      "omitidas": 2,
+      "error_mediano_fraccion": 0.002,
+      "pequenas_referencia": 2,
+      "pequenas_unet": 2
+    }
+  },
+  "nota": "Umbrales elegidos observando fotos reales del proyecto y defectos sintéticos; no es una prueba ciega. Los defectos sintéticos se aplican a la vista de 960 px."
+}
