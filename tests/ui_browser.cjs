@@ -35,7 +35,11 @@ await check('explicit_scope_confirmation',async()=>{await page.locator('#confirm
   assert.equal(await page.evaluate(()=>document.activeElement.id),'confirm-scope','el foco va a la casilla')});
 await check('no_duplicate_toasts',async()=>{await page.locator('#confirm-kind').click();await page.locator('#confirm-kind').click();assert.equal(await page.locator('#toasts .toast[data-key="confirm-scope"]').count(),1)});
 await page.locator('#confirm-scope').check();await page.locator('[data-kind="documento_impreso"]').click();await page.locator('#confirm-kind').click();await page.locator('#step-3').waitFor({state:'visible'});await done();
-await check('field_feedback_cleared',async()=>{assert(await page.locator('#confirm-scope-feedback').isHidden());assert.equal(await page.locator('#toasts .toast[data-key="confirm-scope"]').count(),0)});
+await check('field_feedback_cleared',async()=>{assert(await page.locator('#confirm-scope-feedback').isHidden());assert.equal(await page.locator('#toasts .toast[data-key="confirm-scope"]:not(.leaving)').count(),0)});
+await check('border_confidence_and_mask',async()=>{assert.equal(await page.locator('#border-confidence').getAttribute('data-level'),'segura');
+  assert((await page.locator('#detection-method').innerText()).includes('borde seguro'));const t=page.locator('#toggle-mask');assert(await t.isVisible());
+  await t.click();assert.equal(await t.getAttribute('aria-pressed'),'true');assert(await page.locator('#mask-legend').isVisible());
+  await t.click();assert.equal(await t.getAttribute('aria-pressed'),'false')});
 await check('invalid_aspect_and_recovery',async()=>{await page.locator('#aspect').fill('-1');await page.locator('#confirm-corners').click();await done();assert(await page.locator('#step-3').isVisible());
   assert((await toastText(page,'error')).includes('proporción'));assert(await page.locator('#aspect-feedback').isVisible());assert.equal(await page.locator('#aspect').getAttribute('aria-invalid'),'true');
   await page.locator('#aspect').fill('0');assert(await page.locator('#aspect-feedback').isHidden())});

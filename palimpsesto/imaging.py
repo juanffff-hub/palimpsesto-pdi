@@ -97,10 +97,39 @@ def classical_quad(rgb):
                 candidates.append((score,q))
     return order_quad(max(candidates,key=lambda x:x[0])[1]) if candidates else None
 
-def detect_quad(rgb,models,kind='documento_impreso',method='auto'):
-    small=resize_long(rgb,960);h,w=small.shape[:2];q=None;multi=False;source='manual';warnings=[]
+# Confianza del borde de la U-Net. Umbrales elegidos con las fotos de validación de
+# data/segmentation_manifest.csv y medidos en las de prueba (scripts/evaluate_border_confidence.py).
+FIT_MIN,BAND_MAX=.92,5.
+
+def border_confidence(prob,q,shape):
+    """¿Encajan los cuatro puntos con la máscara y es nítido su contorno?
+
+    fit: IoU entre el cuadrilátero y la máscara de la propia U-Net (960 px).
+    band: píxeles dudosos (0,1 < p < 0,9) por píxel de contorno, a 256 px: ancho medio de la franja incierta.
+    """
+    h,w=shape;mask=cv2.resize((prob>.5).astype(np.uint8),(w,h),interpolation=cv2.INTER_NEAREST)
+    quad=np.zeros((h,w),np.uint8);cv2.fillPoly(quad,[np.round(np.asarray(q)*[w-1,h-1]).astype(np.int32)],1)
+    fit=float((quad&mask).sum()/max((quad|mask).sum(),1))
+    contours=cv2.findContours((prob>.5).astype(np.uint8),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)[0]
+    band=float(((prob>.1)&(prob<.9)).sum()/max(sum(len(c) for c in contours),1))
+    reasons=[]
+    if fit<FIT_MIN:reasons.append(f'Los cuatro puntos cubren solo el {fit*100:.0f} % de la zona que la red marcó como pieza: la pieza puede no ser un rectángulo completo o la red pudo confundir el fondo.')
+    if band>BAND_MAX:reasons.append('El contorno de la máscara es difuso: la red duda dónde termina la pieza (fondo de color parecido, sombra o reflejo).')
+    return {'level':'dudosa' if reasons else 'segura','fit':round(fit,4),'band':round(band,3),'reasons':reasons}
+
+def mask_overlay(prob,shape):
+    """Imagen RGBA de la salida de la U-Net: pieza en verde y franja dudosa en naranja."""
+    h,w=shape;p=cv2.resize(prob.astype(np.float32),(w,h),interpolation=cv2.INTER_LINEAR)
+    rgba=np.zeros((h,w,4),np.uint8)
+    piece=p>.5;rgba[piece]=(63,138,95,110)
+    doubt=(p>.1)&(p<.9);rgba[doubt]=(222,140,40,200)
+    edge=cv2.morphologyEx(piece.astype(np.uint8),cv2.MORPH_GRADIENT,np.ones((3,3),np.uint8))>0;rgba[edge&~doubt]=(35,89,79,230)
+    stream=io.BytesIO();Image.fromarray(rgba,'RGBA').save(stream,format='PNG');return stream.getvalue()
+
+def detect_quad(rgb,models,kind='documento_impreso',method='auto',prob=None):
+    small=resize_long(rgb,960);h,w=small.shape[:2];q=None;multi=False;source='manual';warnings=[];confidence=None
     if method in ('unet','auto'):
-        prob=models.segment(rgb)
+        prob=models.segment(rgb) if prob is None else prob
         if prob is not None:
             mask=cv2.resize((prob>.5).astype(np.uint8),(w,h),interpolation=cv2.INTER_NEAREST)
             q,multi=quad_from_mask(mask);source='unet'
@@ -110,12 +139,14 @@ def detect_quad(rgb,models,kind='documento_impreso',method='auto'):
         q=q/np.array([w-1,h-1],np.float32)
         try:validate_quad(q)
         except ValueError:q=None
+    if q is not None and source=='unet':confidence=border_confidence(prob,q,(h,w))
     if q is None:
         q=np.array([[.08,.08],[.92,.08],[.92,.92],[.08,.92]],np.float32);source='manual'
         warnings.append('No hay un borde fiable. Coloca los cuatro puntos sobre la pieza.')
-    if source=='unet':warnings.append('Borde sugerido por una U-Net entrenada con impresos, manuscritos y pinturas; confirma las cuatro esquinas.')
+    if source=='unet':
+        warnings.append('Borde sugerido por una U-Net entrenada con impresos, manuscritos y pinturas; confirma las cuatro esquinas.' if confidence['level']=='segura' else 'Borde dudoso: revisa las cuatro esquinas sobre la máscara de la red. '+' '.join(confidence['reasons']))
     elif source=='contornos':warnings.append('Borde sugerido por contraste; puede corresponder al marco o al fondo. Confírmalo.')
-    return {'points':q.tolist(),'method':source,'warnings':warnings,'manual_required':source=='manual'}
+    return {'points':q.tolist(),'method':source,'warnings':warnings,'manual_required':source=='manual','confidence':confidence}
 
 def rectify(rgb,points,aspect=0.,max_side=2400):
     q=validate_quad(points)*np.array([rgb.shape[1]-1,rgb.shape[0]-1],np.float32)
