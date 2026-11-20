@@ -50,7 +50,7 @@ class ModelService:
             self.errors.append('No se pudo cargar el clasificador. Comprueba los pesos y sus metadatos.')
         if not path.exists():self.errors.append('Falta el archivo del clasificador; la selección será manual.')
         try:
-            path=self.directory/'unet_resnet18_imagenet.pth'
+            path=self.directory/'unet_resnet18_3clases.pth'
             if path.exists():
                 import segmentation_models_pytorch as smp
                 self.segmenter=smp.Unet(encoder_name='resnet18',encoder_weights=None,in_channels=3,classes=1)

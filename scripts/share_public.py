@@ -17,7 +17,7 @@ REMOTE = 'https://github.com/juanffff-hub/palimpsesto-pdi.git'
 PORT = 8766
 CF_URL = 'https://github.com/cloudflare/cloudflared/releases/download/2026.11.1/cloudflared-windows-amd64.exe'
 CF_SHA = '341deda3db5ec498a0482254d6c38c0b7cf01a30c37bb5dd95d2216d08955e35'
-MODEL_FILES = ('classifier.pt', 'unet_resnet18_imagenet.pth', 'scope_reference.npz')
+MODEL_FILES = ('classifier.pt', 'unet_resnet18_3clases.pth', 'scope_reference.npz')
 GIT = shutil.which('git') or r'C:\Program Files\Git\cmd\git.exe'
 CHILD_FLAGS = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
 
