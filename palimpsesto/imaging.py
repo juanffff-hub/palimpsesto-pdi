@@ -203,9 +203,31 @@ def enhance(rgb,params,kind):
         out=np.repeat(binary[:,:,None],3,axis=2)
     return out,p
 
+HIST_BINS=64
+CLIP_WARN=1.0  # % de la imagen que el ajuste lleva a negro (<=2) o blanco (>=253) puros
+
 def descriptors(rgb):
     small=resize_long(rgb,960);g=cv2.cvtColor(small,cv2.COLOR_RGB2GRAY)
-    return {'laplacian_variance':float(cv2.Laplacian(g,cv2.CV_64F).var()),'rms_contrast':float(g.std()/255),'dark_percent':float((g<=2).mean()*100),'bright_percent':float((g>=253).mean()*100),'metric_width':g.shape[1],'metric_height':g.shape[0]}
+    hist=np.bincount((g.ravel()//(256//HIST_BINS)).astype(np.int64),minlength=HIST_BINS)/g.size
+    return {'laplacian_variance':float(cv2.Laplacian(g,cv2.CV_64F).var()),'rms_contrast':float(g.std()/255),'dark_percent':float((g<=2).mean()*100),'bright_percent':float((g>=253).mean()*100),
+            'histogram':[round(float(v),5) for v in hist],'metric_width':g.shape[1],'metric_height':g.shape[0]}
 
-def compare_metrics(before,after):
-    return {'before':descriptors(before),'after':descriptors(after),'ssim':None,'psnr':None,'reference_status':'No hay referencia alineada. SSIM y PSNR no se calculan.','interpretation':'Nitidez y contraste son descriptores: subirlos no demuestra recuperar información.'}
+def clipped_by_adjustment(before,after):
+    """Píxeles que el ajuste llevó a negro o blanco puros y que antes no lo eran: detalle que ya no se recupera."""
+    gb=cv2.cvtColor(resize_long(before,960),cv2.COLOR_RGB2GRAY);ga=cv2.cvtColor(resize_long(after,960),cv2.COLOR_RGB2GRAY)
+    return (ga<=2)&(gb>2),(ga>=253)&(gb<253)
+
+def clipping_overlay(before,after,limit=1200):
+    """PNG RGBA con los tonos recortados por el ajuste en magenta (blancos) y cian (negros)."""
+    dark,bright=clipped_by_adjustment(resize_long(before,limit),resize_long(after,limit))
+    rgba=np.zeros(dark.shape+(4,),np.uint8);rgba[bright]=(230,0,200,235);rgba[dark]=(0,190,230,235)
+    stream=io.BytesIO();Image.fromarray(rgba,'RGBA').save(stream,format='PNG');return stream.getvalue()
+
+def compare_metrics(before,after,binary=False):
+    m={'before':descriptors(before),'after':descriptors(after),'ssim':None,'psnr':None,'reference_status':'No hay referencia alineada. SSIM y PSNR no se calculan.','interpretation':'Nitidez y contraste son descriptores: subirlos no demuestra recuperar información.'}
+    if binary:
+        m['clipping']={'available':False,'note':'La versión en blanco y negro lleva todos los píxeles a negro o blanco a propósito.'}
+    else:
+        dark,bright=clipped_by_adjustment(before,after);d=float(dark.mean()*100);b=float(bright.mean()*100)
+        m['clipping']={'available':True,'new_dark_percent':round(d,3),'new_bright_percent':round(b,3),'warning':d+b>CLIP_WARN}
+    return m

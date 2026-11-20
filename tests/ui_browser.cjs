@@ -47,6 +47,9 @@ await check('network_error_retry_action',async()=>{await page.route('**/api/proc
   const err=toast(page,'error').filter({hasText:'Sin conexión'});assert(await err.isVisible());assert(await inViewport(err));
   await page.unroute('**/api/process');await err.getByRole('button',{name:'Reintentar'}).click();await page.locator('#step-4').waitFor({state:'visible'});await done();
   assert.equal(await toast(page,'error').count(),0,'el error se cierra al resolverse');assert((await toastText(page,'success')).includes('Vista frontal lista'))});
+await check('histogram_and_tones',async()=>{assert(await page.locator('#tone-card').isVisible(),'histograma visible en el paso 4');
+  assert(await page.locator('#histogram').evaluate(c=>{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;for(let i=3;i<d.length;i+=4)if(d[i])return true;return false}),'el histograma está dibujado');
+  assert(['Sin recorte','Recorte leve','Tonos recortados'].includes(await page.locator('#tone-status').innerText()));assert(await page.locator('#clip-overlay').isHidden())});
 await check('slow_operation_feedback',async()=>{await page.route('**/api/process',route=>setTimeout(()=>route.continue().catch(()=>{}),3200));
   await page.locator('#sharpness').fill('30');await page.locator('#sharpness').dispatchEvent('change');
   await page.locator('#busy-elapsed').waitFor({state:'visible',timeout:5000});assert(/Lleva \d+ s/.test(await page.locator('#busy-elapsed').innerText()));

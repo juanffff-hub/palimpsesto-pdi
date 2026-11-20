@@ -1,0 +1,209 @@
+{
+  "umbral_aviso_pct": 1.0,
+  "ajustes": {
+    "preajuste": {
+      "fotos": 240,
+      "fotos_con_aviso": 0,
+      "fotos_con_aviso_pct": 0.0,
+      "recorte_mediano_pct": 0.0,
+      "recorte_p90_pct": 0.017,
+      "recorte_max_pct": 0.451,
+      "por_clase": {
+        "documento_impreso": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.001,
+          "recorte_p90_pct": 0.033,
+          "recorte_max_pct": 0.125
+        },
+        "manuscrito": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.016,
+          "recorte_max_pct": 0.451
+        },
+        "pintura": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.0,
+          "recorte_max_pct": 0.0
+        }
+      }
+    },
+    "todo_al_50": {
+      "fotos": 240,
+      "fotos_con_aviso": 4,
+      "fotos_con_aviso_pct": 1.7,
+      "recorte_mediano_pct": 0.003,
+      "recorte_p90_pct": 0.123,
+      "recorte_max_pct": 2.692,
+      "por_clase": {
+        "documento_impreso": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.013,
+          "recorte_p90_pct": 0.127,
+          "recorte_max_pct": 0.327
+        },
+        "manuscrito": {
+          "fotos": 80,
+          "fotos_con_aviso": 4,
+          "fotos_con_aviso_pct": 5.0,
+          "recorte_mediano_pct": 0.001,
+          "recorte_p90_pct": 0.347,
+          "recorte_max_pct": 2.692
+        },
+        "pintura": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.001,
+          "recorte_p90_pct": 0.066,
+          "recorte_max_pct": 0.235
+        }
+      }
+    },
+    "iluminacion_100": {
+      "fotos": 240,
+      "fotos_con_aviso": 8,
+      "fotos_con_aviso_pct": 3.3,
+      "recorte_mediano_pct": 0.001,
+      "recorte_p90_pct": 0.236,
+      "recorte_max_pct": 5.371,
+      "por_clase": {
+        "documento_impreso": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.024,
+          "recorte_max_pct": 0.135
+        },
+        "manuscrito": {
+          "fotos": 80,
+          "fotos_con_aviso": 8,
+          "fotos_con_aviso_pct": 10.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.993,
+          "recorte_max_pct": 5.371
+        },
+        "pintura": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.013,
+          "recorte_p90_pct": 0.204,
+          "recorte_max_pct": 0.516
+        }
+      }
+    },
+    "contraste_100": {
+      "fotos": 240,
+      "fotos_con_aviso": 0,
+      "fotos_con_aviso_pct": 0.0,
+      "recorte_mediano_pct": 0.0,
+      "recorte_p90_pct": 0.002,
+      "recorte_max_pct": 0.027,
+      "por_clase": {
+        "documento_impreso": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.0,
+          "recorte_max_pct": 0.001
+        },
+        "manuscrito": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.002,
+          "recorte_max_pct": 0.027
+        },
+        "pintura": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.0,
+          "recorte_p90_pct": 0.004,
+          "recorte_max_pct": 0.018
+        }
+      }
+    },
+    "nitidez_100": {
+      "fotos": 240,
+      "fotos_con_aviso": 1,
+      "fotos_con_aviso_pct": 0.4,
+      "recorte_mediano_pct": 0.005,
+      "recorte_p90_pct": 0.202,
+      "recorte_max_pct": 1.029,
+      "por_clase": {
+        "documento_impreso": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.038,
+          "recorte_p90_pct": 0.393,
+          "recorte_max_pct": 0.702
+        },
+        "manuscrito": {
+          "fotos": 80,
+          "fotos_con_aviso": 1,
+          "fotos_con_aviso_pct": 1.2,
+          "recorte_mediano_pct": 0.001,
+          "recorte_p90_pct": 0.11,
+          "recorte_max_pct": 1.029
+        },
+        "pintura": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.001,
+          "recorte_p90_pct": 0.034,
+          "recorte_max_pct": 0.29
+        }
+      }
+    },
+    "todo_al_100": {
+      "fotos": 240,
+      "fotos_con_aviso": 14,
+      "fotos_con_aviso_pct": 5.8,
+      "recorte_mediano_pct": 0.049,
+      "recorte_p90_pct": 0.554,
+      "recorte_max_pct": 5.398,
+      "por_clase": {
+        "documento_impreso": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.074,
+          "recorte_p90_pct": 0.304,
+          "recorte_max_pct": 0.692
+        },
+        "manuscrito": {
+          "fotos": 80,
+          "fotos_con_aviso": 14,
+          "fotos_con_aviso_pct": 17.5,
+          "recorte_mediano_pct": 0.04,
+          "recorte_p90_pct": 1.777,
+          "recorte_max_pct": 5.398
+        },
+        "pintura": {
+          "fotos": 80,
+          "fotos_con_aviso": 0,
+          "fotos_con_aviso_pct": 0.0,
+          "recorte_mediano_pct": 0.038,
+          "recorte_p90_pct": 0.313,
+          "recorte_max_pct": 0.723
+        }
+      }
+    }
+  }
+}
