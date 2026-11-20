@@ -7,6 +7,7 @@ from .models import ModelService,CLASSES
 from .imaging import load_image,resize_long,encode_png,detect_quad,rectify,enhance,compare_metrics,PRESETS
 from .exporting import build_report,create_pdf,create_bundle
 from .validation import object_payload,choice,number,assess_input
+from .capture import assess as assess_capture
 
 ROOT=Path(__file__).resolve().parents[1]
 app=Flask(__name__,template_folder=str(ROOT/'templates'),static_folder=str(ROOT/'static'))
@@ -85,7 +86,8 @@ def upload():
     data=f.read();rgb,meta=load_image(data);sid=secrets.token_urlsafe(24);t=time.perf_counter()
     with model_lock:
         prediction=models.classify(rgb);assessment=assess_input(rgb,prediction);kind=prediction['class'] or 'documento_impreso';corners=detect_quad(rgb,models,kind)
-    state={'original_bytes':data,'rgb':rgb,'metadata':meta,'name':Path(f.filename or 'imagen').name[:180],'classification':prediction,'detection':corners,'assessment':assessment,'scope_confirmed':False,'access':time.monotonic(),'result':None}
+        capture=assess_capture(rgb,models.segment(rgb),kind)
+    state={'original_bytes':data,'rgb':rgb,'metadata':meta,'name':Path(f.filename or 'imagen').name[:180],'classification':prediction,'detection':corners,'assessment':assessment,'capture':capture,'scope_confirmed':False,'access':time.monotonic(),'result':None}
     with lock:
         old=session.get('sid')
         if old:states.pop(old,None)
@@ -95,7 +97,7 @@ def upload():
         states[sid]=state;session['sid']=sid
     visible_prediction=prediction.copy()
     if assessment['requires_confirmation']:visible_prediction.update({'class':None,'scores':None})
-    return jsonify(metadata=meta,name=state['name'],classification=visible_prediction,assessment=assessment,detection=corners,presets=PRESETS,image_key=sid,elapsed_ms=round(1000*(time.perf_counter()-t)),image_url='/api/image/original?image_key='+sid)
+    return jsonify(metadata=meta,name=state['name'],classification=visible_prediction,assessment=assessment,capture=capture,detection=corners,presets=PRESETS,image_key=sid,elapsed_ms=round(1000*(time.perf_counter()-t)),image_url='/api/image/original?image_key='+sid)
 
 @app.post('/api/detect')
 def detect():

@@ -32,10 +32,8 @@ def assess_input(rgb,prediction):
     std=float(gray.std());edge=float((cv2.Canny(gray,50,150)>0).mean());warnings=[];reasons=[]
     if std<1.2 and edge<.0005:raise ValueError('La imagen está vacía o es casi uniforme. Carga una foto donde se vea el contenido de una pieza.')
     if min(h,w)<200:warnings.append('La resolución es baja. Una captura más grande conservará mejor los trazos finos.')
-    if float((gray<8).mean())>.85:warnings.append('La foto está muy oscura. Revisa los detalles o toma otra con más luz.')
-    if float((gray>250).mean())>.985:warnings.append('Casi toda la imagen es blanca. Comprueba que no falte contenido por sobreexposición.')
+    # Luz, nitidez, reflejos y encuadre se revisan en capture.py, sobre la pieza y con umbrales calibrados.
     sharp=float(cv2.Laplacian(gray,cv2.CV_64F).var())
-    if sharp<18:warnings.append('Hay pocos bordes definidos. Puede haber desenfoque o una pieza de textura suave; revisa el detalle.')
     if prediction.get('scope',{}).get('flagged'):reasons.append('El contenido se aleja de las piezas usadas para entrenar el sistema.')
     # Presence only, no identification. Portrait paintings may also trigger review.
     cascade_path=Path(cv2.data.haarcascades)/'haarcascade_frontalface_default.xml'

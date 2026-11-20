@@ -27,6 +27,8 @@ await check('responsive_home',async()=>{for(const width of [320,390,768,1440]){a
 await page.setViewportSize({width:1440,height:1080});
 await page.locator('#load-demo').click();await page.locator('#step-2').waitFor({state:'visible'});await done();
 await check('upload_success_toast',async()=>{assert((await toastText(page,'success')).includes('Fotografía cargada'));assert(await inViewport(toast(page,'success').first()))});
+await check('capture_quality_traffic_light',async()=>{const box=page.locator('#capture-quality');assert(await box.isVisible(),'semáforo visible en el paso 2');
+  assert.equal(await box.getAttribute('data-verdict'),'ok');assert.equal(await page.locator('#cq-checks li').count(),5);assert(await page.locator('#cq-retake').isHidden())});
 await check('explicit_scope_confirmation',async()=>{await page.locator('#confirm-kind').click();assert(await page.locator('#step-2').isVisible());
   assert((await toastText(page,'warning')).includes('confirmación'));
   assert(await page.locator('#confirm-scope-feedback').isVisible(),'mensaje junto a la casilla');

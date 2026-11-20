@@ -9,7 +9,7 @@ def build_report(state,params,points,H,metrics,kind,method,aspect):
     return {'project':'Palimpsesto','version':'0.2.0','timestamp_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
         'original':state['metadata'],'original_name':state['name'],'classification_suggestion':state['classification'],
         'confirmed_class':kind,'corners_normalized':points,'corners_user_accepted':True,'geometry_method':method,'homography':H.tolist(),
-        'input_assessment':state.get('assessment'),'scope_confirmation_override':state.get('scope_confirmed',False),
+        'input_assessment':state.get('assessment'),'capture_quality':(state.get('capture') or {}).get('by_kind',{}).get(kind),'scope_confirmation_override':state.get('scope_confirmed',False),
         'aspect_ratio_input':aspect,'aspect_ratio_status':'declarada por usuario' if aspect else 'estimada; no es medida física',
         'parameters':params,'metrics':metrics,'output_purpose':'derivado de consulta; original conservado',
         'limitations':['No reconstruye información ausente ni certifica fidelidad patrimonial.','La nitidez y el contraste no son una medida universal de calidad.','SSIM/PSNR requieren una referencia alineada.'],
