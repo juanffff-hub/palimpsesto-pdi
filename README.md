@@ -57,7 +57,7 @@ Palimpsesto actúa como un **restaurador digital asistido** en cinco pasos:
 
 1. **Cargar** la foto (JPG/PNG). Se valida el archivo, se corrige la orientación EXIF y se comprueba si el contenido parece una pieza admitida. Un **semáforo de la captura** revisa nitidez, luz, reflejos, encuadre y tamaño de la pieza y dice si conviene repetir la foto.
 2. **Identificar**: una CNN sugiere el tipo de pieza y el usuario lo confirma o lo cambia.
-3. **Encuadrar**: una U-Net, entrenada con impresos, manuscritos y pinturas, propone las cuatro esquinas; el usuario las revisa, las arrastra o las marca a mano.
+3. **Encuadrar**: una U-Net, entrenada con impresos, manuscritos y pinturas, propone las cuatro esquinas e indica si el borde es **seguro o dudoso**; el usuario puede ver la máscara que predijo la red, y revisa, arrastra o marca a mano las esquinas.
 4. **Mejorar**: homografía a vista frontal y mejora clásica ajustable (iluminación, CLAHE, suavizado, nitidez, binarización solo en documentos), con comparación antes/después y detalle a resolución real.
 5. **Guardar**: PNG, PDF, registro JSON de todas las decisiones y un ZIP que incluye el **original byte a byte**.
 
@@ -116,7 +116,7 @@ flowchart TB
 | Alcance | RGB → alerta sí/no | similitud coseno con 408 embeddings de desarrollo | `palimpsesto/models.py` |
 | Calidad de la captura | RGB + máscara de la U-Net → veredicto y 5 chequeos | segunda derivada por dirección y por bloques, percentil 95 de luminancia, manchas saturadas compactas (componentes conexas), contacto de la máscara con el borde | `palimpsesto/capture.py` |
 | M2 Clasificación | RGB 224×224 → 3 puntuaciones | ResNet18 ImageNet congelada + cabeza lineal | `models.py` |
-| M3 Borde | RGB 256×256 → máscara → 4 puntos | U-Net de 3 clases (encoder ResNet18); contornos; manual | `models.py`, `imaging.py` |
+| M3 Borde | RGB 256×256 → máscara → 4 puntos + confianza (segura / dudosa) | U-Net de 3 clases (encoder ResNet18); encaje de los 4 puntos con la máscara y ancho de la franja incierta; contornos; manual | `models.py`, `imaging.py` |
 | M4 Rectificación | RGB + 4 puntos → vista frontal | homografía (`getPerspectiveTransform`, `warpPerspective`) | `imaging.py` |
 | M5 Mejora | vista frontal + parámetros → resultado | en el canal L de Lab: filtro bilateral, división por fondo gaussiano, CLAHE, máscara de enfoque; Otsu/Sauvola en documentos | `imaging.py` |
 | M6 Evaluación | antes/después → métricas | varianza del Laplaciano, contraste RMS; SSIM/PSNR con referencia | `imaging.py` |
@@ -146,6 +146,7 @@ flowchart TB
 - **Segmentación:** U-Net con encoder ResNet18, con la receta del tercer parcial (Soft Dice, Adam, volteo y giro). En el parcial se entrenó solo con documentos impresos (80 fotos); en la v0.4.0 se reentrenó con **240 fotos de las tres clases** (80 impresos, 80 manuscritos y 80 pinturas anotados con polígonos en makesense.ai). De su máscara se extrae el cuadrilátero.
 - **Mejora (en el canal L de Lab, para no alterar el tono):** filtro bilateral contra el ruido; estimación de iluminación con filtro gaussiano grande y división; CLAHE (Zuiderveld, 1994); máscara de enfoque; binarización global de Otsu (1979) y local de Sauvola (2000) solo en documentos.
 - **Frecuencia:** filtro *high-boost* con FFT, evaluado en `notebooks/Palimpsesto_experimentos.ipynb` y `results/quality/`, pero no desplegado porque no superó a los filtros espaciales.
+- **Confianza del borde:** IoU entre el cuadrilátero y la máscara de la propia U-Net, y ancho medio de la franja de probabilidad incierta (0,1 < p < 0,9) del contorno; la máscara se muestra superpuesta para que la persona vea en qué se basó la red.
 - **Calidad de la captura:** nitidez como varianza de la segunda derivada en *x* y en *y* por bloques de la pieza (el temblor borra una sola dirección), exposición por histograma de luminancia (percentil 95), reflejos como componentes conexas saturadas y compactas, y encuadre a partir de la máscara de la U-Net.
 - **Métricas:** SSIM (Wang et al., 2004) y PSNR solo cuando hay referencia alineada; nitidez (varianza del Laplaciano) y contraste RMS como descriptores, no como notas de fidelidad.
 
@@ -201,6 +202,7 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 | El original nunca se modifica | Se guardan sus bytes y su SHA-256; las transformaciones trabajan sobre copias y el ZIP incluye el archivo exacto. |
 | Resultados que no se mezclan | Cada imagen tiene una clave y cada procesamiento una revisión; un enlace viejo o una pestaña con otra foto se rechazan. |
 | Clasificación con supervisión | Si la puntuación es baja, si falta el modelo o si el contenido parece ajeno, la interfaz no impone la clase. |
+| Ver lo que vio la red | En el paso 3, la máscara de la U-Net se superpone a la foto (verde: pieza; naranja: zona dudosa) y una etiqueta dice si el borde es seguro o dudoso, con el motivo. Si es dudoso, la máscara aparece sola y se ofrece marcar a mano. |
 | Avisar a tiempo | Al cargar la foto, un semáforo (verde, amarillo o rojo) explica qué falla y ofrece cargar otra; se recalcula si cambias el tipo de pieza y queda en el registro JSON. |
 | Esquinas revisables | Canvas con arrastre, selección de punto y flechas del teclado; la geometría inválida (cruzada, repetida, fuera de la foto) se rechaza. |
 | Ajustes reversibles | Deshacer, mejoras en cero y comparación antes/después con la misma geometría. |
@@ -262,6 +264,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 | ![](docs/img/gui_02_identificar.png) **2 · Identificar** | Confirma que la foto es una pieza admitida y confirma o cambia el tipo | Puntuaciones por clase, preajuste y alerta de alcance |
 | ![](docs/img/gui_02b_semaforo.png) **2 · Semáforo de la captura** | Lee si la foto sirve; si está en rojo, la repite con un clic | Veredicto, cinco chequeos con el motivo concreto y botón para cargar otra foto |
 | ![](docs/img/gui_03_encuadrar.png) **3 · Encuadrar** | Arrastra las 4 esquinas, vuelve a detectar, marca a mano o gira 90° | Cuadrilátero sobre la foto y método usado (U-Net, contornos, manual) |
+| ![](docs/img/gui_03b_mascara.png) **3 · Borde dudoso** | Mira la máscara de la red y lleva los puntos a las esquinas reales | Etiqueta «borde dudoso» con el motivo, máscara superpuesta y acceso al borde manual |
 | ![](docs/img/gui_04_mejorar.png) **4 · Mejorar** | Mueve deslizadores, deshace, pone en cero o amplía el detalle | Vista previa, comparación antes/después y métricas |
 | ![](docs/img/gui_05_guardar.png) **5 · Guardar** | Descarga ZIP, PNG, PDF o JSON | Resumen de las decisiones; el original va intacto |
 | ![](docs/img/gui_06_aviso_error.png) **Avisos** | Corrige o reintenta desde el propio aviso | Error, advertencia, información o éxito, siempre visibles |
@@ -272,7 +275,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 
 1. Abre la aplicación (ver [instalación](#9-instalación-y-ejecución)) y pulsa **Seleccionar JPG o PNG**, arrastra una foto o usa el **ejemplo sintético**.
 2. Mira el **semáforo de la captura**: en verde, sigue; en amarillo, revisa el punto señalado; en rojo, repite la foto ahora con **Repetir la foto**. Luego revisa la categoría sugerida, marca la casilla de confirmación y pulsa **Confirmar y revisar borde**.
-3. Comprueba que los cuatro puntos caen en las esquinas de la pieza. Si no, arrástralos o pulsa **Volver a detectar** o **Marcar manualmente**. Si conoces las medidas, escribe la proporción ancho/alto; si no, deja 0.
+3. Lee la etiqueta del borde: si dice **borde dudoso**, mira la máscara de la red (en naranja, donde duda). Puedes verla siempre con **Ver lo que vio la red**. Comprueba que los cuatro puntos caen en las esquinas de la pieza. Si no, arrástralos o pulsa **Volver a detectar** o **Marcar manualmente**. Si conoces las medidas, escribe la proporción ancho/alto; si no, deja 0.
 4. Ajusta las mejoras mirando la comparación. Usa **Ver detalle** para revisar trazos finos. Si algo empeora, **Deshacer** o **Sin mejoras**.
 5. Pulsa **Revisado, continuar** y descarga el ZIP completo o el formato que necesites.
 
@@ -368,6 +371,26 @@ Los métodos clásicos no se entrenan, así que se miden sobre las 80 fotos. La 
 
 **Límites de esta evaluación.** Son 40 fotos de prueba de 8 piezas o bloques (3 de impresos, 2 de manuscritos y 3 de pinturas), así que cada cifra depende de pocas piezas. Las pinturas siguen siendo la clase más difícil. Un lienzo sin marco, de tonos rojos y fotografiado sobre una silla roja (bloque PIN008), baja su media porque casi no contrasta con el fondo; solo 4 de 12 pinturas superan IoU 0,95. Los manuscritos elegidos tienen bordes rectos: con bordes rasgados o quemados la reducción a cuatro esquinas es una aproximación. Por eso los cuatro puntos siguen siendo editables y los contornos y el modo manual siguen disponibles.
 
+### ¿Cuándo dudar del borde? Confianza del borde y máscara visible
+
+**Qué resuelve.** La U-Net siempre entrega cuatro puntos, aunque se equivoque, y la persona no sabía cuándo desconfiar. Ahora la app mide dos cosas sin necesitar una referencia. Primero, **cuánto encajan los cuatro puntos con la máscara de la propia red** (IoU entre ambos). Segundo, **qué tan difuso es el contorno de la máscara** (ancho medio de la franja con probabilidad entre 0,1 y 0,9). Si el encaje es < 0,92 o la franja supera 5 px, el borde es **dudoso**: la app muestra la máscara y explica el motivo.
+
+**Cómo se comprobó** (`scripts/evaluate_border_confidence.py`, `results/border_confidence/`). Se usó la misma función de la aplicación sobre las fotos con máscara de referencia; un borde es malo si su IoU real es < 0,90. Los umbrales se eligieron solo con las fotos de **validación** y se midieron en las de **prueba**. Además de la U-Net desplegada se usaron las de control (semillas 7 y 2026) para tener más casos.
+
+![Confianza del borde frente al error real](results/figures/confianza_borde.png)
+
+| Fotos de piezas no vistas | Bordes malos marcados «dudoso» | Bordes buenos marcados «dudoso» | Bordes malos entre los «seguros» |
+|---|---:|---:|---:|
+| Validación (elección de umbrales), 3 U-Net | 14 de 15 | 8 de 105 | 1 |
+| **Prueba, 3 U-Net** | **21 de 21** | **10 de 98** | **0** |
+| **Prueba, U-Net desplegada** | **6 de 6** | **5 de 34** | **0** |
+
+En prueba, los bordes «seguros» tienen IoU media de 0,970 y los «dudosos», de 0,824. Por clase, los 36 bordes de impresos fueron seguros y correctos. En manuscritos se marcaron dudosos los 4 malos y 4 de 44 buenos; en pinturas, los 17 malos y 6 de 18 buenos.
+
+**En las 480 fotos de clasificación**, que no tienen referencia, marca dudosos 16 de 160 impresos, 47 de 160 manuscritos y 71 de 160 pinturas. Esas fotos incluyen las capturas difíciles que se dejaron fuera del dataset de segmentación: cuadros cortados, sombras de mano y perspectivas extremas. Se revisó a ojo una muestra de 32 pinturas «dudosas»: unas 20 tenían el borde realmente mal, unas 6 estaban en el límite y unas 6 eran falsas alarmas. Una falsa alarma cuesta poco (mirar la máscara y confirmar); una omisión cuesta un recorte equivocado.
+
+**Límites.** La regla se eligió con 120 bordes de validación y se probó con 119, de pocas piezas. La etiqueta mide la coherencia interna de la red, no la verdad: si la red se equivoca con seguridad y con un contorno nítido, el borde puede salir «seguro». No ocurrió en prueba, pero es posible. Contornos y modo manual no tienen etiqueta: siempre piden revisión.
+
 ### Calidad de la mejora (referencia sintética alineada)
 
 | Caso | Sin mejora: PSNR / SSIM | Preajuste de impreso: PSNR / SSIM | Mejor técnica individual |
@@ -421,9 +444,9 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos y semáforo de la captura | 96/96 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos, semáforo de la captura y confianza del borde | 102/102 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
-| `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 23/23 |
+| `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, confianza del borde y máscara, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 24/24 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
 
 Las pruebas automáticas verifican los contratos del software. La evaluación experimental del modelo se describe por separado, con sus protocolos y limitaciones.
@@ -439,6 +462,7 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 - Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
 - La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos). Al reentrenarla con 160 máscaras nuevas de manuscritos y pinturas, con una regla de adopción fijada de antemano, el borde propuesto en prueba subió de 0,811 a 0,937 de IoU media (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963) sin empeorar los impresos.
 - La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
+- La etiqueta de confianza del borde avisa cuándo dudar de la U-Net: en las fotos de prueba marcó como dudosos los 21 bordes malos (6 de 6 con la U-Net desplegada), y ningún borde «seguro» resultó malo. La máscara superpuesta muestra en qué se basó la red.
 - El semáforo de la captura lleva a la práctica el escenario de uso: dice en el momento si conviene repetir la foto. Frente a los avisos anteriores, detecta defectos controlados en el 80–100 % de los casos (antes 2–23 %) y marcó en rojo las 23 fotos reales que lo merecían, de las que antes se detectaban 5.
 
 **Limitaciones**
@@ -489,6 +513,7 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 .\.venv\Scripts\python.exe scripts/evaluate_model.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_capture.py --root "C:\ruta\datos" --seg "C:\ruta\segmentacion_3clases"   # semáforo de la captura
+.\.venv\Scripts\python.exe scripts/evaluate_border_confidence.py --seg "C:\ruta\segmentacion_3clases" --root "C:\ruta\datos"   # confianza del borde
 .\.venv\Scripts\python.exe scripts/benchmark_quality.py
 .\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 42 --save   # U-Net v0.4.0
 .\.venv\Scripts\python.exe scripts/train_unet.py --data "C:\ruta\segmentacion_3clases" --seed 7          # semillas de control (también 2026)
