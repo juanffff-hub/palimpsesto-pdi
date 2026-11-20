@@ -28,6 +28,11 @@ Esta matriz delimita lo implementado. Ningún conjunto finito de pruebas demuest
 | Banco de alcance de otro modelo/manifiesto | Se desactiva filtro, informa falta de correspondencia; recalibrar | Verificación hash en carga |
 | Conexión fallida / respuesta no JSON / demora >90 s | Mensaje y reintento; controles no quedan bloqueados | Corte de conexión probado en navegador; ramas de timeout/JSON implementadas |
 | Ruta/método/formato exportación inexistente | Respuesta controlada; exportación válida posterior funciona | Python |
+| Aviso fuera de la vista (página desplazada, celular) | Avisos fijos dentro de la ventana, bajo la cabecera si está visible; máximo 2 en celular y 4 en escritorio; error con icono, título, efecto y acción | Navegador 390 px desplazado + escritorio |
+| Falla al procesar con resultado anterior en pantalla | Franja «Vista previa desactualizada», imagen atenuada, exportación bloqueada, botón Reintentar | Navegador |
+| Sesión sin foto o foto cambiada en otra pestaña | Código `session`; el aviso ofrece «Cargar otra foto» en vez de un reintento inútil | Python + comprobación manual en navegador |
+| Operación larga | Tiempo real transcurrido desde 2 s; «Dejar de esperar» desde 8 s; aviso de demora desde 20 s; sin porcentajes inventados | Navegador (retardo simulado de 3,2 s) |
+| Descartar foto con trabajo hecho | Diálogo de confirmación, foco en «Seguir trabajando»; Escape cancela | Navegador |
 | Error inesperado | Mensaje genérico al usuario, traza en consola para diagnosticar | Manejador global; no afirmar prueba de toda excepción posible |
 | Cambios demasiado fuertes | Antes/después, detalle, deshacer, ajustes en cero o rechazar | Navegador; cero conserva píxeles RGB |
 | No hay referencia limpia real | SSIM/PSNR no se inventan; aparecen no disponibles | Python + reportes |
@@ -35,11 +40,11 @@ Esta matriz delimita lo implementado. Ningún conjunto finito de pruebas demuest
 
 ## Qué se ejecutó
 
-`python scripts/check.py`: 81 tests, incluyendo contratos parametrizados, homografía, EXIF, sesión, concurrencia y recuperación. Los tests API unitarios usan stubs: no miden calidad de red.
+`python scripts/check.py`: 83 tests, incluyendo contratos parametrizados, homografía, EXIF, sesión, concurrencia y recuperación. Los tests API unitarios usan stubs: no miden calidad de red.
 
 `python scripts/verify_real_pipeline.py --root RUTA`: nueve imágenes, una por bloque de prueba y tres por clase, con ambos checkpoints reales; comprueba salida PNG/PDF/JSON/ZIP y original. No sustituye revisión de trazos. `results/integration/real_pipeline.json` contiene cada caso.
 
-`npm run test:ui` con servidor iniciado: 12 comprobaciones en Chrome/Playwright; anchos 320, 390, 768 y 1440; confirmación, valores inválidos, fallo de conexión y reintento, detalle, deshacer, cuatro descargas, invalidación de resultado y foto ajena. `results/browser/verification.json` registra ausencia/presencia de errores JS. Requiere Node, `npm install` y Chrome; `CHROME_PATH` admite otra ruta. Playwright es solo herramienta de prueba.
+`npm run test:ui` con servidor iniciado: 22 comprobaciones en Chrome/Playwright; anchos 320, 390, 768, 1024 y 1440; confirmación, valores inválidos con mensaje junto al campo, fallo de conexión y botón Reintentar del aviso, vista previa desactualizada, espera larga con tiempo transcurrido, error persistente frente a confirmación temporal, avisos sin duplicados, regiones para lector de pantalla, Escape, diálogo de descarte con foco en la opción segura, celular con la página desplazada (aviso dentro de la ventana y sin tapar el botón principal), movimiento reducido, detalle, deshacer, cuatro descargas, invalidación de resultado y foto ajena. `results/browser/verification.json` registra ausencia/presencia de errores JS. Requiere Node, `npm install` y Chrome; `CHROME_PATH` admite otra ruta. Playwright es solo herramienta de prueba.
 
 `python scripts/evaluate_scope.py --root RUTA`: 10 negativos de conveniencia, 72 positivos provisionales y un escaneo externo. Resultado 9/10 alertas negativas, 0/72 y 0/1 positivas. **Un negativo pasa.** No es una estimación robusta de sensibilidad/especificidad en población abierta. La cara del astronaut no fue advertida por la heurística auxiliar de esta configuración. El umbral no se eligió con estos negativos.
 

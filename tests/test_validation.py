@@ -100,6 +100,18 @@ def test_expired_session(client):
     server.states[sid]['access']=time.monotonic()-3601
     r=client.get('/api/image/original');assert r.status_code==400 and 'expiró' in r.json['error']
 
+def test_session_errors_have_machine_code(client):
+    # La interfaz ofrece «cargar otra foto» (no «reintentar») solo cuando code=='session'.
+    with client.session_transaction() as sess:sid=sess['sid']
+    server.states[sid]['access']=time.monotonic()-3601
+    r=client.post('/api/process',json=body());assert r.status_code==400 and r.json['code']=='session'
+    other=server.app.test_client()
+    r=other.post('/api/detect',json={'kind':'manuscrito','method':'auto','scope_confirmed':True})
+    assert r.status_code==400 and r.json['code']=='session'
+
+def test_validation_errors_are_not_session_errors(client):
+    r=client.post('/api/process',json=body(aspect='wrong'));assert r.status_code==400 and 'code' not in r.json
+
 def test_recovery_after_error(client):
     assert client.post('/api/process',json=body(aspect='wrong')).status_code==400
     assert client.post('/api/process',json=body()).status_code==200
