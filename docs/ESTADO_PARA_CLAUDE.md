@@ -80,3 +80,14 @@ Rama `revision/fase2-calidad-rubrica`, creada sobre `revision/feedback-interfaz`
 **Comandos verificados:** check 83/83; verify_real_pipeline 9/9; test:ui 22/22 con el modelo nuevo.
 
 **Pendiente humano nuevo:** enlace de Google Drive del dataset con permiso para el profesor (README, sección 5).
+
+## Traspaso tras el merge (19 de noviembre de 2026, noche)
+
+PR #1 (fase 1) y PR #2 (fase 2) fusionados en `main` con el acuerdo de Juan Felipe; las pruebas automáticas pasaron en ambas ramas. `main` ya contiene la interfaz con avisos, el clasificador v0.3.0 (código y resultados), el README según la rúbrica y las figuras.
+
+**Pendiente para dejar la entrega completa:**
+1. **Pesos v0.3.0 en una release** (David): subir `modelos_palimpsesto_v0.3.0.zip` (SHA-256 `9880804e55312b0cc0556a52c2ff94f03a7ef4ed08ceb820a680e4221006e577`) como pre-release `v0.3.0-rc1`. Mientras no esté, quien clone el repo y use los pesos de la v0.2.0 tendrá el clasificador anterior: los checksums de `classifier.pt` y `scope_reference.npz` no coincidirán y el filtro de alcance se desactivará por diferencia de hash.
+2. **Enlace de Google Drive del dataset con permiso de lectura para el profesor** (Juan Felipe): pegarlo en el README, sección 5.
+3. **Acceso del profesor** al repositorio privado y a las releases (Juan Felipe, como dueño del repo).
+4. **Póster/infografía, video ≤ 3 min y exposición** (Juan Felipe): usar las figuras de `results/figures/`, las capturas de `docs/img/` y `docs/GUIA_SUSTENTACION.md`.
+5. **Tareas humanas de evidencia** (equipo): certificar piezas, fotografiar 6–9 piezas nuevas, prueba de uso con 3–5 personas. No marcarlas como hechas sin evidencia.
