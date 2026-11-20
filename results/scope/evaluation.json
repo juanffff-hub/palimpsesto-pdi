@@ -16,21 +16,13 @@
   "cases": [
     {
       "set": "negative",
-      "image_id": "astronaut",
-      "flagged": false,
-      "reasons": [],
-      "similarity": 0.7040076851844788,
-      "raw_class": "pintura"
-    },
-    {
-      "set": "negative",
-      "image_id": "brick",
+      "image_id": "coffee",
       "flagged": true,
       "reasons": [
         "El contenido se aleja de las piezas usadas para entrenar el sistema."
       ],
-      "similarity": 0.6135331988334656,
-      "raw_class": "manuscrito"
+      "similarity": 0.5841068625450134,
+      "raw_class": "documento_impreso"
     },
     {
       "set": "negative",
@@ -44,43 +36,11 @@
     },
     {
       "set": "negative",
-      "image_id": "chelsea",
-      "flagged": true,
-      "reasons": [
-        "El contenido se aleja de las piezas usadas para entrenar el sistema."
-      ],
-      "similarity": 0.577528178691864,
-      "raw_class": "manuscrito"
-    },
-    {
-      "set": "negative",
-      "image_id": "coffee",
-      "flagged": true,
-      "reasons": [
-        "El contenido se aleja de las piezas usadas para entrenar el sistema."
-      ],
-      "similarity": 0.5841068029403687,
-      "raw_class": "manuscrito"
-    },
-    {
-      "set": "negative",
-      "image_id": "coins",
-      "flagged": true,
-      "reasons": [
-        "El contenido se aleja de las piezas usadas para entrenar el sistema."
-      ],
-      "similarity": 0.6037883162498474,
-      "raw_class": "manuscrito"
-    },
-    {
-      "set": "negative",
-      "image_id": "grass",
-      "flagged": true,
-      "reasons": [
-        "El contenido se aleja de las piezas usadas para entrenar el sistema."
-      ],
-      "similarity": 0.4579803943634033,
-      "raw_class": "manuscrito"
+      "image_id": "astronaut",
+      "flagged": false,
+      "reasons": [],
+      "similarity": 0.704007625579834,
+      "raw_class": "pintura"
     },
     {
       "set": "negative",
@@ -89,7 +49,17 @@
       "reasons": [
         "El contenido se aleja de las piezas usadas para entrenar el sistema."
       ],
-      "similarity": 0.5739881992340088,
+      "similarity": 0.5739882588386536,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "brick",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.6135331988334656,
       "raw_class": "manuscrito"
     },
     {
@@ -99,7 +69,17 @@
       "reasons": [
         "El contenido se aleja de las piezas usadas para entrenar el sistema."
       ],
-      "similarity": 0.5311673879623413,
+      "similarity": 0.5311673283576965,
+      "raw_class": "manuscrito"
+    },
+    {
+      "set": "negative",
+      "image_id": "grass",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.45798030495643616,
       "raw_class": "manuscrito"
     },
     {
@@ -109,8 +89,28 @@
       "reasons": [
         "El contenido se aleja de las piezas usadas para entrenar el sistema."
       ],
-      "similarity": 0.6205994486808777,
+      "similarity": 0.6205993294715881,
+      "raw_class": "documento_impreso"
+    },
+    {
+      "set": "negative",
+      "image_id": "chelsea",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.5775281190872192,
       "raw_class": "pintura"
+    },
+    {
+      "set": "negative",
+      "image_id": "coins",
+      "flagged": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.6037883758544922,
+      "raw_class": "manuscrito"
     },
     {
       "set": "positive_external_scan",
@@ -126,14 +126,14 @@
       "flagged": false,
       "reasons": [],
       "similarity": 0.9117650985717773,
-      "raw_class": "documento_impreso"
+      "raw_class": "manuscrito"
     },
     {
       "set": "positive_dataset",
       "image_id": "I0019",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8920865058898926,
+      "similarity": 0.8920865654945374,
       "raw_class": "documento_impreso"
     },
     {
@@ -157,7 +157,7 @@
       "image_id": "I0022",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.9198266863822937,
+      "similarity": 0.9198265671730042,
       "raw_class": "documento_impreso"
     },
     {
@@ -181,7 +181,7 @@
       "image_id": "I0025",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.9257524013519287,
+      "similarity": 0.9257523417472839,
       "raw_class": "documento_impreso"
     },
     {
@@ -189,7 +189,7 @@
       "image_id": "I0066",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8917201161384583,
+      "similarity": 0.8917202353477478,
       "raw_class": "documento_impreso"
     },
     {
@@ -205,7 +205,7 @@
       "image_id": "I0068",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8671781420707703,
+      "similarity": 0.867178201675415,
       "raw_class": "documento_impreso"
     },
     {
@@ -237,7 +237,7 @@
       "image_id": "I0072",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8771539330482483,
+      "similarity": 0.8771540522575378,
       "raw_class": "documento_impreso"
     },
     {
@@ -245,7 +245,7 @@
       "image_id": "I0073",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8912091255187988,
+      "similarity": 0.8912089467048645,
       "raw_class": "documento_impreso"
     },
     {
@@ -261,7 +261,7 @@
       "image_id": "I0163",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8698078989982605,
+      "similarity": 0.869807779788971,
       "raw_class": "documento_impreso"
     },
     {
@@ -269,7 +269,7 @@
       "image_id": "I0164",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8339120745658875,
+      "similarity": 0.833912193775177,
       "raw_class": "documento_impreso"
     },
     {
@@ -285,7 +285,7 @@
       "image_id": "I0166",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8652176260948181,
+      "similarity": 0.8652176856994629,
       "raw_class": "documento_impreso"
     },
     {
@@ -301,7 +301,7 @@
       "image_id": "I0168",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.878535270690918,
+      "similarity": 0.8785350918769836,
       "raw_class": "documento_impreso"
     },
     {
@@ -317,7 +317,7 @@
       "image_id": "I0226",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8709562420845032,
+      "similarity": 0.8709564208984375,
       "raw_class": "manuscrito"
     },
     {
@@ -325,7 +325,7 @@
       "image_id": "I0227",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8498845100402832,
+      "similarity": 0.8498843312263489,
       "raw_class": "manuscrito"
     },
     {
@@ -341,7 +341,7 @@
       "image_id": "I0229",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8440907001495361,
+      "similarity": 0.8440907597541809,
       "raw_class": "manuscrito"
     },
     {
@@ -365,7 +365,7 @@
       "image_id": "I0232",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8141745924949646,
+      "similarity": 0.814174473285675,
       "raw_class": "manuscrito"
     },
     {
@@ -373,7 +373,7 @@
       "image_id": "I0233",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8672325015068054,
+      "similarity": 0.8672323226928711,
       "raw_class": "manuscrito"
     },
     {
@@ -381,7 +381,7 @@
       "image_id": "I0266",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8368589282035828,
+      "similarity": 0.8368587493896484,
       "raw_class": "manuscrito"
     },
     {
@@ -389,8 +389,8 @@
       "image_id": "I0267",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.9203339219093323,
-      "raw_class": "documento_impreso"
+      "similarity": 0.9203338623046875,
+      "raw_class": "manuscrito"
     },
     {
       "set": "positive_dataset",
@@ -405,7 +405,7 @@
       "image_id": "I0269",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8350882530212402,
+      "similarity": 0.8350881934165955,
       "raw_class": "manuscrito"
     },
     {
@@ -429,7 +429,7 @@
       "image_id": "I0272",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.851675808429718,
+      "similarity": 0.8516759276390076,
       "raw_class": "manuscrito"
     },
     {
@@ -446,22 +446,22 @@
       "flagged": false,
       "reasons": [],
       "similarity": 0.8449723124504089,
-      "raw_class": "documento_impreso"
+      "raw_class": "manuscrito"
     },
     {
       "set": "positive_dataset",
       "image_id": "I0291",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8597168922424316,
-      "raw_class": "documento_impreso"
+      "similarity": 0.8597169518470764,
+      "raw_class": "manuscrito"
     },
     {
       "set": "positive_dataset",
       "image_id": "I0292",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8503349423408508,
+      "similarity": 0.8503348231315613,
       "raw_class": "manuscrito"
     },
     {
@@ -494,14 +494,14 @@
       "flagged": false,
       "reasons": [],
       "similarity": 0.82903653383255,
-      "raw_class": "documento_impreso"
+      "raw_class": "manuscrito"
     },
     {
       "set": "positive_dataset",
       "image_id": "I0297",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.7759636044502258,
+      "similarity": 0.7759637236595154,
       "raw_class": "manuscrito"
     },
     {
@@ -509,7 +509,7 @@
       "image_id": "I0050",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8589043617248535,
+      "similarity": 0.8589043021202087,
       "raw_class": "pintura"
     },
     {
@@ -525,7 +525,7 @@
       "image_id": "I0052",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8383840918540955,
+      "similarity": 0.8383839726448059,
       "raw_class": "pintura"
     },
     {
@@ -533,7 +533,7 @@
       "image_id": "I0053",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8228966593742371,
+      "similarity": 0.8228964805603027,
       "raw_class": "pintura"
     },
     {
@@ -549,7 +549,7 @@
       "image_id": "I0055",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.7422113418579102,
+      "similarity": 0.7422112822532654,
       "raw_class": "pintura"
     },
     {
@@ -573,7 +573,7 @@
       "image_id": "I0362",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.775449275970459,
+      "similarity": 0.7754492163658142,
       "raw_class": "pintura"
     },
     {
@@ -589,7 +589,7 @@
       "image_id": "I0364",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.7554986476898193,
+      "similarity": 0.7554985880851746,
       "raw_class": "pintura"
     },
     {
@@ -605,7 +605,7 @@
       "image_id": "I0366",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.749852180480957,
+      "similarity": 0.7498520016670227,
       "raw_class": "pintura"
     },
     {
@@ -613,7 +613,7 @@
       "image_id": "I0367",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.757722795009613,
+      "similarity": 0.7577226758003235,
       "raw_class": "pintura"
     },
     {
@@ -621,7 +621,7 @@
       "image_id": "I0368",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.7427141666412354,
+      "similarity": 0.7427142262458801,
       "raw_class": "pintura"
     },
     {
@@ -629,7 +629,7 @@
       "image_id": "I0369",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.7901174426078796,
+      "similarity": 0.7901173233985901,
       "raw_class": "pintura"
     },
     {
@@ -693,7 +693,7 @@
       "image_id": "I0497",
       "flagged": false,
       "reasons": [],
-      "similarity": 0.8090011477470398,
+      "similarity": 0.8090010285377502,
       "raw_class": "pintura"
     }
   ],

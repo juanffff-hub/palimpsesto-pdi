@@ -1,0 +1,1113 @@
+{
+  "protocol": {
+    "hypothesis": "Añadir giros rectos a las vistas de entrenamiento de la cabeza mejora la clasificación de fotos giradas sin empeorar las derechas.",
+    "data": "Solo desarrollo (split != test): 408 fotos, 41 bloques provisionales. Encoder ResNet18 ImageNet congelado.",
+    "folds": "5-fold StratifiedGroupKFold, semilla 2026 (idénticos a train_transfer.py)",
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0
+    ],
+    "c_selection": "macro-F1 medio de folds en fotos derechas, por variante",
+    "variants": {
+      "base": [
+        "vista0@0",
+        "vista1@0",
+        "vista2@0",
+        "vista3@0"
+      ],
+      "giros_originales": [
+        "vista0@0",
+        "vista1@0",
+        "vista2@0",
+        "vista3@0",
+        "vista0@90",
+        "vista0@180",
+        "vista0@270"
+      ],
+      "giros_todas": [
+        "vista0@0",
+        "vista0@90",
+        "vista0@180",
+        "vista0@270",
+        "vista1@0",
+        "vista1@90",
+        "vista1@180",
+        "vista1@270",
+        "vista2@0",
+        "vista2@90",
+        "vista2@180",
+        "vista2@270",
+        "vista3@0",
+        "vista3@90",
+        "vista3@180",
+        "vista3@270"
+      ]
+    },
+    "base_views": "vista0 original; vista1 brillo 0,75; vista2 giro +8°; vista3 giro -8° y brillo 1,12",
+    "adoption_rule": {
+      "upright_macro_f1_min": "base - 0.01",
+      "upright_recall_each_class_min": 0.8,
+      "rotated_mean_macro_f1_min": "base + 0.05"
+    },
+    "secondary_test": "72 fotos ya abiertas; se reportan una vez y no deciden",
+    "fixed_before_running": true
+  },
+  "variants": {
+    "base": {
+      "C": 0.01,
+      "mean_fold_macro_f1": 0.9518238197765172,
+      "oof": {
+        "0": {
+          "n": 408,
+          "accuracy": 0.9534313725490197,
+          "macro_f1": 0.9531318103098251,
+          "confusion_matrix": [
+            [
+              131,
+              5,
+              0
+            ],
+            [
+              9,
+              123,
+              4
+            ],
+            [
+              0,
+              1,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9357142857142857,
+              "recall": 0.9632352941176471,
+              "f1": 0.9492753623188407,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9534883720930233,
+              "recall": 0.9044117647058824,
+              "f1": 0.9283018867924528,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9712230215827338,
+              "recall": 0.9926470588235294,
+              "f1": 0.9818181818181818,
+              "support": 136
+            }
+          }
+        },
+        "90": {
+          "n": 408,
+          "accuracy": 0.8627450980392157,
+          "macro_f1": 0.8585257769357675,
+          "confusion_matrix": [
+            [
+              86,
+              48,
+              2
+            ],
+            [
+              4,
+              131,
+              1
+            ],
+            [
+              0,
+              1,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9555555555555556,
+              "recall": 0.6323529411764706,
+              "f1": 0.7610619469026547,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.7277777777777777,
+              "recall": 0.9632352941176471,
+              "f1": 0.8291139240506329,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9782608695652174,
+              "recall": 0.9926470588235294,
+              "f1": 0.9854014598540147,
+              "support": 136
+            }
+          }
+        },
+        "180": {
+          "n": 408,
+          "accuracy": 0.9338235294117647,
+          "macro_f1": 0.9331985869005198,
+          "confusion_matrix": [
+            [
+              125,
+              7,
+              4
+            ],
+            [
+              10,
+              120,
+              6
+            ],
+            [
+              0,
+              0,
+              136
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9259259259259259,
+              "recall": 0.9191176470588235,
+              "f1": 0.922509225092251,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9448818897637795,
+              "recall": 0.8823529411764706,
+              "f1": 0.9125475285171102,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9315068493150684,
+              "recall": 1.0,
+              "f1": 0.9645390070921985,
+              "support": 136
+            }
+          }
+        },
+        "270": {
+          "n": 408,
+          "accuracy": 0.8529411764705882,
+          "macro_f1": 0.8474458964552802,
+          "confusion_matrix": [
+            [
+              82,
+              52,
+              2
+            ],
+            [
+              1,
+              131,
+              4
+            ],
+            [
+              0,
+              1,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9879518072289156,
+              "recall": 0.6029411764705882,
+              "f1": 0.7488584474885844,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.7119565217391305,
+              "recall": 0.9632352941176471,
+              "f1": 0.81875,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9574468085106383,
+              "recall": 0.9926470588235294,
+              "f1": 0.9747292418772563,
+              "support": 136
+            }
+          }
+        }
+      },
+      "rotated_mean_macro_f1": 0.8797234200971892,
+      "secondary_test": {
+        "0": {
+          "n": 72,
+          "accuracy": 0.9305555555555556,
+          "macro_f1": 0.9297937691970163,
+          "confusion_matrix": [
+            [
+              24,
+              0,
+              0
+            ],
+            [
+              5,
+              19,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.8275862068965517,
+              "recall": 1.0,
+              "f1": 0.9056603773584906,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 1.0,
+              "recall": 0.7916666666666666,
+              "f1": 0.8837209302325582,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "90": {
+          "n": 72,
+          "accuracy": 0.8194444444444444,
+          "macro_f1": 0.797917871602082,
+          "confusion_matrix": [
+            [
+              11,
+              9,
+              4
+            ],
+            [
+              0,
+              24,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 1.0,
+              "recall": 0.4583333333333333,
+              "f1": 0.6285714285714286,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.7272727272727273,
+              "recall": 1.0,
+              "f1": 0.8421052631578948,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 0.8571428571428571,
+              "recall": 1.0,
+              "f1": 0.923076923076923,
+              "support": 24
+            }
+          }
+        },
+        "180": {
+          "n": 72,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.958315240990013,
+          "confusion_matrix": [
+            [
+              23,
+              1,
+              0
+            ],
+            [
+              2,
+              22,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.92,
+              "recall": 0.9583333333333334,
+              "f1": 0.9387755102040817,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9565217391304348,
+              "recall": 0.9166666666666666,
+              "f1": 0.9361702127659574,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "270": {
+          "n": 72,
+          "accuracy": 0.7916666666666666,
+          "macro_f1": 0.7738284502990386,
+          "confusion_matrix": [
+            [
+              11,
+              10,
+              3
+            ],
+            [
+              2,
+              22,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.8461538461538461,
+              "recall": 0.4583333333333333,
+              "f1": 0.5945945945945945,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 0.8888888888888888,
+              "recall": 1.0,
+              "f1": 0.9411764705882353,
+              "support": 24
+            }
+          }
+        }
+      }
+    },
+    "giros_originales": {
+      "C": 0.1,
+      "mean_fold_macro_f1": 0.956196752989451,
+      "oof": {
+        "0": {
+          "n": 408,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9581281229025281,
+          "confusion_matrix": [
+            [
+              131,
+              4,
+              1
+            ],
+            [
+              7,
+              125,
+              4
+            ],
+            [
+              1,
+              0,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9424460431654677,
+              "recall": 0.9632352941176471,
+              "f1": 0.9527272727272728,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9689922480620154,
+              "recall": 0.9191176470588235,
+              "f1": 0.9433962264150944,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9642857142857143,
+              "recall": 0.9926470588235294,
+              "f1": 0.9782608695652174,
+              "support": 136
+            }
+          }
+        },
+        "90": {
+          "n": 408,
+          "accuracy": 0.9632352941176471,
+          "macro_f1": 0.9631223444819699,
+          "confusion_matrix": [
+            [
+              131,
+              4,
+              1
+            ],
+            [
+              7,
+              127,
+              2
+            ],
+            [
+              0,
+              1,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9492753623188406,
+              "recall": 0.9632352941176471,
+              "f1": 0.9562043795620438,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9621212121212122,
+              "recall": 0.9338235294117647,
+              "f1": 0.9477611940298508,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9782608695652174,
+              "recall": 0.9926470588235294,
+              "f1": 0.9854014598540147,
+              "support": 136
+            }
+          }
+        },
+        "180": {
+          "n": 408,
+          "accuracy": 0.9436274509803921,
+          "macro_f1": 0.9431330876363472,
+          "confusion_matrix": [
+            [
+              128,
+              5,
+              3
+            ],
+            [
+              10,
+              121,
+              5
+            ],
+            [
+              0,
+              0,
+              136
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.927536231884058,
+              "recall": 0.9411764705882353,
+              "f1": 0.9343065693430658,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9603174603174603,
+              "recall": 0.8897058823529411,
+              "f1": 0.9236641221374045,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9444444444444444,
+              "recall": 1.0,
+              "f1": 0.9714285714285714,
+              "support": 136
+            }
+          }
+        },
+        "270": {
+          "n": 408,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9582016922685841,
+          "confusion_matrix": [
+            [
+              131,
+              5,
+              0
+            ],
+            [
+              6,
+              126,
+              4
+            ],
+            [
+              1,
+              1,
+              134
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9492753623188406,
+              "recall": 0.9632352941176471,
+              "f1": 0.9562043795620438,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9545454545454546,
+              "recall": 0.9264705882352942,
+              "f1": 0.9402985074626866,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9710144927536232,
+              "recall": 0.9852941176470589,
+              "f1": 0.9781021897810219,
+              "support": 136
+            }
+          }
+        }
+      },
+      "rotated_mean_macro_f1": 0.9548190414623003,
+      "secondary_test": {
+        "0": {
+          "n": 72,
+          "accuracy": 0.9722222222222222,
+          "macro_f1": 0.9722222222222223,
+          "confusion_matrix": [
+            [
+              23,
+              1,
+              0
+            ],
+            [
+              1,
+              23,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9583333333333334,
+              "recall": 0.9583333333333334,
+              "f1": 0.9583333333333334,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9583333333333334,
+              "recall": 0.9583333333333334,
+              "f1": 0.9583333333333334,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "90": {
+          "n": 72,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.958315240990013,
+          "confusion_matrix": [
+            [
+              23,
+              1,
+              0
+            ],
+            [
+              2,
+              22,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.92,
+              "recall": 0.9583333333333334,
+              "f1": 0.9387755102040817,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9565217391304348,
+              "recall": 0.9166666666666666,
+              "f1": 0.9361702127659574,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "180": {
+          "n": 72,
+          "accuracy": 0.9861111111111112,
+          "macro_f1": 0.9861050803300043,
+          "confusion_matrix": [
+            [
+              24,
+              0,
+              0
+            ],
+            [
+              1,
+              23,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.96,
+              "recall": 1.0,
+              "f1": 0.9795918367346939,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 1.0,
+              "recall": 0.9583333333333334,
+              "f1": 0.9787234042553191,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "270": {
+          "n": 72,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9580317942779949,
+          "confusion_matrix": [
+            [
+              23,
+              1,
+              0
+            ],
+            [
+              1,
+              22,
+              1
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9583333333333334,
+              "recall": 0.9583333333333334,
+              "f1": 0.9583333333333334,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9565217391304348,
+              "recall": 0.9166666666666666,
+              "f1": 0.9361702127659574,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 0.96,
+              "recall": 1.0,
+              "f1": 0.9795918367346939,
+              "support": 24
+            }
+          }
+        }
+      }
+    },
+    "giros_todas": {
+      "C": 0.01,
+      "mean_fold_macro_f1": 0.9535483403319182,
+      "oof": {
+        "0": {
+          "n": 408,
+          "accuracy": 0.9558823529411765,
+          "macro_f1": 0.9556433904259992,
+          "confusion_matrix": [
+            [
+              131,
+              4,
+              1
+            ],
+            [
+              8,
+              124,
+              4
+            ],
+            [
+              1,
+              0,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9357142857142857,
+              "recall": 0.9632352941176471,
+              "f1": 0.9492753623188407,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.96875,
+              "recall": 0.9117647058823529,
+              "f1": 0.9393939393939394,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9642857142857143,
+              "recall": 0.9926470588235294,
+              "f1": 0.9782608695652174,
+              "support": 136
+            }
+          }
+        },
+        "90": {
+          "n": 408,
+          "accuracy": 0.9705882352941176,
+          "macro_f1": 0.9704933682096678,
+          "confusion_matrix": [
+            [
+              133,
+              2,
+              1
+            ],
+            [
+              8,
+              127,
+              1
+            ],
+            [
+              0,
+              0,
+              136
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9432624113475178,
+              "recall": 0.9779411764705882,
+              "f1": 0.96028880866426,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9844961240310077,
+              "recall": 0.9338235294117647,
+              "f1": 0.9584905660377359,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9855072463768116,
+              "recall": 1.0,
+              "f1": 0.9927007299270074,
+              "support": 136
+            }
+          }
+        },
+        "180": {
+          "n": 408,
+          "accuracy": 0.9436274509803921,
+          "macro_f1": 0.9432566903288001,
+          "confusion_matrix": [
+            [
+              130,
+              2,
+              4
+            ],
+            [
+              11,
+              120,
+              5
+            ],
+            [
+              1,
+              0,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9154929577464789,
+              "recall": 0.9558823529411765,
+              "f1": 0.9352517985611511,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9836065573770492,
+              "recall": 0.8823529411764706,
+              "f1": 0.9302325581395349,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9375,
+              "recall": 0.9926470588235294,
+              "f1": 0.9642857142857143,
+              "support": 136
+            }
+          }
+        },
+        "270": {
+          "n": 408,
+          "accuracy": 0.9656862745098039,
+          "macro_f1": 0.9655374476269999,
+          "confusion_matrix": [
+            [
+              132,
+              4,
+              0
+            ],
+            [
+              5,
+              127,
+              4
+            ],
+            [
+              0,
+              1,
+              135
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9635036496350365,
+              "recall": 0.9705882352941176,
+              "f1": 0.967032967032967,
+              "support": 136
+            },
+            "manuscrito": {
+              "precision": 0.9621212121212122,
+              "recall": 0.9338235294117647,
+              "f1": 0.9477611940298508,
+              "support": 136
+            },
+            "pintura": {
+              "precision": 0.9712230215827338,
+              "recall": 0.9926470588235294,
+              "f1": 0.9818181818181818,
+              "support": 136
+            }
+          }
+        }
+      },
+      "rotated_mean_macro_f1": 0.959762502055156,
+      "secondary_test": {
+        "0": {
+          "n": 72,
+          "accuracy": 0.9444444444444444,
+          "macro_f1": 0.9444444444444443,
+          "confusion_matrix": [
+            [
+              22,
+              2,
+              0
+            ],
+            [
+              2,
+              22,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9166666666666666,
+              "recall": 0.9166666666666666,
+              "f1": 0.9166666666666666,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9166666666666666,
+              "recall": 0.9166666666666666,
+              "f1": 0.9166666666666666,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "90": {
+          "n": 72,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.958315240990013,
+          "confusion_matrix": [
+            [
+              23,
+              1,
+              0
+            ],
+            [
+              2,
+              22,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.92,
+              "recall": 0.9583333333333334,
+              "f1": 0.9387755102040817,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9565217391304348,
+              "recall": 0.9166666666666666,
+              "f1": 0.9361702127659574,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "180": {
+          "n": 72,
+          "accuracy": 0.9861111111111112,
+          "macro_f1": 0.9861050803300043,
+          "confusion_matrix": [
+            [
+              24,
+              0,
+              0
+            ],
+            [
+              1,
+              23,
+              0
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.96,
+              "recall": 1.0,
+              "f1": 0.9795918367346939,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 1.0,
+              "recall": 0.9583333333333334,
+              "f1": 0.9787234042553191,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 24
+            }
+          }
+        },
+        "270": {
+          "n": 72,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9580317942779949,
+          "confusion_matrix": [
+            [
+              23,
+              1,
+              0
+            ],
+            [
+              1,
+              22,
+              1
+            ],
+            [
+              0,
+              0,
+              24
+            ]
+          ],
+          "classes": {
+            "documento_impreso": {
+              "precision": 0.9583333333333334,
+              "recall": 0.9583333333333334,
+              "f1": 0.9583333333333334,
+              "support": 24
+            },
+            "manuscrito": {
+              "precision": 0.9565217391304348,
+              "recall": 0.9166666666666666,
+              "f1": 0.9361702127659574,
+              "support": 24
+            },
+            "pintura": {
+              "precision": 0.96,
+              "recall": 1.0,
+              "f1": 0.9795918367346939,
+              "support": 24
+            }
+          }
+        }
+      }
+    }
+  },
+  "decisions": {
+    "giros_originales": {
+      "checks": {
+        "upright_not_worse": true,
+        "upright_recall_each_class": true,
+        "rotated_improves": true
+      },
+      "adopt": true
+    },
+    "giros_todas": {
+      "checks": {
+        "upright_not_worse": true,
+        "upright_recall_each_class": true,
+        "rotated_improves": true
+      },
+      "adopt": true
+    }
+  },
+  "chosen": "giros_originales",
+  "elapsed_seconds": 6.289555527999994
+}

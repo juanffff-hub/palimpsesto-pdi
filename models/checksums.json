@@ -4,6 +4,10 @@
     "sha256": "d9281e974e907d88e70985da83c550a9cd80ca51d0898de728d1dd0b9ec2bd10"
   },
   "classifier.pt": {
+    "bytes": 44791627,
+    "sha256": "94cc64bd23d7811ada624324f6c7ccbd0813ce1b2bf9e11c17e3a21e6dc44d4b"
+  },
+  "classifier_v0.2.0.pt": {
     "bytes": 44791179,
     "sha256": "c8eaf87b3610df43c8a2ece8aebb17391be707a7e5da677dcd4bfe7ef88f3711"
   },
@@ -28,8 +32,8 @@
     "sha256": "953bed14353184a8319350aaf2796f04db9386d38aa7d3ac6b6602097333a9ea"
   },
   "scope_reference.npz": {
-    "bytes": 757350,
-    "sha256": "f77698ce1f07f28348cbb251660cd540711121aff58a536e496eac634f0a3c81"
+    "bytes": 756525,
+    "sha256": "e41d517f66f7f910f98bd3637521e9acbd84509bb40fbae32bbfa48363708f78"
   },
   "transfer_candidate.pt": {
     "bytes": 44792203,
