@@ -30,3 +30,13 @@ La rama de trabajo del desarrollador no se restablece automáticamente; cada int
 ## Entregables siguientes
 
 Póster académico, video de máximo tres minutos y sustentación oral. Para las limitaciones experimentales, consultar `MODEL_CARD.md`, `DATA_CARD.md` y el análisis del README. Los datos de referencia y el material docente original permanecen intactos fuera del repositorio público.
+
+## Reescritura de autores (20 de noviembre de 2026)
+
+Se reescribió la historia de `main` para que los commits de la revisión de interfaz y clasificador figuren a nombre de DavidN09 y sin líneas de coautoría. Los archivos quedaron idénticos byte a byte (mismo árbol que el commit anterior `687fe80`); los commits de juanffff-hub conservan su autor y su fecha. No se tocaron redes, pesos, métricas ni el trabajo de la demo pública: los 12 archivos de ese cierre (`run_public.py`, `scripts/share_public.py`, lanzadores, `server.py`, pruebas…) están completos en `main`. Comprobado: 87 pruebas Python pasan.
+
+Equivalencias de commits: `687fe80` → `0aa3877` (demo HTTPS), `6e15970` → `5c86e8d` (acceso al dataset), `d7e11f1` → `88a8b93`.
+
+**Para actualizar una copia local** (sin cambios propios sin subir): `git fetch origin` y luego `git reset --hard origin/main`. Si `git status` muestra cambios propios, primero guardarlos con `git stash`.
+
+**Pendiente desde la web de GitHub:** el tag `v0.3.0` sigue apuntando al commit antiguo `d7e11f1`; la release y sus archivos funcionan igual. Las ramas ya fusionadas `revision/feedback-interfaz` y `revision/fase2-calidad-rubrica` conservan la historia antigua y pueden borrarse desde la página de ramas.
