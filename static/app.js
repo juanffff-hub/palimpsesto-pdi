@@ -473,7 +473,7 @@ async function process({ quiet = false } = {}) {
 }
 $('#stale-retry').onclick = () => process();
 
-$('#confirm-corners').onclick = async () => { if (await process()) { history = []; show(4); } };
+$('#confirm-corners').onclick = async () => { if (await process()) { history = []; Feedback.dismiss('detect-ok'); show(4); } };
 function changeParameters() { history.push({ ...params }); params = readControls(); process(); }
 sliders.forEach(k => {
   $('#' + k).oninput = () => $('#' + k + '-value').textContent = $('#' + k).value + ' %';
