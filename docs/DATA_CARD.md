@@ -13,3 +13,7 @@ SSIM/PSNR de mejora usa referencias construidas/alineadas, no ground truth de co
 Posibles sesgos: clases capturadas en contextos repetidos, iluminación y fondos correlacionados, múltiples vistas de una pieza, número real de piezas aún incierto, pocas pinturas únicas, manuscritos débiles confundidos con impresos. Revisión humana y capturas nuevas son necesarias antes de afirmaciones definitivas.
 
 Material privado del equipo y del curso; no se presupone autorización de difusión pública. El paquete incluye un inventario SHA256 para comprobar que todos los originales se conservaron. No modificar ni eliminar archivos fuente durante futuras revisiones.
+
+## Acceso de entrega — 19 de noviembre de 2026
+
+Por solicitud expresa del responsable del proyecto, se habilita consulta mediante enlace del dataset y de una copia pública del código y los pesos (README, sección 5). Esta entrega separada incluye 647 archivos de datos; el paquete privado completo conserva los 804 archivos originales, incluido el material docente, que no se publica. Compartir para revisión académica no establece una licencia abierta sobre fotografías u obras. Se preservan el manifiesto, las agrupaciones provisionales y todos los originales. Los dos Drive son carpetas de trabajo con acceso por enlace; el ZIP con hashes es la referencia estable de reproducción.

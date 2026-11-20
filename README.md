@@ -211,10 +211,13 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 
 Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artificial, reflejos y ángulos. Las miniaturas de documentos aparecen difuminadas porque algunos contienen nombres de personas.
 
-**Acceso a los datos**
+**Acceso a los datos (sin invitación)**
 
-- **Enlace de Google Drive (consulta del docente): ⏳ pendiente.** Debe subirlo el equipo con permisos de lectura para el profesor y pegarlo aquí. Ver [trabajo humano](#trabajo-humano-pendiente).
-- Para el equipo: la release privada del repositorio incluye `Palimpsesto_Claude_Code_COMPLETO.zip` (los 804 archivos originales con su manifiesto SHA-256) y el ZIP de pesos.
+- **Google Drive:** [480 fotos de clasificación](https://drive.google.com/drive/folders/1x-kLwxyBtguRjrFI5dU6oVQEYpr3U4Ay) y [fotos, máscaras y anotaciones de segmentación](https://drive.google.com/drive/folders/1a8JVuc3vZH-Qbuj92hRyBT6S9kvS6V3K). Son las carpetas originales de trabajo; sus etiquetas históricas train/test/val no sustituyen las particiones del manifiesto.
+- **Descarga reproducible recomendada:** [dataset_palimpsesto_v1.zip · 820 MB](https://github.com/juanffff-hub/palimpsesto-pdi-entrega/releases/download/v0.3.0/dataset_palimpsesto_v1.zip). Contiene las 480 fotos del manifiesto, 80 fotos de segmentación, 80 máscaras, cinco extras y dos archivos de anotación: **647 archivos de datos**, más manifiesto, instrucciones y hashes. Se comprobaron los 480 hashes contra el manifiesto y los 647 archivos dentro del ZIP. No incluye material docente ni pesos.
+- Extrae el ZIP y usa su carpeta `datos/` como `--root`. Incluye `LEEME_DATASET.txt`, `manifest.csv` y `SHA256_ARCHIVOS.json`. SHA-256 del ZIP: `1b00cb28f0490d1247b7f11874b0542dd3d73e1f3b590ef163a7768ca72d8820`.
+- **Código y pesos para el docente:** [entrega pública](https://github.com/juanffff-hub/palimpsesto-pdi-entrega) y [release v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi-entrega/releases/tag/v0.3.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. El repositorio privado del equipo conserva el historial y el paquete completo del curso.
+- Las carpetas originales de Drive permiten actualmente editar a cualquiera con el enlace. Para una copia estable de consulta, usa el ZIP de la release; no modifiques los originales.
 - `data/manifest.csv` relaciona cada foto con su clase, bloque, partición y hash. `group_verified=false` indica que **la identidad física de las piezas aún no se ha certificado**: los 50 bloques son una agrupación automática conservadora, no 50 piezas confirmadas.
 - Detalle de procedencia, sesgos y licencias: `docs/DATA_CARD.md`.
 
@@ -364,7 +367,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Descarga y extrae en la raíz los pesos de la [release del proyecto](https://github.com/juanffff-hub/palimpsesto-pdi/releases) (privada; requiere acceso al repositorio). Deben existir `models/classifier.pt` y `models/unet_resnet18_imagenet.pth`; sus hashes están en `models/checksums.json`.
+Descarga `modelos_palimpsesto_v0.3.0.zip` de la [release pública v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi-entrega/releases/tag/v0.3.0) y extráelo en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_imagenet.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP es idéntico al publicado por el equipo (SHA-256 `9880804e55312b0cc0556a52c2ff94f03a7ef4ed08ceb820a680e4221006e577`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
@@ -376,7 +379,7 @@ Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a 
 
 ### Reproducir entrenamiento, evaluación y figuras
 
-`--root` apunta a la carpeta con las rutas del manifiesto (por ejemplo `material_original/Material Proyecto de PDI` del paquete completo).
+`--root` apunta a `datos/` al extraer el ZIP de la sección 5. También admite la carpeta `material_original/Material Proyecto de PDI` del paquete privado original.
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/train_classifier.py --root "C:\ruta\datos"      # CNN del curso y ANN
@@ -399,12 +402,13 @@ Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a 
 
 ## Trabajo humano pendiente
 
-1. **Enlace de datos para el docente:** subir el dataset a Google Drive con permiso de lectura para el profesor y pegar el enlace en la [sección 5](#5-datos).
-2. **Acceso del docente** al repositorio privado y a la release.
-3. **Certificar piezas:** confirmar con la herramienta de revisión qué fotos son de la misma pieza física y regenerar la partición con `scripts/resplit_manifest.py`.
-4. **Piezas nuevas:** fotografiar 6–9 piezas no vistas (dos vistas cada una) y evaluarlas sin tocar los pesos.
-5. **Usabilidad:** prueba con 3–5 personas (plantilla en `docs/validacion_humana.csv`) y revisión visual de trazos y color.
-6. **Póster, video de máximo 3 minutos y sustentación** (guía en `docs/GUIA_SUSTENTACION.md`).
+El acceso al código, los pesos y los datos está resuelto en la [sección 5](#5-datos). Antes de dar por terminada la validación del proyecto, falta evidencia que debe aportar el equipo:
+
+1. **Certificar piezas:** confirmar qué fotos pertenecen a la misma pieza física. La nueva partición puede generarse automáticamente con `scripts/resplit_manifest.py` una vez entregada la revisión; conservar el manifiesto y los pesos actuales como baseline.
+2. **Piezas nuevas:** fotografiar 6–9 piezas no vistas (dos vistas cada una, cubriendo las tres clases), registrar su clase real e incluir fotos ajenas al dominio. Evaluarlas con los pesos congelados, sin ajustar el modelo con esa prueba.
+3. **Usabilidad y fidelidad:** observar a 3–5 personas realizando el flujo completo (plantilla en `docs/validacion_humana.csv`) y revisar con la pieza original que la mejora conserva trazos y color. Registrar dificultades y fallos reales, aunque la exportación termine correctamente.
+
+Después se preparan el **póster, video de máximo 3 minutos y sustentación** (guía en `docs/GUIA_SUSTENTACION.md`). No se han añadido nuevas interacciones ni cambiado el entrenamiento para este cierre de acceso.
 
 No hay resultados humanos inventados en este repositorio.
 

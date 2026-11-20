@@ -93,3 +93,16 @@ PR #1 (fase 1) y PR #2 (fase 2) fusionados en `main` con el acuerdo de Juan Feli
 5. **Tareas humanas de evidencia** (equipo): certificar piezas, fotografiar 6–9 piezas nuevas, prueba de uso con 3–5 personas. No marcarlas como hechas sin evidencia.
 
 Instalación verificada en el equipo de David (Windows, Python 3.12.10): `Instalar_Palimpsesto.cmd` → 83 passed; app abierta con «IA lista»; el ejemplo sintético se sugiere como Impreso (98,5 %).
+
+## Cierre de acceso para el docente — 19 de noviembre de 2026
+
+Partida: `main` en `3fe28a6` (fases 1/2 fusionadas, release v0.3.0 publicada). Rama `revision/cierre-dataset-validacion`. El usuario pidió concentrarse en los pendientes, sin repetir entrenamientos ni las pruebas generales ya realizadas por el equipo.
+
+- README sección 5: enlaces reales a ambos Drive y ZIP consolidado. 647 archivos originales de datos; 480 hashes coinciden con `data/manifest.csv`; integridad del ZIP comprobada. SHA-256: `1b00cb28f0490d1247b7f11874b0542dd3d73e1f3b590ef163a7768ca72d8820`.
+- Entrega consultable sin invitación: https://github.com/juanffff-hub/palimpsesto-pdi-entrega. Copia del código actual sin historial privado, material docente, inventarios del curso ni registros de instalación local. La colaboración continúa en el repositorio privado; no desarrollar en paralelo sobre la copia de entrega.
+- Pesos públicos v0.3.0: copia exacta de la release de David, 182755574 bytes, SHA-256 `9880804e55312b0cc0556a52c2ff94f03a7ef4ed08ceb820a680e4221006e577`. Se verifica la transferencia del archivo, no se repite entrenamiento ni se inventan nuevos resultados.
+- No hay cambios de aplicación, interfaz, modelos, particiones ni cifras experimentales. Se conservaron las pruebas documentadas de Claude (83 Python, 9 recorridos, 22 navegador); en esta revisión también se había comprobado 83/83 Python antes de la instrucción de evitar repeticiones.
+- Drive: las carpetas originales ya tienen permiso `anyone/writer`. No se alteraron permisos del trabajo del equipo. El ZIP estable se sirve por la release pública; el conector de Drive rechaza archivos mayores de 512 MiB y el navegador disponible no permite completar la gestión de permisos. La carpeta nueva vacía «Palimpsesto — dataset y entrega académica» no forma parte de la entrega.
+- Quedan exclusivamente como evidencia humana: identidades de piezas, capturas nuevas con clase real, usabilidad con 3–5 personas y revisión visual de trazos/color. La evaluación y tabulación posteriores pueden automatizarse. Póster/video/sustentación se abordan después.
+
+Esta sección actualiza los pendientes históricos de acceso anteriores; no marca como completadas las validaciones humanas.
