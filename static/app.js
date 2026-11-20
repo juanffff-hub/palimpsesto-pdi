@@ -81,10 +81,10 @@ async function api(url, body, form = false) {
     return data;
   } catch (e) {
     if (e.name === 'AbortError') {
-      if (userCancelled) throw apiError('El servidor local puede terminar la operación por su cuenta; puedes volver a intentarlo.', 'cancelled');
+      if (userCancelled) throw apiError('El servidor puede terminar la operación por su cuenta; puedes volver a intentarlo.', 'cancelled');
       throw apiError('Pasaron 90 segundos sin respuesta. Intenta con una foto más pequeña o reinicia el servidor.', 'timeout');
     }
-    if (e instanceof TypeError) throw apiError('Comprueba que la ventana del servidor local siga abierta e inténtalo de nuevo.', 'network');
+    if (e instanceof TypeError) throw apiError('Comprueba tu conexión y que Palimpsesto siga abierto en el computador que lo ejecuta. Después, inténtalo de nuevo.', 'network');
     throw e;
   } finally { clearTimeout(timeout); if (currentAbort === abort) currentAbort = null; }
 }
@@ -516,7 +516,7 @@ async function checkStatus() {
   try {
     const s = await api('/api/status');
     presets = s.presets;
-    $('#model-status').textContent = s.classifier && s.segmenter ? 'IA lista · en tu equipo' : 'Modo manual · revisa modelos';
+    $('#model-status').textContent = s.classifier && s.segmenter ? (s.local ? 'IA lista · en tu equipo' : 'IA lista · demo en línea') : 'Modo manual · revisa modelos';
     document.querySelector('.status-dot').classList.toggle('degraded', !(s.classifier && s.segmenter));
     Feedback.dismiss('status');
     if (!s.classifier) {

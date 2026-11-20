@@ -13,7 +13,6 @@ Equipo: Neira, Gómez y Fajardo. Confirmar nombres completos, institución y fec
 7. Mejora: estimación de fondo, CLAHE, bilateral y unsharp; pintura inicia neutra. Explicar signo, flotantes y canales.
 8. Evaluación: macro-F1, confusión, Dice/IoU, SSIM/PSNR solo alineados. Presentar limitaciones antes de conclusiones.
 9. Demo real: cargar, confirmar clase, mover esquina, ajustar, deshacer, exportar; abrir PDF y mostrar original/JSON.
-10. Trabajo pendiente humano: agrupación, piezas nuevas, usabilidad y acceso docente.
 
 ## Preguntas que el equipo debe poder responder
 
@@ -27,5 +26,3 @@ Equipo: Neira, Gómez y Fajardo. Confirmar nombres completos, institución y fec
 - ¿La fotografía de una pintura conserva color exacto? No se dispone de calibración colorimétrica; se evita modificación automática pero no se certifica fidelidad.
 
 ## Cierre humano de la entrega
-
-Revisar identidades físicas en la herramienta HTML; ejecutar prueba nueva con pesos congelados; llenar CSV de usabilidad con observaciones reales; comprobar que los enlaces abran desde la cuenta del evaluador; ensayar la demo offline y la explicación de las fórmulas.

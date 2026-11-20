@@ -43,13 +43,13 @@ Gran parte del patrimonio documental y artístico (manuscritos, cartas, diplomas
 
 **General.** Desarrollar un sistema interactivo de procesamiento digital de imágenes y aprendizaje profundo que, a partir de una fotografía imperfecta de una pieza de valor cultural, identifique su tipo, corrija su perspectiva y mejore su iluminación y nitidez, permitiendo al usuario supervisar y ajustar cada etapa, para producir una imagen legible y apta para el archivo digital.
 
-**Específicos y estado**
+**Objetivos específicos del prototipo y estado**
 
-| Objetivo específico (propuesta) | Estado en esta versión |
+| Objetivo específico | Estado en esta versión |
 |---|---|
 | 1. Construir un conjunto de imágenes reales de celular y versiones con distorsión sintética, e implementar la corrección geométrica (esquinas + homografía). | ✅ 480 fotos reales etiquetadas; perturbaciones y referencias sintéticas; U-Net + contornos + borde manual; homografía sobre RGB original. |
 | 2. Diseñar, entrenar y validar una CNN que clasifique la pieza (manuscrito, impreso, pintura) controlando el sobreajuste con *data augmentation*, Dropout y L2; implementar la mejora con preajuste por clase y conservando el color en pinturas. | ✅ CNN del curso con 5 variantes (base, Dropout, L2, aumentos, combinada) + ANN de descriptores; clasificador operativo por transferencia (ResNet18); preajustes por clase; pinturas sin binarización. |
-| 3. Integrar los módulos en un prototipo web interactivo y evaluar con métricas cuantitativas y una prueba de usabilidad. | ✅ Prototipo web de cinco pasos con métricas de clasificación, segmentación y calidad. ⏳ **La prueba de usabilidad con personas está pendiente** (ver [trabajo humano](#trabajo-humano-pendiente)). |
+| 3. Integrar los módulos en un prototipo web interactivo y evaluar el sistema mediante datos reales, métricas cuantitativas y pruebas de funcionamiento. | ✅ Prototipo de cinco pasos; clasificación, segmentación, mejora y exportación evaluadas. |
 
 ### Solución propuesta
 
@@ -178,7 +178,7 @@ static/app.js       Flujo de la interfaz (carga → identificar → encuadrar �
 static/feedback.js  Sistema de avisos: éxito, información, advertencia, error, mensajes de campo, diálogos
 static/*.css        Identidad visual (papel + verde bosque), avisos y animaciones
 scripts/            Entrenamiento, calibración, evaluación, figuras y verificación
-tests/              83 pruebas Python + 22 de navegador
+tests/              Pruebas Python de contratos y acceso remoto + 22 de navegador
 notebooks/          Recorrido académico con FFT y evaluación
 data/manifest.csv   480 fotos, clase, bloque, partición y hash
 results/            Fuente numérica de todas las cifras del README
@@ -214,9 +214,9 @@ Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artifi
 **Acceso a los datos (sin invitación)**
 
 - **Google Drive:** [480 fotos de clasificación](https://drive.google.com/drive/folders/1x-kLwxyBtguRjrFI5dU6oVQEYpr3U4Ay) y [fotos, máscaras y anotaciones de segmentación](https://drive.google.com/drive/folders/1a8JVuc3vZH-Qbuj92hRyBT6S9kvS6V3K). Son las carpetas originales de trabajo; sus etiquetas históricas train/test/val no sustituyen las particiones del manifiesto.
-- **Descarga reproducible recomendada:** [dataset_palimpsesto_v1.zip · 820 MB](https://github.com/juanffff-hub/palimpsesto-pdi-entrega/releases/download/v0.3.0/dataset_palimpsesto_v1.zip). Contiene las 480 fotos del manifiesto, 80 fotos de segmentación, 80 máscaras, cinco extras y dos archivos de anotación: **647 archivos de datos**, más manifiesto, instrucciones y hashes. Se comprobaron los 480 hashes contra el manifiesto y los 647 archivos dentro del ZIP. No incluye material docente ni pesos.
+- **Descarga reproducible recomendada:** [dataset_palimpsesto_v1.zip · 820 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.3.0/dataset_palimpsesto_v1.zip). Contiene las 480 fotos del manifiesto, 80 fotos de segmentación, 80 máscaras, cinco extras y dos archivos de anotación: **647 archivos de datos**, más manifiesto, instrucciones y hashes. Se comprobaron los 480 hashes contra el manifiesto y los 647 archivos dentro del ZIP. No incluye material docente ni pesos.
 - Extrae el ZIP y usa su carpeta `datos/` como `--root`. Incluye `LEEME_DATASET.txt`, `manifest.csv` y `SHA256_ARCHIVOS.json`. SHA-256 del ZIP: `1b00cb28f0490d1247b7f11874b0542dd3d73e1f3b590ef163a7768ca72d8820`.
-- **Código y pesos para el docente:** [entrega pública](https://github.com/juanffff-hub/palimpsesto-pdi-entrega) y [release v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi-entrega/releases/tag/v0.3.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. El repositorio privado del equipo conserva el historial y el paquete completo del curso.
+- **Código y pesos para el docente:** [repositorio principal](https://github.com/juanffff-hub/palimpsesto-pdi) y [release v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.3.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. Este es el único repositorio principal y de entrega. El material completo del curso se conserva fuera de la publicación.
 - Las carpetas originales de Drive permiten actualmente editar a cualquiera con el enlace. Para una copia estable de consulta, usa el ZIP de la release; no modifiques los originales.
 - `data/manifest.csv` relaciona cada foto con su clase, bloque, partición y hash. `group_verified=false` indica que **la identidad física de las piezas aún no se ha certificado**: los 50 bloques son una agrupación automática conservadora, no 50 piezas confirmadas.
 - Detalle de procedencia, sesgos y licencias: `docs/DATA_CARD.md`.
@@ -325,7 +325,7 @@ Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 
 | `npm run test:ui`: navegador en 320–1440 px, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 22/22 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
 
-Las pruebas automáticas comprueban que el software hace lo que debe. **No reemplazan una prueba de uso con personas ni una evaluación con piezas nuevas.**
+Las pruebas automáticas verifican los contratos del software. La evaluación experimental del modelo se describe por separado, con sus protocolos y limitaciones.
 
 ---
 
@@ -334,7 +334,7 @@ Las pruebas automáticas comprueban que el software hace lo que debe. **No reemp
 **Principales resultados**
 
 - Se construyó un sistema funcional de extremo a extremo (cargar → identificar → encuadrar → mejorar → exportar) que integra clasificación, segmentación y PDI clásico, corre en CPU sin conexión y conserva el original byte a byte.
-- La transferencia (ResNet18 congelada) superó con claridad a la CNN del curso (macro-F1 0,958 frente a 0,705) con los mismos datos. Con pocos datos, reutilizar rasgos aprendidos supera a entrenar desde cero.
+- En el diagnóstico secundario de las mismas 72 fotos, el clasificador operativo acertó 70/72 y la CNN del curso 52/72. La validación cruzada del clasificador operativo obtuvo macro-F1 0,958; corresponde a otro protocolo y no se compara directamente con el F1 del diagnóstico de la CNN. Los resultados favorecen la transferencia en este conjunto, con las limitaciones de separación descritas.
 - Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
 - La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos).
 - La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
@@ -344,7 +344,6 @@ Las pruebas automáticas comprueban que el software hace lo que debe. **No reemp
 - Las identidades físicas de las piezas no están certificadas y el diagnóstico de 72 fotos ya se había usado, así que **las métricas son provisionales y no prueban generalización a piezas nuevas**.
 - Manuscritos de letra muy regular todavía se confunden con impresos; la U-Net es menos fiable fuera de los documentos.
 - No hay referencia real para medir la fidelidad de la mejora; la homografía no corrige páginas curvas.
-- La prueba de usabilidad con personas está pendiente.
 
 **Oportunidades de mejora**
 
@@ -352,7 +351,6 @@ Las pruebas automáticas comprueban que el software hace lo que debe. **No reemp
 - Ampliar la U-Net con máscaras de manuscritos y pinturas.
 - Ajustar el modelo completo (*fine-tuning*) una vez exista una partición certificada.
 - Incorporar dewarping para páginas curvas y OCR como herramienta externa de evaluación.
-- Hacer la prueba de usabilidad (SUS, Brooke, 1996) con 3–5 personas.
 
 ---
 
@@ -367,13 +365,13 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Descarga `modelos_palimpsesto_v0.3.0.zip` de la [release pública v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi-entrega/releases/tag/v0.3.0) y extráelo en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_imagenet.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP es idéntico al publicado por el equipo (SHA-256 `9880804e55312b0cc0556a52c2ff94f03a7ef4ed08ceb820a680e4221006e577`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
+Descarga `modelos_palimpsesto_v0.3.0.zip` de la [release pública v0.3.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.3.0) y extráelo en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_imagenet.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP es idéntico al publicado por el equipo (SHA-256 `9880804e55312b0cc0556a52c2ff94f03a7ef4ed08ceb820a680e4221006e577`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
 ```
 
-Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. El servidor escucha solo en localhost: es para demostración local, no para alojamiento público.
+Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. Este lanzador escucha solo en localhost. Para compartir una demo HTTPS gratuita, consulta «Demo compartida gratuita».
 
 Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
 
@@ -400,21 +398,24 @@ Si faltan los pesos, la interfaz entra en **modo manual** (categoría y borde a 
 
 ---
 
-## Trabajo humano pendiente
+## Cierre técnico y entregables
 
-El acceso al código, los pesos y los datos está resuelto en la [sección 5](#5-datos). Antes de dar por terminada la validación del proyecto, falta evidencia que debe aportar el equipo:
+El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
 
-1. **Certificar piezas:** confirmar qué fotos pertenecen a la misma pieza física. La nueva partición puede generarse automáticamente con `scripts/resplit_manifest.py` una vez entregada la revisión; conservar el manifiesto y los pesos actuales como baseline.
-2. **Piezas nuevas:** fotografiar 6–9 piezas no vistas (dos vistas cada una, cubriendo las tres clases), registrar su clase real e incluir fotos ajenas al dominio. Evaluarlas con los pesos congelados, sin ajustar el modelo con esa prueba.
-3. **Usabilidad y fidelidad:** observar a 3–5 personas realizando el flujo completo (plantilla en `docs/validacion_humana.csv`) y revisar con la pieza original que la mejora conserva trazos y color. Registrar dificultades y fallos reales, aunque la exportación termine correctamente.
+La evaluación corresponde al dataset y a los protocolos documentados: no constituye una certificación de fidelidad patrimonial ni una garantía de generalización a cualquier pieza. La certificación de identidades físicas y la evaluación con piezas nuevas son ampliaciones recomendadas; no se han usado para inflar las cifras existentes.
 
-Después se preparan el **póster, video de máximo 3 minutos y sustentación** (guía en `docs/GUIA_SUSTENTACION.md`). No se han añadido nuevas interacciones ni cambiado el entrenamiento para este cierre de acceso.
+Quedan los entregables de comunicación: **póster académico, video de máximo tres minutos y sustentación oral**, incluida la demostración del funcionamiento.
 
-No hay resultados humanos inventados en este repositorio.
+## Demo compartida gratuita
+
+Ejecuta `Iniciar_Enlace_Publico.cmd` para obtener un enlace HTTPS sin cuenta ni tarjeta. Se publica la aplicación completa, con las dos redes y el control de alcance. El enlace aparece en la consola y en `.public_runtime/enlace.txt`. Para cerrarlo, usa `Detener_Enlace_Publico.cmd`.
+
+El computador debe permanecer encendido y conectado. Es una demostración temporal: al reiniciar el túnel cambia la URL y no hay garantía de disponibilidad continua. Las fotos se procesan en el computador anfitrión a través de Cloudflare; las sesiones se eliminan tras 15 minutos sin actividad, con limpieza cada 30 segundos.
+
+El gestor consulta `main` de este repositorio cada 90 segundos. Los cambios de aplicación se aplican cuando no detecta sesiones activas; la URL del túnel se conserva mientras siga abierto. Un cambio solo de documentación o de historia/autor no reinicia la aplicación. Si cambian las dependencias o faltan pesos compatibles, se conserva la versión anterior y se explica el motivo en el registro. [Operación y actualizaciones](docs/DEMO_PUBLICA.md).
 
 ## Referencias
 
-- Brooke, J. (1996). SUS: A "quick and dirty" usability scale. En *Usability evaluation in industry* (pp. 189–194). Taylor & Francis.
 - Canny, J. (1986). A computational approach to edge detection. *IEEE TPAMI, 8*(6), 679–698. https://doi.org/10.1109/TPAMI.1986.4767851
 - Gonzalez, R. C., & Woods, R. E. (2018). *Digital image processing* (4.ª ed.). Pearson.
 - Hartley, R., & Zisserman, A. (2004). *Multiple view geometry in computer vision* (2.ª ed.). Cambridge University Press.
@@ -431,4 +432,4 @@ No hay resultados humanos inventados en este repositorio.
 
 **Derechos.** No se presupone una licencia pública para las fotografías, las obras ni el material docente. El código y los modelos se entregan para este proyecto académico; revisa las autorizaciones antes de redistribuir. Las bibliotecas y el preentrenamiento conservan sus propias licencias.
 
-**Continuidad.** `CLAUDE.md` y `docs/ESTADO_PARA_CLAUDE.md` registran las decisiones, los comandos y los pendientes para continuar el trabajo en otra sesión.
+**Estado del proyecto.** `docs/ESTADO_PROYECTO.md` resume la versión, los comandos y las limitaciones para el mantenimiento del equipo.

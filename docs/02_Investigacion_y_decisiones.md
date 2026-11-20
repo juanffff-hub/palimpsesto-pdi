@@ -182,7 +182,6 @@ Antes de cerrar académicamente: (1) revisar las identidades mediante `03_Revisa
 
 Si se modifica la agrupación, se crea otro manifiesto y se conservan sus hashes. La independencia se verifica por pieza y por derivación. Cambiar el CSV no vuelve nuevos los pesos antiguos de la U-Net; para una evaluación integral hace falta prueba nueva o reentrenar bajo partición común. [StratifiedGroupKFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedGroupKFold.html) garantiza separación según los IDs suministrados, pero no verifica que esos IDs sean verdaderos.
 
-Para usabilidad bastan 3–5 participantes con una tarea concreta: cargar, confirmar/corregir clase, mover una esquina, comparar, deshacer y exportar. Registrar finalización, ayuda requerida, tiempo, error y comentario. No redactar opiniones antes de obtenerlas. Evaluar conservación de trazos finos, acentos, márgenes, manchas significativas y color; no pedir únicamente «se ve más bonito».
 
 Una foto muy borrosa, con reflejos o información recortada debe repetirse. El modo manual permite corregir localización y categoría; no convierte una entrada ilegible en una captura válida. Los casos fallidos forman parte de la demostración y explican el alcance.
 
@@ -197,7 +196,6 @@ Una foto muy borrosa, con reflejos o información recortada debe repetirse. El m
 | Referencias de calidad | Degradaciones sintéticas reproducibles | Capturar pares reales o piezas nuevas si se desea evidencia externa |
 | Documentos y comunicación | Ruta, informe, notebook, póster, presentación y demo | Verificar autores, criterio docente, ensayar y sustentar |
 | GitHub y acceso | Repositorio y release preparados/publicados con autorización | Probar acceso del docente; decidir qué datos identificables compartir |
-| Usabilidad | Plantilla y resumen automático cuando existan observaciones | Personas reales deben realizar tareas y aportar observaciones |
 
 Presupuesto humano orientativo: revisión de grupos 45–90 min; nuevas capturas 45–90 min; revisión de salidas y anotación 45–90 min; pruebas de uso 45–60 min; lectura/ensayo 2–3 h; accesos y verificación de entrega 20–30 min. Son estimaciones, no tiempos observados. Pueden repartirse entre los tres integrantes, pero el núcleo no depende de que los tres programen. El cronograma completo reserva 20 h esenciales y 10 h de contingencia durante cinco días.
 

@@ -1,20 +1,7 @@
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
-$palimpsestoPython = $null
-if (Get-Command py -ErrorAction SilentlyContinue) {
-    $palimpsestoCandidate = & py -3.12 -c 'import sys; print(sys.executable)' 2>$null
-    if ($LASTEXITCODE -eq 0) { $palimpsestoPython = $palimpsestoCandidate }
-}
-if (-not $palimpsestoPython) {
-    $palimpsestoCandidate = Get-Command python -ErrorAction SilentlyContinue
-    if ($palimpsestoCandidate) {
-        $palimpsestoVersion = & $palimpsestoCandidate.Source -c 'import sys; print(sys.version_info[:2] == (3,12))' 2>$null
-        if ($palimpsestoVersion -eq 'True') { $palimpsestoPython = $palimpsestoCandidate.Source }
-    }
-}
-if (-not $palimpsestoPython) {
-    throw 'Instala Python 3.12 o pide a Claude Code que localice un runtime 3.12 disponible. Consulta README.md. No se modificaron archivos del sistema.'
-}
+. (Join-Path $PSScriptRoot 'scripts\python_runtime.ps1')
+$palimpsestoPython = Resolve-PalimpsestoPython -ProjectRoot $PSScriptRoot -BasePython
 $palimpsestoVenv = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $palimpsestoVenv)) {
     & $palimpsestoPython -m venv .venv

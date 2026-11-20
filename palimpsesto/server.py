@@ -11,7 +11,8 @@ from .validation import object_payload,choice,number,assess_input
 ROOT=Path(__file__).resolve().parents[1]
 app=Flask(__name__,template_folder=str(ROOT/'templates'),static_folder=str(ROOT/'static'))
 app.secret_key=secrets.token_hex(32)
-app.config.update(MAX_CONTENT_LENGTH=42*1024*1024,SESSION_COOKIE_SAMESITE='Strict',SESSION_COOKIE_HTTPONLY=True)
+app.config.update(MAX_CONTENT_LENGTH=42*1024*1024,SESSION_COOKIE_SAMESITE='Strict',SESSION_COOKIE_HTTPONLY=True,
+                  PUBLIC_DEMO=False,SESSION_TTL_SECONDS=3600,MAX_ACTIVE_SESSIONS=8)
 models=None;states={};lock=threading.RLock();model_lock=threading.RLock()
 operation_lock=threading.RLock()
 
@@ -23,7 +24,11 @@ def serialize_image_operations():
     # A local CPU application: serialize stateful operations, including exports,
     # so a second tab cannot rotate pixels halfway through an existing request.
     if request.path.startswith('/api/') and request.path!='/api/status':
-        operation_lock.acquire();g.palimpsesto_operation_locked=True
+        if not operation_lock.acquire(blocking=not app.config['PUBLIC_DEMO'] or request.method!='POST'):
+            response=jsonify(error='El servidor está procesando otra fotografía. Espera unos segundos y pulsa Reintentar.',code='busy')
+            response.headers['Retry-After']='3'
+            return response,503
+        g.palimpsesto_operation_locked=True
 
 @app.teardown_request
 def release_image_operation(error=None):
@@ -34,8 +39,8 @@ def current():
     with lock:
         state=states.get(sid)
         if not state:raise SessionError('La sesión no tiene una imagen. Carga una foto para comenzar.')
-        if time.monotonic()-state['access']>3600:
-            states.pop(sid,None);raise SessionError('La sesión expiró tras una hora sin actividad. Vuelve a cargar la fotografía.')
+        if time.monotonic()-state['access']>app.config['SESSION_TTL_SECONDS']:
+            states.pop(sid,None);raise SessionError('La sesión expiró por inactividad. Vuelve a cargar la fotografía.')
         expected=request.headers.get('X-Palimpsesto-Image') or request.args.get('image_key')
         if expected and expected!=sid:raise SessionError('La imagen cambió en otra pestaña. Vuelve a cargar la foto en esta pestaña antes de continuar.')
         state['access']=time.monotonic();return state
@@ -56,11 +61,22 @@ def handle_error(error):
     if isinstance(error,(ValueError,KeyError,TypeError)):return jsonify(error=str(error)),400
     app.logger.exception('Error de procesamiento');return jsonify(error='No se pudo completar la operación. Cambia la imagen o reinicia los ajustes.'),500
 
+@app.after_request
+def protect_session_response(response):
+    if request.path.startswith('/api/'):
+        response.headers['Cache-Control']='no-store'
+    response.headers['X-Content-Type-Options']='nosniff'
+    response.headers['Referrer-Policy']='no-referrer'
+    return response
+
 @app.get('/')
-def home():return render_template('index.html')
+def home():return render_template('index.html',public_demo=app.config['PUBLIC_DEMO'])
 
 @app.get('/api/status')
-def status():return jsonify(version='0.2.0',classifier=models is not None and models.classifier is not None,segmenter=models is not None and models.segmenter is not None,scope_screen=models is not None and getattr(models,'scope_bank',None) is not None,model_warnings=getattr(models,'errors',[]),presets=PRESETS,local=True)
+def status():
+    with lock:
+        active=sum(time.monotonic()-s['access']<=app.config['SESSION_TTL_SECONDS'] for s in states.values())
+    return jsonify(version='0.2.0',classifier=models is not None and models.classifier is not None,segmenter=models is not None and models.segmenter is not None,scope_screen=models is not None and getattr(models,'scope_bank',None) is not None,model_warnings=getattr(models,'errors',[]),presets=PRESETS,local=not app.config['PUBLIC_DEMO'],active_sessions=active)
 
 @app.post('/api/upload')
 def upload():
@@ -74,8 +90,8 @@ def upload():
         old=session.get('sid')
         if old:states.pop(old,None)
         now=time.monotonic()
-        for key in [k for k,v in states.items() if now-v['access']>3600]:states.pop(key,None)
-        if len(states)>=8:raise ValueError('Hay demasiadas sesiones activas. Cierra una sesión antes de continuar.')
+        for key in [k for k,v in states.items() if now-v['access']>app.config['SESSION_TTL_SECONDS']]:states.pop(key,None)
+        if len(states)>=app.config['MAX_ACTIVE_SESSIONS']:raise ValueError('Hay demasiadas sesiones activas. Espera a que otra persona termine o cierre su sesión.')
         states[sid]=state;session['sid']=sid
     visible_prediction=prediction.copy()
     if assessment['requires_confirmation']:visible_prediction.update({'class':None,'scores':None})

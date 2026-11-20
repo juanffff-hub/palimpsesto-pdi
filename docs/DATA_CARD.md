@@ -14,6 +14,7 @@ Posibles sesgos: clases capturadas en contextos repetidos, iluminación y fondos
 
 Material privado del equipo y del curso; no se presupone autorización de difusión pública. El paquete incluye un inventario SHA256 para comprobar que todos los originales se conservaron. No modificar ni eliminar archivos fuente durante futuras revisiones.
 
-## Acceso de entrega — 19 de noviembre de 2026
 
-Por solicitud expresa del responsable del proyecto, se habilita consulta mediante enlace del dataset y de una copia pública del código y los pesos (README, sección 5). Esta entrega separada incluye 647 archivos de datos; el paquete privado completo conserva los 804 archivos originales, incluido el material docente, que no se publica. Compartir para revisión académica no establece una licencia abierta sobre fotografías u obras. Se preservan el manifiesto, las agrupaciones provisionales y todos los originales. Los dos Drive son carpetas de trabajo con acceso por enlace; el ZIP con hashes es la referencia estable de reproducción.
+## Acceso de entrega
+
+El dataset y los pesos se consultan en la release v0.3.0 de `juanffff-hub/palimpsesto-pdi`, repositorio público principal. README sección 5 incluye también los dos Drive originales. El ZIP de datos contiene 647 archivos, con hashes: 480 fotos de clasificación y los datos de segmentación. El material docente completo se conserva localmente y no forma parte de esta publicación. La consulta académica no concede una licencia abierta sobre fotografías u obras.

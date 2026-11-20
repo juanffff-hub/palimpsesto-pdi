@@ -67,7 +67,6 @@ Las 1–2 horas adicionales por día son reserva para datos ambiguos, entrenamie
 | Confirmar agrupación de fotos por pieza | Mismo texto, marcos y fondos pueden engañar al agrupador; el equipo conoce los objetos | Antes de declarar evaluación final |
 | Confirmar clase/borde y conservación de detalles en casos de uso | La utilidad y fidelidad del resultado requieren una decisión de quien conoce la pieza | Durante las pruebas y cada uso |
 | Capturar piezas nuevas, si se quiere medir generalización externa | El asistente no puede fotografiar objetos físicos ausentes | Jornada 4 o antes |
-| Participar en una prueba real de usabilidad | No se pueden inventar usuarios, tiempos ni opiniones | Jornada 4 |
 | Confirmar qué fotos/datos pueden compartirse y la cuenta de entrega | La carpeta contiene certificados y obras con autor; el equipo decide el material publicable | Antes de publicación |
 | Sustentar y responder preguntas | La defensa académica corresponde a los estudiantes | Jornada 5 |
 

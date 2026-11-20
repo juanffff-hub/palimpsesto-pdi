@@ -13,6 +13,7 @@ results/screenshots/
 data/raw/
 data/review/
 exports/
+.public_runtime/
 *.zip
 .env
 *.pem
