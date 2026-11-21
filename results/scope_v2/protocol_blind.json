@@ -1,0 +1,120 @@
+{
+  "nombre": "Control de alcance v2 · prueba ciega única",
+  "fecha_congelado": "2026-11-20",
+  "estado": "congelado antes de abrir la prueba ciega; la carpeta 02_prueba_ciega_negativos_v2_NO_ABRIR no se abrió, listó ni evaluó durante el desarrollo",
+  "metodo": {
+    "nombre": "regresión logística · recorte · C=10",
+    "descripcion": "Se recorta la pieza con la caja de la mayor región de la U-Net (+5 %), se calculan los 512 rasgos del encoder ResNet18 congelado del clasificador v0.3.0 (normalizados L2) y una regresión logística binaria (pieza válida frente a contenido ajeno, clases ponderadas) da la probabilidad de pieza válida. Alerta si es menor que el umbral.",
+    "C": 10.0,
+    "umbral_probabilidad_valida": 0.3060433840751648,
+    "criterio_umbral": "aceptar el 97 % de los positivos de desarrollo fuera de fold (mismo criterio de percentil 3 de la v0.4.0)",
+    "por_que_es_explicable": "Reutiliza el encoder y el recorte de la U-Net ya existentes y añade una sola capa lineal (512 pesos y un sesgo), la misma idea de la cabeza del clasificador vista en el curso; funciona en CPU en unos 33 ms."
+  },
+  "datos": {
+    "positivos_ajuste": "408 fotos de desarrollo de data/manifest.csv (41 bloques)",
+    "negativos_ajuste": "88 fotos de 01_desarrollo_negativos_v2 (47 grupos de identidad, data/scope_negatives_dev_v2.csv)",
+    "regresion_positiva": "72 fotos de diagnóstico de data/manifest.csv; conjunto reutilizado, no prueba ciega",
+    "referencia_v1": "30 negativos v1 ya abiertos; solo referencia, no ajustaron nada",
+    "prueba_ciega": "18 imágenes: 6 escenas, 6 objetos tridimensionales y 6 negativos difíciles"
+  },
+  "resultado_desarrollo": {
+    "fuera_de_fold": {
+      "negativos_alertados": "79/88",
+      "sensibilidad_negativos": 0.8977,
+      "positivos_aceptados": "395/408",
+      "aceptacion_positivos": 0.9681,
+      "aceptacion_por_clase": {
+        "documento_impreso": 1.0,
+        "manuscrito": 1.0,
+        "pintura": 0.9044
+      },
+      "alertas_por_categoria": {
+        "01_escenas": "17/21",
+        "02_objetos_tridimensionales": "50/52",
+        "03_negativos_dificiles": "12/15"
+      },
+      "balanced_accuracy": 0.9329,
+      "matriz_confusion": {
+        "valida_aceptada": 395,
+        "valida_rechazada": 13,
+        "ajena_alertada": 79,
+        "ajena_aceptada": 9
+      },
+      "cumple_puerta_desarrollo": true
+    },
+    "regresion_positiva_72": {
+      "aceptadas": "72/72",
+      "aceptacion": 1.0,
+      "por_clase": {
+        "documento_impreso": "24/24",
+        "manuscrito": "24/24",
+        "pintura": "24/24"
+      }
+    },
+    "referencia_v1": {
+      "alertadas": "27/30",
+      "01_escenas": "10/10",
+      "02_objetos_tridimensionales": "10/10",
+      "03_negativos_dificiles": "7/10"
+    },
+    "linea_base_v0.4.0_fuera_de_fold": {
+      "negativos_alertados": "46/88",
+      "sensibilidad_negativos": 0.5227,
+      "positivos_aceptados": "395/408",
+      "aceptacion_positivos": 0.9681,
+      "aceptacion_por_clase": {
+        "documento_impreso": 1.0,
+        "manuscrito": 0.9338,
+        "pintura": 0.9706
+      },
+      "alertas_por_categoria": {
+        "01_escenas": "8/21",
+        "02_objetos_tridimensionales": "34/52",
+        "03_negativos_dificiles": "4/15"
+      },
+      "balanced_accuracy": 0.7454,
+      "matriz_confusion": {
+        "valida_aceptada": 395,
+        "valida_rechazada": 13,
+        "ajena_alertada": 46,
+        "ajena_aceptada": 42
+      },
+      "cumple_puerta_desarrollo": false
+    },
+    "tiempo_ms_cpu": 33.0
+  },
+  "puerta_desarrollo": {
+    "negativos_validacion_alertados_min": 0.85,
+    "piezas_validas_aceptadas_min": 0.95,
+    "aceptacion_por_clase_min": 0.9,
+    "mejora_clara_frente_a_v0.4.0": true,
+    "cpu_compatible": true,
+    "cumple": true
+  },
+  "regla_prueba_ciega": {
+    "negativos_alertados_min": 15,
+    "de": 18,
+    "alertados_por_grupo_min": 4,
+    "por_grupo_de": 6,
+    "aceptacion_positiva_min": 0.95
+  },
+  "decision": {
+    "cumple": "adoptar el control v2, conservando la confirmación manual del usuario",
+    "mejora_sin_cumplir": "conservar como experimento, no desplegar y volver al control v0.4.0",
+    "empeora": "rechazar y explicar"
+  },
+  "no_reajustar": "Después de observar la prueba ciega no se reajusta el sistema para volver a presentarla como ciega. Una mejora posterior requiere un tercer conjunto nuevo.",
+  "congelado_sha256": {
+    "models/scope_head.npz": "c0fed7ee88ee266b2d737f0c80b2b6661f1fc6ab506d5138ec1746a928672253",
+    "models/classifier.pt": "94cc64bd23d7811ada624324f6c7ccbd0813ce1b2bf9e11c17e3a21e6dc44d4b",
+    "models/unet_resnet18_3clases.pth": "54f8cd5b08113eb9c8311ca4164ddce4c5eac87258a019bda41b14a1d6a20d3f",
+    "palimpsesto/models.py": "a25827d920eb8eff43a85fb673945c6bd7d257c1623fafcd49d06005a689d3ae",
+    "palimpsesto/imaging.py": "19f6031771f1d883d4ef1dbe6a4929843202d524be0bc2bb84ecb4bd0064ce99",
+    "palimpsesto/validation.py": "ebde87bf767cf47992caa68a0927fc59e7994785bd4ecb74bc4d7d0af5c78648",
+    "palimpsesto/server.py": "ad86464f5dc4516a7e8be9080144eb73146d1bc52dba6922c949a0bbefbe01cd",
+    "scripts/develop_scope_v2.py": "938e59c9dd54ee59c976988845fb2d0bc0b13c155a13eb641b64d17e162c94e0",
+    "scripts/evaluate_scope_blind_v2.py": "83f9fb1c956749c103d7114d4d4086efac78b6b29b5414d16bb86cbb41e055dd",
+    "data/scope_negatives_dev_v2.csv": "0d6549a5507bbbff76ce0405c92d6705f103600bf46f98df689400994778ca3d",
+    "data/manifest.csv": "fc7e1b4cc9c4acc24d8eb350ac2ea36fc547a4b744b89d1ed5383fb971724381"
+  }
+}

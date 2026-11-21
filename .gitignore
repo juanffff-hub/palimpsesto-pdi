@@ -24,3 +24,4 @@ results/browser/*.png
 results/browser/*.pdf
 results/browser/browser_export.*
 results/rotation/features_rot.npz
+results/scope_v2/features.npz
