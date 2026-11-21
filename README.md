@@ -479,6 +479,63 @@ El filtro separa mejor objetos tridimensionales, pero confunde con frecuencia es
 
 **Decisión y siguiente paso.** La regla fijada antes de inferir exigía al menos 24/30 y 6/10 por categoría para considerar una ampliación menor; 13/30 activa `revision_prioritaria`. Estas 30 fotos quedan cerradas como prueba externa y **no deben usarse para recalibrar y volver a reportar el mismo resultado**. Hasta una mejora independiente, la confirmación humana de que existe una sola pieza plana admitida sigue siendo obligatoria. La siguiente iteración debe: (1) reunir otro conjunto de negativos para desarrollo, separado por identidad física; (2) comparar un detector explícito de fuera-de-distribución o una clase negativa con el banco actual; (3) fijar la regla de adopción; y (4) evaluar una sola vez en un segundo conjunto ciego distinto. El protocolo, los 30 casos y el resultado reproducible están en `results/scope/`; el historial y la ruta de mejora se mantienen en [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
 
+### Evolución del control de alcance
+
+El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o una pintura plana. Su historia se conserva completa, incluidos los resultados desfavorables. El detalle está en la bitácora [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
+
+| Versión / iteración | Datos | Negativos alertados | Piezas válidas aceptadas | Tipo de evidencia | Decisión |
+|---|---|---:|---:|---|---|
+| v0.4.0 · similitud top-3 (foto entera) | 10 imágenes públicas de conveniencia | 9/10 | 72/72 (diagnóstico) | Exploratoria, pocos ejemplos | Desplegada |
+| v0.4.0 · prueba externa v1 | 30 negativos propios congelados | **13/30 (43 %)** | — | Prueba externa | `revision_prioritaria` |
+| v2 · desarrollo, mismos rasgos de foto entera | 408 válidas + 88 negativos nuevos | 41–46/88 | 395/408 | Validación cruzada por grupos | Ningún método supera la línea base |
+| **v2 · desarrollo, recorte de la pieza + regresión logística** | 408 válidas + 88 negativos nuevos | **79/88 (90 %)** | **395/408 (97 %)**; 72/72 en regresión | Solo desarrollo | Cumple la puerta; congelado (`b3a7ad1`) |
+| v2 · prueba ciega | 18 negativos nunca vistos | *pendiente* | *pendiente* | Prueba ciega única | *pendiente de autorización* |
+
+**Problema observado.** En la prueba externa v1 el filtro v0.4.0 alertó 8/10 objetos tridimensionales, pero solo 3/10 escenas y 2/10 negativos difíciles. Las piezas válidas y las fotos ajenas se tomaron en los mismos interiores (pisos, sofás y mesas), y la pieza ocupa en promedio un 38 % de la foto. Los rasgos de la foto entera describen sobre todo el fondo.
+
+**Hipótesis.** Si se mira **la pieza y no la escena**, un clasificador lineal sencillo debería separar mejor. Para eso se recorta con la U-Net, que ya existe, la caja de su mayor región (+5 %) antes de calcular los rasgos.
+
+**Datos y separación.**
+- **Ajuste:** las 408 fotos válidas de desarrollo (41 bloques de pieza) y **88 negativos nuevos de desarrollo** (21 escenas, 52 objetos 3D, 15 negativos difíciles). Los negativos se agruparon a ojo en 47 identidades: misma mesa, sofá, taller o tienda (`data/scope_negatives_dev_v2.csv`).
+- **Validación:** cruzada en 5 folds sin repartir piezas ni identidades.
+- **Regresión positiva:** las 72 fotos de diagnóstico, que son un conjunto reutilizado y no una prueba ciega.
+- **Referencia:** los 30 negativos v1 solo se informan, porque ya estaban abiertos y no ajustaron nada.
+- **Prueba ciega v2:** 18 imágenes que no se abrieron, ni listaron, ni evaluaron durante el desarrollo.
+
+**Métodos comparados** (encoder ResNet18 congelado del clasificador). La línea base v0.4.0, una regresión logística binaria con clases ponderadas y la distancia de Mahalanobis (covarianza Ledoit-Wolf), cada uno sobre la foto entera y sobre el recorte de la pieza. También una regresión sobre recorte + 5 descriptores de la máscara. Para que la comparación sea justa, todos usan el mismo criterio de umbral que la v0.4.0: aceptar el 97 % de las piezas válidas fuera de fold.
+
+![Evolución del control de alcance en desarrollo](results/figures/alcance_v2_desarrollo.png)
+
+| Desarrollo (fuera de fold) | Negativos alertados | Escenas | Objetos 3D | Difíciles | Válidas aceptadas | Peor clase |
+|---|---:|---:|---:|---:|---:|---:|
+| v0.4.0 · similitud (foto) | 46/88 | 8/21 | 34/52 | 4/15 | 395/408 | 93,4 % |
+| Regresión logística (foto), mejor C | 45/88 | 11/21 | 30/52 | 4/15 | 395/408 | 91,9 % |
+| Mahalanobis (foto) | 30/88 | 3/21 | 24/52 | 3/15 | 395/408 | 92,6 % |
+| Mahalanobis (recorte) | 68/88 | 17/21 | 39/52 | 12/15 | 395/408 | 91,2 % |
+| **Regresión logística (recorte), C = 10** | **79/88** | **17/21** | **50/52** | **12/15** | **395/408** | **90,4 %** |
+| Regresión (recorte + máscara), mejor C | 80/88 | 17/21 | 50/52 | 13/15 | 395/408 | 91,2 % |
+
+**Regla de adopción, fijada antes de abrir la prueba ciega** (`results/scope_v2/protocol_blind.json`).
+- **Puerta de desarrollo:**
+  - al menos 85 % de negativos alertados;
+  - al menos 95 % de piezas válidas aceptadas y al menos 90 % en cada clase;
+  - una mejora clara frente a la v0.4.0;
+  - funcionamiento en CPU.
+- **Elección:** si dos métodos cumplen, se conserva el más sencillo.
+- **Prueba ciega, una sola vez:**
+  - al menos 15/18 negativos alertados;
+  - al menos 4/6 en cada grupo;
+  - al menos 95 % de aceptación en la regresión positiva.
+- **No se reajusta después de verla.**
+
+**Resultado de desarrollo.** La regresión logística sobre el recorte cumple la puerta y es la opción más sencilla que lo hace: una capa lineal de 512 pesos sobre rasgos que la app ya calcula, más unos 33 ms en CPU. Frente a la v0.4.0 con la misma aceptación de válidas, pasa de 46/88 a 79/88. En la regresión positiva acepta 72/72. Como referencia, en los 30 negativos v1 alertaría 27/30 en lugar de 13/30; no cuenta como prueba porque ese conjunto ya estaba abierto. El recorte + máscara también cumple, pero no aporta lo suficiente para justificar su complejidad. Método, umbral (0,306), regla y hashes quedaron congelados en el commit `b3a7ad1` antes de abrir la prueba ciega.
+
+**Impacto en piezas válidas.** Impresos y manuscritos se aceptan 136/136. Las 13 válidas rechazadas son pinturas: 10 de ellas de **un solo cuadro** (el jarrón alto y angosto, bloque PIN010, fotos comprimidas por chat) y 3 de otros dos cuadros. La confirmación manual se conserva: un rechazo solo pide confirmar que la foto es una pieza admitida.
+
+**Estado.** **Mejora observada solo en desarrollo.** La mejora no se declara definitiva hasta la prueba ciega.
+
+**Limitaciones.** Los negativos de desarrollo y las piezas válidas provienen de pocos hogares y tiendas. Pinturas poco comunes pueden rechazarse; la peor clase queda en el límite de la puerta (90,4 %). Siguen pasando algunas escenas de interiores con superficies planas (puertas, sofás, un puesto de computador) y algunos empaques.
+
 ### Pruebas del sistema
 
 | Conjunto | Resultado |
