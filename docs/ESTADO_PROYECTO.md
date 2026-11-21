@@ -8,14 +8,14 @@ Repositorio único: https://github.com/juanffff-hub/palimpsesto-pdi
 
 ## Evidencia existente
 
-- 108 comprobaciones Python (incluidas la descarga verificada de los pesos, el semáforo de la captura, la confianza del borde y los tonos recortados), nueve recorridos con modelos reales y 25 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
+- 113 comprobaciones Python (incluidas la descarga verificada de los pesos, el semáforo de la captura, la confianza del borde, los tonos recortados y el control de alcance v2), nueve recorridos con modelos reales y 25 comprobaciones de navegador documentados en la revisión de la interfaz y del clasificador.
 - Diagnóstico secundario: 70/72 clasificaciones correctas; es un conjunto reutilizado, no un test ciego.
 - CV macro-F1 0,9581 en vistas derechas y 0,9548 en vistas giradas, con grupos provisionales.
 - U-Net v0.4.0 (impresos, manuscritos y pinturas): IoU media del borde propuesto 0,937 en 40 fotos de prueba por pieza, frente a 0,811 de la v0.3.0 (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963; impresos 0,968 → 0,970). Regla de adopción fijada antes de entrenar.
 - Histograma y tonos recortados: con los preajustes, 0 de 240 fotos pierde detalle por recorte; el aviso aparece sobre todo con iluminación alta en manuscritos (8 de 80 al 100 %).
 - Confianza del borde: en fotos de prueba marca como dudosos los 21 bordes malos de las 3 U-Net (6 de 6 con la desplegada) y 10 de 98 buenos; ningún borde «seguro» resultó malo.
 - Semáforo de la captura: con defectos controlados avisa en el 80–100 % de los casos (antes 2–23 %); en fotos reales marca en rojo 23 fotos, todas revisadas a ojo y justificadas.
-- Filtro de alcance: la comprobación exploratoria alertó 9/10 negativos de conveniencia, pero una prueba externa congelada de 30 fotos propias alertó 13/30 (43,3 %): escenas 3/10, objetos tridimensionales 8/10 y negativos difíciles 2/10. El control sigue siendo auxiliar y la confirmación humana es obligatoria.
+- Control de alcance: la v0.4.0 alertó 13/30 (43,3 %) en una prueba externa congelada. El control v2 (recorte de la pieza con la U-Net + regresión logística) alertó 79/88 negativos de desarrollo y **16/18 en una prueba ciega única** (escenas 6/6, objetos 6/6, difíciles 4/6), con 72/72 positivos de regresión. Cumple la regla predeclarada y está desplegado. Sigue siendo auxiliar y la confirmación humana es obligatoria.
 - Clasificación propia del curso y ANN conservadas como líneas base, incluidos sus fallos.
 
 El cierre del acceso remoto añade ocho comprobaciones dirigidas a HTTPS, sesiones, espera, expiración y recuperación; no repite la evaluación científica.
@@ -36,7 +36,7 @@ Póster académico, video de máximo tres minutos y sustentación oral. Para las
 
 ## Continuación técnica del control de alcance
 
-`negativos_alcance_v1` queda cerrado como prueba externa y no se usa para ajustar el sistema. Si se continúa esta línea, el siguiente paso es crear un conjunto **diferente** de negativos de desarrollo, separado por objeto o escena; comparar allí el banco actual contra una clase negativa o un método explícito de fuera-de-distribución; predeclarar una puerta de adopción; y evaluar una sola vez en otro conjunto ciego. Hasta entonces no presentar el filtro como detector universal y conservar la confirmación explícita de una pieza válida. Los comandos y resultados están en `scripts/evaluate_scope_external.py` y `results/scope/`; el registro de iteraciones está en `docs/PROGRESO_CONTROL_ALCANCE.md`.
+**Actualización (20 de noviembre de 2026):** la iteración v2 se completó y se adoptó; ver `docs/PROGRESO_CONTROL_ALCANCE.md`. Los conjuntos v1 y v2 ya están abiertos: una mejora futura necesita un tercer conjunto ciego. Texto original: `negativos_alcance_v1` queda cerrado como prueba externa y no se usa para ajustar el sistema. Si se continúa esta línea, el siguiente paso es crear un conjunto **diferente** de negativos de desarrollo, separado por objeto o escena; comparar allí el banco actual contra una clase negativa o un método explícito de fuera-de-distribución; predeclarar una puerta de adopción; y evaluar una sola vez en otro conjunto ciego. Hasta entonces no presentar el filtro como detector universal y conservar la confirmación explícita de una pieza válida. Los comandos y resultados están en `scripts/evaluate_scope_external.py` y `results/scope/`; el registro de iteraciones está en `docs/PROGRESO_CONTROL_ALCANCE.md`.
 
 ## Reescritura de autores (20 de noviembre de 2026)
 

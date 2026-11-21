@@ -72,9 +72,27 @@ La regresión sobre el recorte cumple la puerta: ≥ 85 % de negativos, ≥ 95 %
 
 **Estado.** Mejora observada **solo en desarrollo**; pendiente de la prueba ciega autorizada.
 
-## Iteración 3 · Prueba ciega v2
+## Iteración 3 · Prueba ciega v2 (20 de noviembre de 2026)
 
-*Pendiente de autorización expresa del equipo.*
+**Autorización y ejecución.** Con autorización expresa del equipo se ejecutó `scripts/evaluate_scope_blind_v2.py`. El script comprueba primero los hashes congelados y se niega a repetir la prueba.
+
+**Incidente.** El primer intento se detuvo al cargar una imagen de más de 40 MP. El ejecutor usaba el cargador de la app, que tiene ese límite, mientras que el desarrollo cargaba sin límite. Ocurrió **antes de calcular o mostrar ninguna predicción** y no se escribió ningún resultado. Con una nueva autorización se corrigió solo el cargador del ejecutor (**enmienda 1**, commit `8e284c7`, registrada en el protocolo). El método, los pesos, la cabeza, el umbral, el código de la app y la regla conservaron los hashes de `b3a7ad1`.
+
+**Resultado (única ejecución válida, `results/scope_v2/blind.json`).**
+
+| Grupo | Alertados | Regla |
+|---|---:|---|
+| Escenas | 6/6 | ≥ 4/6 ✅ |
+| Objetos tridimensionales | 6/6 | ≥ 4/6 ✅ |
+| Negativos difíciles | 4/6 | ≥ 4/6 ✅ (justo en el mínimo) |
+| **Total** | **16/18 (88,9 %)** | ≥ 15/18 ✅ |
+| Regresión positiva (72 reutilizadas) | 72/72 aceptadas | ≥ 95 % ✅ |
+
+No alertados: BLIND013 y BLIND014, ambos negativos difíciles, con probabilidad de pieza válida de 0,51 y 0,69. Su contenido no se examinó: la autorización cubría solo la evaluación. Una de las 18 imágenes supera los 40 MP; la app la rechazaría por tamaño antes del control.
+
+**Decisión: adoptar.** El control v2 queda desplegado y se conserva la confirmación manual. Es una **mejora confirmada en prueba ciega**, distinta de la mejora observada en desarrollo y de la mejora del protocolo de la iteración 1. No se reajustó nada después de ver la prueba.
+
+**Limitaciones que permanecen.** La prueba ciega es pequeña (18) y los negativos difíciles quedaron en el mínimo. Hay pinturas poco comunes que pueden rechazarse (90,4 % de aceptación de pinturas en desarrollo, casi toda la pérdida en un solo cuadro). Los datos vienen de pocos hogares y tiendas. **v1 y v2 ya están abiertos**: una nueva mejora requiere un tercer conjunto ciego.
 
 ## Registro
 
@@ -82,3 +100,4 @@ La regresión sobre el recorte cumple la puerta: ≥ 85 % de negativos, ≥ 95 %
 |---|---|---|
 | 2026-11-20 | Conjunto externo v1 saneado, protocolo, evaluador, resultados, figura y documentación | Establece una línea base externa reproducible y revela una debilidad; no modifica pesos, banco ni umbral |
 | 2026-11-20 | Negativos de desarrollo v2 agrupados, comparación de métodos, control v2 (recorte + regresión logística) y protocolo ciego congelado (`b3a7ad1`) | Mejora observada en desarrollo (46/88 → 79/88 con 97 % de válidas aceptadas); pendiente de prueba ciega |
+| 2026-11-20 | Prueba ciega v2 (tras la enmienda 1 del ejecutor): 16/18 negativos, 72/72 positivos | Mejora confirmada en prueba ciega; control v2 adoptado y desplegado |

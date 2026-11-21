@@ -77,7 +77,7 @@ flowchart TB
   subgraph S[Servidor local Flask · palimpsesto/server.py]
     direction TB
     V[Validación de archivo<br/>formato real, tamaño, EXIF, alfa] --> M1[M1 · Preproceso<br/>RGB, vistas reducidas 1200/960 px, hash]
-    M1 --> AL[Control de alcance<br/>similitud de embeddings]
+    M3 --> AL[Control de alcance v2<br/>recorte de la pieza con la U-Net<br/>+ regresión logística]
     M1 --> CQ[Calidad de la captura<br/>nitidez, luz, reflejos, encuadre y tamaño<br/>sobre la máscara de la U-Net]
     M1 --> M2[M2 · Clasificación<br/>ResNet18 congelada + cabeza lineal<br/>224×224 → 3 puntuaciones]
     M2 --> P[Preajuste por clase]
@@ -103,9 +103,12 @@ flowchart TB
     TR --> W[(models/classifier.pt)]
     D --> CS[calibrate_scope.py] --> SB[(scope_reference.npz)]
     DS[(data/segmentation_manifest.csv<br/>240 fotos + máscaras · bloques)] --> TU[train_unet.py] --> WU[(models/unet_resnet18_3clases.pth)]
+    NV[(data/scope_negatives_dev_v2.csv<br/>88 negativos · 47 grupos)] --> DV[develop_scope_v2.py] --> SH[(models/scope_head.npz)]
+    D --> DV
   end
   W -.-> M2
   WU -.-> M3
+  SH -.-> AL
   SB -.-> AL
 ```
 
@@ -113,7 +116,7 @@ flowchart TB
 |---|---|---|---|
 | Validación | bytes → RGB uint8 | decodificación real, límites de tamaño/píxeles, EXIF, alfa sobre blanco | `palimpsesto/imaging.py` |
 | M1 Preproceso | RGB → vista previa (1200 px), vista de detección (960 px), hash | redimensión INTER_AREA, SHA-256 | `imaging.py` |
-| Alcance | RGB → alerta sí/no | similitud coseno con 408 embeddings de desarrollo | `palimpsesto/models.py` |
+| Alcance (v2) | RGB + máscara de la U-Net → probabilidad de pieza válida → alerta sí/no | recorte de la pieza, rasgos del encoder ResNet18 congelado y regresión logística binaria (umbral 0,306); sin la cabeza v2, similitud top-3 de la v0.4.0 | `palimpsesto/models.py` |
 | Calidad de la captura | RGB + máscara de la U-Net → veredicto y 5 chequeos | segunda derivada por dirección y por bloques, percentil 95 de luminancia, manchas saturadas compactas (componentes conexas), contacto de la máscara con el borde | `palimpsesto/capture.py` |
 | M2 Clasificación | RGB 224×224 → 3 puntuaciones | ResNet18 ImageNet congelada + cabeza lineal | `models.py` |
 | M3 Borde | RGB 256×256 → máscara → 4 puntos + confianza (segura / dudosa) | U-Net de 3 clases (encoder ResNet18); encaje de los 4 puntos con la máscara y ancho de la franja incierta; contornos; manual | `models.py`, `imaging.py` |
@@ -160,6 +163,7 @@ flowchart TB
 | **Clasificador operativo v0.3.0** | ResNet18 ImageNet congelada + cabeza lineal (regresión logística L2) entrenada con vistas de brillo, giros de ±8° y **giros de 90°/180°/270°** | Sugiere el tipo de pieza en la interfaz. |
 | **U-Net de 3 clases (v0.4.0)** | Encoder ResNet18 ImageNet, entrada 256×256, 1 canal; entrenada con impresos, manuscritos y pinturas | Propone el borde de la pieza en las tres clases. |
 | U-Net del Parcial 3 | La misma arquitectura, entrenada solo con impresos | Línea base de la comparación; se conserva en la release. |
+| **Control de alcance v2** | Recorte de la pieza con la U-Net → 512 rasgos del encoder congelado → regresión logística binaria (C = 10, clases ponderadas) | Avisa si la foto no parece una pieza admitida; la persona siempre confirma. Sustituye al banco de similitud de la v0.4.0, que se conserva como respaldo. |
 
 **Protocolo de evaluación.** Las fotos de una misma pieza física son muy parecidas, así que dividir al azar infla los resultados. Por eso las particiones se hacen por **bloques** (41 en desarrollo y 9 en el diagnóstico) con `StratifiedGroupKFold` (5 folds, semilla 2026). Los hiperparámetros se eligen solo con validación cruzada en desarrollo. Las 72 fotos de diagnóstico ya se habían usado con la CNN del curso, así que **se reportan como diagnóstico secundario y no como prueba ciega**.
 
@@ -181,7 +185,7 @@ flowchart TB
 palimpsesto/        Núcleo del sistema
   server.py         API Flask local: carga, detección, rotación, proceso, exportación; sesiones aisladas
   imaging.py        Validación, EXIF, homografía, mejora clásica, métricas
-  models.py         Carga estricta de pesos (weights_only=True), clasificación, alcance, U-Net
+  models.py         Carga estricta de pesos (weights_only=True), clasificación, U-Net y control de alcance v2 (recorte de la pieza)
   exporting.py      PNG, PDF, JSON y ZIP con el original y sus hashes
   capture.py        Semáforo de la captura: nitidez, luz, reflejos, encuadre y tamaño de la pieza
   weights.py        Al iniciar, comprueba los pesos por SHA-256 y descarga los de la release vigente
@@ -220,6 +224,8 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 | **Segmentación** | 240 fotos con máscara, 80 por clase: 80 impresos del tercer parcial (18 documentos) + 80 manuscritos (10 piezas) y 80 pinturas (13 bloques) anotados con polígonos en makesense.ai; partición por pieza (160 / 40 / 40) | Entrenar y evaluar la U-Net |
 | **Referencias sintéticas** | Página construida con sombra, ruido y desenfoque controlados | Comparar técnicas de mejora con SSIM/PSNR |
 | **Negativos de alcance exploratorios** | 10 imágenes públicas de scikit-image (gato, astronauta, monedas…) | Comprobación inicial de la alerta de contenido ajeno |
+| **Negativos de alcance v2 · desarrollo** | 88 fotografías propias nuevas fuera de alcance (21 escenas, 52 objetos 3D, 15 negativos difíciles), agrupadas en 47 identidades (`data/scope_negatives_dev_v2.csv`) | Ajustar y comparar el control de alcance v2 |
+| **Negativos de alcance v2 · prueba ciega** | 18 fotografías propias nuevas (6 escenas, 6 objetos 3D, 6 negativos difíciles) | Prueba ciega única del control v2; no se abrieron durante el desarrollo |
 | **Negativos externos v1** | 30 fotografías propias nuevas, una por objeto o escena: 10 escenas, 10 objetos tridimensionales y 10 negativos difíciles | Prueba externa congelada del filtro de alcance; no se usan para entrenar ni ajustar el umbral |
 
 ![Distribución del dataset](results/figures/dataset_distribution.png)
@@ -477,6 +483,8 @@ La comprobación exploratoria original alertó en 9 de 10 imágenes públicas aj
 
 El filtro separa mejor objetos tridimensionales, pero confunde con frecuencia escenas y superficies que comparten textura o composición con pinturas y documentos. Entre los fallos hay una planta, una persona sin rostro visible, un refrigerador, una tableta apagada, empaques, cartón, una pantalla y una fotografía enmarcada. El clasificador puede asignarles una clase con puntuación alta; esa puntuación **no demuestra que estén dentro del alcance**.
 
+*(Resultado histórico de la v0.4.0. La iteración siguiente se describe en «Evolución del control de alcance».)*
+
 **Decisión y siguiente paso.** La regla fijada antes de inferir exigía al menos 24/30 y 6/10 por categoría para considerar una ampliación menor; 13/30 activa `revision_prioritaria`. Estas 30 fotos quedan cerradas como prueba externa y **no deben usarse para recalibrar y volver a reportar el mismo resultado**. Hasta una mejora independiente, la confirmación humana de que existe una sola pieza plana admitida sigue siendo obligatoria. La siguiente iteración debe: (1) reunir otro conjunto de negativos para desarrollo, separado por identidad física; (2) comparar un detector explícito de fuera-de-distribución o una clase negativa con el banco actual; (3) fijar la regla de adopción; y (4) evaluar una sola vez en un segundo conjunto ciego distinto. El protocolo, los 30 casos y el resultado reproducible están en `results/scope/`; el historial y la ruta de mejora se mantienen en [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
 
 ### Evolución del control de alcance
@@ -488,8 +496,8 @@ El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o
 | v0.4.0 · similitud top-3 (foto entera) | 10 imágenes públicas de conveniencia | 9/10 | 72/72 (diagnóstico) | Exploratoria, pocos ejemplos | Desplegada |
 | v0.4.0 · prueba externa v1 | 30 negativos propios congelados | **13/30 (43 %)** | — | Prueba externa | `revision_prioritaria` |
 | v2 · desarrollo, mismos rasgos de foto entera | 408 válidas + 88 negativos nuevos | 41–46/88 | 395/408 | Validación cruzada por grupos | Ningún método supera la línea base |
-| **v2 · desarrollo, recorte de la pieza + regresión logística** | 408 válidas + 88 negativos nuevos | **79/88 (90 %)** | **395/408 (97 %)**; 72/72 en regresión | Solo desarrollo | Cumple la puerta; congelado (`b3a7ad1`) |
-| v2 · prueba ciega | 18 negativos nunca vistos | *pendiente* | *pendiente* | Prueba ciega única | *pendiente de autorización* |
+| v2 · desarrollo, recorte de la pieza + regresión logística | 408 válidas + 88 negativos nuevos | 79/88 (90 %) | 395/408 (97 %); 72/72 en regresión | Solo desarrollo | Cumple la puerta; congelado (`b3a7ad1`) |
+| **v2 · prueba ciega** | 18 negativos nunca vistos | **16/18 (89 %)** · escenas 6/6, objetos 6/6, difíciles 4/6 | **72/72** en regresión | **Prueba ciega única** | **Adoptado** (v2 desplegada) |
 
 **Problema observado.** En la prueba externa v1 el filtro v0.4.0 alertó 8/10 objetos tridimensionales, pero solo 3/10 escenas y 2/10 negativos difíciles. Las piezas válidas y las fotos ajenas se tomaron en los mismos interiores (pisos, sofás y mesas), y la pieza ocupa en promedio un 38 % de la foto. Los rasgos de la foto entera describen sobre todo el fondo.
 
@@ -532,15 +540,19 @@ El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o
 
 **Impacto en piezas válidas.** Impresos y manuscritos se aceptan 136/136. Las 13 válidas rechazadas son pinturas: 10 de ellas de **un solo cuadro** (el jarrón alto y angosto, bloque PIN010, fotos comprimidas por chat) y 3 de otros dos cuadros. La confirmación manual se conserva: un rechazo solo pide confirmar que la foto es una pieza admitida.
 
-**Estado.** **Mejora observada solo en desarrollo.** La mejora no se declara definitiva hasta la prueba ciega.
+**Resultado ciego (una sola ejecución, `results/scope_v2/blind.json`).** El control v2 alertó **16/18** negativos nunca vistos: 6/6 escenas, 6/6 objetos tridimensionales y 4/6 negativos difíciles. En la regresión positiva aceptó **72/72**. Cumple las tres condiciones de la regla, aunque los negativos difíciles quedan **justo en el mínimo (4/6)**. Los dos que no alertó (BLIND013 y BLIND014) son negativos difíciles con probabilidad de pieza válida de 0,51 y 0,69. Una de las 18 imágenes supera el límite de 40 MP de la app, que la rechazaría al cargarla antes de llegar al control.
 
-**Limitaciones.** Los negativos de desarrollo y las piezas válidas provienen de pocos hogares y tiendas. Pinturas poco comunes pueden rechazarse; la peor clase queda en el límite de la puerta (90,4 %). Siguen pasando algunas escenas de interiores con superficies planas (puertas, sofás, un puesto de computador) y algunos empaques.
+**Incidente registrado.** El primer intento autorizado se detuvo al abrir esa imagen, porque el ejecutor usaba el cargador de la app y el desarrollo cargaba sin límite. Se detuvo antes de calcular ninguna predicción. Solo se corrigió el cargador del ejecutor (enmienda 1, commit `8e284c7`); el método, los pesos, el umbral y la regla conservaron los hashes de `b3a7ad1`.
+
+**Decisión: adoptar.** La v2 queda desplegada. **Mejora confirmada en prueba ciega**: frente al 43 % de la v0.4.0 en la prueba externa v1 (13/30), la v2 alertó el 89 % de una prueba ciega nueva (16/18). Las dos pruebas no son el mismo conjunto, así que la comparación es de órdenes de magnitud, no de puntos. **La confirmación manual se conserva**: el control avisa y la persona decide.
+
+**Limitaciones.** La prueba ciega tiene solo 18 imágenes, y los negativos difíciles quedaron en el mínimo (4/6): objetos planos y rectangulares que parecen documentos o cuadros siguen siendo el punto débil. Los datos provienen de pocos hogares y tiendas. Pinturas poco comunes pueden rechazarse; en desarrollo la peor clase quedó en 90,4 %, casi toda por un solo cuadro alto y angosto. Las 72 fotos de regresión son un conjunto reutilizado. Ninguna prueba demuestra un detector universal de objetos desconocidos.
 
 ### Pruebas del sistema
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos, semáforo de la captura, confianza del borde, histograma y tonos recortados | 108/108 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos, semáforo de la captura, confianza del borde, histograma, tonos recortados y control de alcance v2 | 113/113 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
 | `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, confianza del borde y máscara, histograma, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 25/25 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
@@ -561,21 +573,21 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 - El histograma del paso 4 muestra el efecto real de cada ajuste en los tonos. Con los preajustes ninguna de 240 fotos pierde detalle por recorte; cuando un ajuste extremo quema detalle (sobre todo iluminación alta en manuscritos), la app lo dice y marca dónde.
 - La etiqueta de confianza del borde avisa cuándo dudar de la U-Net: en las fotos de prueba marcó como dudosos los 21 bordes malos (6 de 6 con la U-Net desplegada), y ningún borde «seguro» resultó malo. La máscara superpuesta muestra en qué se basó la red.
 - El semáforo de la captura lleva a la práctica el escenario de uso: dice en el momento si conviene repetir la foto. Frente a los avisos anteriores, detecta defectos controlados en el 80–100 % de los casos (antes 2–23 %) y marcó en rojo las 23 fotos reales que lo merecían, de las que antes se detectaban 5.
-- La prueba externa de alcance identificó 13/30 entradas ajenas. Este resultado negativo es útil: evidencia que el control automático todavía no puede sustituir la confirmación humana y define una mejora posterior sin contaminar la prueba.
+- La prueba externa de alcance identificó 13/30 entradas ajenas con la v0.4.0. Ese resultado negativo llevó a una nueva iteración: mirar la pieza recortada por la U-Net en lugar de la foto entera. Con una regresión logística sobre esos rasgos, el control v2 alertó 79/88 negativos de desarrollo y **16/18 en una prueba ciega nueva**, aceptando 72/72 piezas válidas de regresión. Se adoptó con una regla fijada antes de ver la prueba.
 
 **Limitaciones**
 
 - Las identidades físicas de las piezas no están certificadas y el diagnóstico de 72 fotos ya se había usado, así que **las métricas son provisionales y no prueban generalización a piezas nuevas**.
 - Manuscritos de letra muy regular todavía se confunden con impresos. La U-Net acierta menos en pinturas que en documentos (IoU 0,877 frente a 0,96–0,97), sobre todo cuando la pintura y el fondo tienen colores parecidos, y su prueba tiene solo 8 piezas o bloques.
 - No hay referencia real para medir la fidelidad de la mejora; la homografía no corrige páginas curvas.
-- El control de alcance detectó 43,3 % de 30 negativos externos; es una barrera de advertencia, no un detector universal de objetos desconocidos.
+- El control de alcance v2 detectó 16/18 negativos ciegos, pero solo 4/6 de los difíciles (objetos planos parecidos a documentos o cuadros) y la prueba es pequeña. Es una barrera de advertencia, no un detector universal; la confirmación humana sigue siendo obligatoria.
 
 **Oportunidades de mejora**
 
 - Certificar las piezas y capturar 6–9 piezas nuevas para una evaluación realmente independiente.
 - Anotar más pinturas sobre fondos de colores parecidos y manuscritos de borde irregular, para seguir ampliando la U-Net.
 - Ajustar el modelo completo (*fine-tuning*) una vez exista una partición certificada.
-- Mejorar el rechazo de entradas ajenas con negativos de desarrollo independientes y comprobarlo después en un segundo conjunto ciego; no ajustar con `negativos_alcance_v1`.
+- Reunir más negativos difíciles (objetos planos y rectangulares) y pinturas poco comunes para el control de alcance, y comprobarlo en un tercer conjunto ciego nuevo (los conjuntos v1 y v2 ya están abiertos).
 - Incorporar dewarping para páginas curvas y OCR como herramienta externa de evaluación.
 
 ---
@@ -613,6 +625,8 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 .\.venv\Scripts\python.exe scripts/evaluate_model.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_scope_external.py --data "C:\ruta\negativos_alcance_v1"  # prueba externa congelada; no recalibra
+.\.venv\Scripts\python.exe scripts/develop_scope_v2.py --root "C:\ruta\datos" --neg "C:\ruta\01_desarrollo_negativos_v2" --save   # control de alcance v2 (desarrollo)
+.\.venv\Scripts\python.exe scripts/make_scope_figures.py
 .\.venv\Scripts\python.exe scripts/evaluate_capture.py --root "C:\ruta\datos" --seg "C:\ruta\segmentacion_3clases"   # semáforo de la captura
 .\.venv\Scripts\python.exe scripts/evaluate_border_confidence.py --seg "C:\ruta\segmentacion_3clases" --root "C:\ruta\datos"   # confianza del borde
 .\.venv\Scripts\python.exe scripts/evaluate_tones.py --root "C:\ruta\datos"   # histograma y tonos recortados
