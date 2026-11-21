@@ -194,7 +194,7 @@ static/app.js       Flujo de la interfaz (carga → identificar → encuadrar �
 static/feedback.js  Sistema de avisos: éxito, información, advertencia, error, mensajes de campo, diálogos
 static/*.css        Identidad visual (papel + verde bosque), avisos y animaciones
 scripts/            Entrenamiento, calibración, evaluación, figuras y verificación
-tests/              Pruebas Python de contratos y acceso remoto + 22 de navegador
+tests/              113 pruebas Python y 25 de navegador
 notebooks/          Recorrido académico con FFT y evaluación
 data/manifest.csv   480 fotos, clase, bloque, partición y hash
 data/segmentation_manifest.csv  240 fotos con máscara, clase, bloque, partición y hash (U-Net)
@@ -236,18 +236,28 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 
 Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artificial, reflejos y ángulos. Las miniaturas de documentos aparecen difuminadas porque algunos contienen nombres de personas.
 
-**Acceso a los datos (sin invitación)**
+**Acceso a los datos (sin cuenta ni invitación)**
 
-- **Google Drive:** [480 fotos de clasificación](https://drive.google.com/drive/folders/1x-kLwxyBtguRjrFI5dU6oVQEYpr3U4Ay) y [fotos, máscaras y anotaciones de segmentación](https://drive.google.com/drive/folders/1a8JVuc3vZH-Qbuj92hRyBT6S9kvS6V3K). Son las carpetas originales de trabajo; sus etiquetas históricas train/test/val no sustituyen las particiones del manifiesto.
-- **Descarga reproducible recomendada:** [dataset_palimpsesto_v1.zip · 820 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.3.0/dataset_palimpsesto_v1.zip). Contiene las 480 fotos del manifiesto, 80 fotos de segmentación, 80 máscaras, cinco extras y dos archivos de anotación: **647 archivos de datos**, más manifiesto, instrucciones y hashes. Se comprobaron los 480 hashes contra el manifiesto y los 647 archivos dentro del ZIP. No incluye material docente ni pesos.
-- **Segmentación de 3 clases:** [segmentacion_3clases_v1.zip · 209 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/segmentacion_3clases_v1.zip), en la release v0.4.0. Contiene las 240 fotos, sus 240 máscaras, `segmentation_manifest.csv`, las anotaciones COCO de makesense.ai y los hashes de sus 485 archivos. Las fotos de manuscritos y pinturas son las mismas del ZIP principal, elegidas entre las 160 de cada clase. SHA-256 del ZIP: `7fec6df5bcccc27344bd0a65746cd2306f1c4d93eee2fe5c9f817c10dc9b4000`.
-- **Prueba externa del control de alcance:** [negativos_alcance_v1.zip · 79,2 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v1.zip). Incluye las 30 fotos, manifiestos, hashes, criterios y estructura por etiqueta. La selección visual se congeló antes de ejecutar el modelo y se limitó a una toma por identidad física o escena. La copia pública elimina EXIF/GPS, datos de cámara y nombres originales, con la orientación aplicada a los píxeles. SHA-256: `2063dd1ec00552c591c7c121d1c4f3a53a549f20309786aba5f6363d9158aaf3`; copia auditable del manifiesto en `data/external_negative_scope_v1.csv`.
-- **Control de alcance v2:** [negativos_alcance_v2_desarrollo.zip · 142 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v2_desarrollo.zip) (88 negativos de desarrollo; SHA-256 `5f654100e8ca0670e3bc2241d52a0b7bb5d002fe91e854bb63dd4ed54897d577`) y [negativos_alcance_v2_prueba_ciega.zip · 57 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v2_prueba_ciega.zip) (18 negativos de la prueba ciega, ya ejecutada una vez; SHA-256 `71c36714185cd03c971fa35152da3930f0ac5ab1d1d3deea85fbc8bda60e76b3`). Imágenes sin EXIF, manifiestos con SHA-256 por imagen y sin la columna de índice privado. La agrupación por identidad de los 88 negativos está en `data/scope_negatives_dev_v2.csv`.
-- Extrae el ZIP y usa su carpeta `datos/` como `--root`. Incluye `LEEME_DATASET.txt`, `manifest.csv` y `SHA256_ARCHIVOS.json`. SHA-256 del ZIP: `1b00cb28f0490d1247b7f11874b0542dd3d73e1f3b590ef163a7768ca72d8820`.
-- **Código y pesos para el docente:** [repositorio principal](https://github.com/juanffff-hub/palimpsesto-pdi) y [release v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. Este es el único repositorio principal y de entrega. El material completo del curso se conserva fuera de la publicación.
-- Las carpetas originales de Drive permiten actualmente editar a cualquiera con el enlace. Para una copia estable de consulta, usa el ZIP de la release; no modifiques los originales.
-- `data/segmentation_manifest.csv` hace lo mismo con las 240 fotos de segmentación. Los manuscritos y las pinturas usan los bloques de `data/manifest.csv`, así que una pieza nunca queda repartida entre entrenamiento y prueba.
-- `data/manifest.csv` relaciona cada foto con su clase, bloque, partición y hash. `group_verified=false` indica que **la identidad física de las piezas aún no se ha certificado**: los 50 bloques son una agrupación automática conservadora, no 50 piezas confirmadas.
+- **Google Drive · [Dataset de Palimpsesto](https://drive.google.com/drive/folders/1IIC5X-oEXs4mcuuWMMLGhzr5HQmRVveq?usp=sharing).** Contiene `DatasetPalimpsesto.zip` (1,2 GB) con **todas las fotos del proyecto separadas por rol**:
+  - `01_clasificacion`: las 480 fotos, por partición y clase.
+  - `02_segmentacion_unet`: 240 fotos, sus máscaras y las anotaciones de makesense.ai.
+  - `03_control_alcance`: los negativos exploratorios, v1, v2 de desarrollo y v2 de prueba ciega.
+
+  Incluye un `LEEME.md` que explica cada carpeta y el SHA-256 de cada archivo.
+- **Releases de GitHub**, para reproducir los experimentos con los scripts (sección 9). Los hashes de cada ZIP están en `docs/DATA_CARD.md`.
+
+| Archivo | Contenido | Uso en los scripts |
+|---|---|---|
+| [dataset_palimpsesto_v1.zip](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.3.0/dataset_palimpsesto_v1.zip) · 820 MB | Las 480 fotos con su estructura original, `manifest.csv` y hashes | `--root` apunta a su carpeta `datos/` |
+| [segmentacion_3clases_v1.zip](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/segmentacion_3clases_v1.zip) · 209 MB | 240 fotos, 240 máscaras y anotaciones COCO | `--data` / `--seg` |
+| [negativos_alcance_v1.zip](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v1.zip) · 79 MB | 30 negativos de la prueba externa v1 | `evaluate_scope_external.py --data` |
+| [negativos_alcance_v2_desarrollo.zip](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v2_desarrollo.zip) · 142 MB | 88 negativos de desarrollo v2 | `develop_scope_v2.py --neg` |
+| [negativos_alcance_v2_prueba_ciega.zip](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v2_prueba_ciega.zip) · 57 MB | 18 negativos de la prueba ciega v2, ya ejecutada una vez | Solo consulta |
+
+Las fotos propias de los negativos están saneadas: sin EXIF/GPS ni nombres originales.
+
+- **Código y pesos:** este repositorio y su [release v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0), sin cuenta ni permisos de colaborador.
+- `data/manifest.csv` relaciona cada foto con su clase, bloque, partición y hash; `data/segmentation_manifest.csv` hace lo mismo con las 240 fotos de segmentación. Los 50 bloques son una agrupación automática y conservadora: la identidad física de las piezas aún no está certificada (`group_verified=false`).
 - Detalle de procedencia, sesgos y licencias: `docs/DATA_CARD.md`.
 
 ---
@@ -439,7 +449,7 @@ No existe un ajuste universal: cada defecto pide una técnica distinta, y por es
 
 ### Semáforo de la captura
 
-**Qué resuelve.** El escenario de uso pide saber *antes de salir de la sala* si la foto sirve. Hasta ahora había tres avisos genéricos calculados sobre la foto entera, fondo incluido, con umbrales fijos. El semáforo mide **la pieza**: usa la máscara de la U-Net y revisa cinco puntos.
+**Qué resuelve.** El escenario de uso pide saber *antes de salir de la sala* si la foto sirve. Antes había tres avisos genéricos calculados sobre la foto entera, fondo incluido, con umbrales fijos. El semáforo mide **la pieza**: usa la máscara de la U-Net y revisa cinco puntos.
 
 | Chequeo | Medida | Amarillo (revisar) | Rojo (repetir) |
 |---|---|---|---|
@@ -473,7 +483,7 @@ No existe un ajuste universal: cada defecto pide una técnica distinta, y por es
 
 ### Control de alcance
 
-La comprobación exploratoria original alertó en 9 de 10 imágenes públicas ajenas (gato, monedas, cohete…) y en 0 de las 72 fotos de diagnóstico. Sin embargo, diez ejemplos de conveniencia no representaban la variedad de entradas reales. Por eso se capturaron y congelaron 30 negativos propios antes de consultar la salida del modelo (`results/scope/external_negatives_v1_protocol.json`). La métrica principal es cuántos activa directamente el filtro de alcance; otras excepciones se informan aparte.
+El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o una pintura plana. La primera versión (v0.4.0) comparaba la foto con las de entrenamiento por similitud. Alertó en 9 de 10 imágenes públicas ajenas (gato, monedas, cohete…), pero diez ejemplos de conveniencia no representan las entradas reales. Por eso se tomaron 30 fotos propias de cosas que no son piezas y se congelaron antes de ejecutar el modelo (`results/scope/external_negatives_v1_protocol.json`).
 
 | Prueba externa v1 | Alertados | No alertados | Sensibilidad a negativos |
 |---|---:|---:|---:|
@@ -482,20 +492,16 @@ La comprobación exploratoria original alertó en 9 de 10 imágenes públicas aj
 | Negativos difíciles | 2/10 | 8/10 | 20,0 % |
 | **Total** | **13/30** | **17/30** | **43,3 %** |
 
-El filtro separa mejor objetos tridimensionales, pero confunde con frecuencia escenas y superficies que comparten textura o composición con pinturas y documentos. Entre los fallos hay una planta, una persona sin rostro visible, un refrigerador, una tableta apagada, empaques, cartón, una pantalla y una fotografía enmarcada. El clasificador puede asignarles una clase con puntuación alta; esa puntuación **no demuestra que estén dentro del alcance**.
-
-*(Resultado histórico de la v0.4.0. La iteración siguiente se describe en «Evolución del control de alcance».)*
-
-**Decisión y siguiente paso.** La regla fijada antes de inferir exigía al menos 24/30 y 6/10 por categoría para considerar una ampliación menor; 13/30 activa `revision_prioritaria`. Estas 30 fotos quedan cerradas como prueba externa y **no deben usarse para recalibrar y volver a reportar el mismo resultado**. Hasta una mejora independiente, la confirmación humana de que existe una sola pieza plana admitida sigue siendo obligatoria. La siguiente iteración debe: (1) reunir otro conjunto de negativos para desarrollo, separado por identidad física; (2) comparar un detector explícito de fuera-de-distribución o una clase negativa con el banco actual; (3) fijar la regla de adopción; y (4) evaluar una sola vez en un segundo conjunto ciego distinto. El protocolo, los 30 casos y el resultado reproducible están en `results/scope/`; el historial y la ruta de mejora se mantienen en [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
+El filtro detectaba bien los objetos tridimensionales, pero dejaba pasar escenas y superficies parecidas a documentos o cuadros: una planta, un refrigerador, una tableta apagada, empaques, una fotografía enmarcada. El clasificador podía asignarles una clase con puntuación alta; esa puntuación **no demuestra que estén dentro del alcance**. La regla fijada antes de la prueba pedía al menos 24/30, así que el resultado (13/30) se registró como insuficiente y motivó la v2. Esas 30 fotos nunca se usaron para ajustar.
 
 ### Evolución del control de alcance
 
-El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o una pintura plana. Su historia se conserva completa, incluidos los resultados desfavorables. El detalle está en la bitácora [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
+La historia del control se conserva completa, incluidos los resultados desfavorables. El detalle está en la bitácora [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
 
 | Versión / iteración | Datos | Negativos alertados | Piezas válidas aceptadas | Tipo de evidencia | Decisión |
 |---|---|---:|---:|---|---|
 | v0.4.0 · similitud top-3 (foto entera) | 10 imágenes públicas de conveniencia | 9/10 | 72/72 (diagnóstico) | Exploratoria, pocos ejemplos | Desplegada |
-| v0.4.0 · prueba externa v1 | 30 negativos propios congelados | **13/30 (43 %)** | — | Prueba externa | `revision_prioritaria` |
+| v0.4.0 · prueba externa v1 | 30 negativos propios congelados | **13/30 (43 %)** | — | Prueba externa | Insuficiente; motivó la v2 |
 | v2 · desarrollo, mismos rasgos de foto entera | 408 válidas + 88 negativos nuevos | 41–46/88 | 395/408 | Validación cruzada por grupos | Ningún método supera la línea base |
 | v2 · desarrollo, recorte de la pieza + regresión logística | 408 válidas + 88 negativos nuevos | 79/88 (90 %) | 395/408 (97 %); 72/72 en regresión | Solo desarrollo | Cumple la puerta; congelado (`b3a7ad1`) |
 | **v2 · prueba ciega** | 18 negativos nunca vistos | **16/18 (89 %)** · escenas 6/6, objetos 6/6, difíciles 4/6 | **72/72** en regresión | **Prueba ciega única** | **Adoptado** (v2 desplegada) |
@@ -511,7 +517,7 @@ El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o
 - **Referencia:** los 30 negativos v1 solo se informan, porque ya estaban abiertos y no ajustaron nada.
 - **Prueba ciega v2:** 18 imágenes que no se abrieron, ni listaron, ni evaluaron durante el desarrollo.
 
-**Métodos comparados** (encoder ResNet18 congelado del clasificador). La línea base v0.4.0, una regresión logística binaria con clases ponderadas y la distancia de Mahalanobis (covarianza Ledoit-Wolf), cada uno sobre la foto entera y sobre el recorte de la pieza. También una regresión sobre recorte + 5 descriptores de la máscara. Para que la comparación sea justa, todos usan el mismo criterio de umbral que la v0.4.0: aceptar el 97 % de las piezas válidas fuera de fold.
+**Métodos comparados.** Todos usan los rasgos del encoder ResNet18 del clasificador. Se compararon la similitud de la v0.4.0, una regresión logística (pieza válida o no) y la distancia de Mahalanobis, cada uno sobre la foto entera y sobre el recorte de la pieza. Para que la comparación sea justa, todos usan el mismo umbral: el que acepta el 97 % de las piezas válidas.
 
 ![Evolución del control de alcance en desarrollo](results/figures/alcance_v2_desarrollo.png)
 
@@ -537,15 +543,15 @@ El control de alcance avisa cuando la foto no parece un impreso, un manuscrito o
   - al menos 95 % de aceptación en la regresión positiva.
 - **No se reajusta después de verla.**
 
-**Resultado de desarrollo.** La regresión logística sobre el recorte cumple la puerta y es la opción más sencilla que lo hace: una capa lineal de 512 pesos sobre rasgos que la app ya calcula, más unos 33 ms en CPU. Frente a la v0.4.0 con la misma aceptación de válidas, pasa de 46/88 a 79/88. En la regresión positiva acepta 72/72. Como referencia, en los 30 negativos v1 alertaría 27/30 en lugar de 13/30; no cuenta como prueba porque ese conjunto ya estaba abierto. El recorte + máscara también cumple, pero no aporta lo suficiente para justificar su complejidad. Método, umbral (0,306), regla y hashes quedaron congelados en el commit `b3a7ad1` antes de abrir la prueba ciega.
+**Resultado de desarrollo.** La regresión logística sobre el recorte cumple la puerta y es la opción más sencilla que lo hace: una capa lineal de 512 pesos sobre rasgos que la app ya calcula, más unos 33 ms en CPU. Frente a la v0.4.0 con la misma aceptación de válidas, pasa de 46/88 a 79/88. En la regresión positiva acepta 72/72. El recorte + máscara también cumple, pero no aporta lo suficiente para justificar su complejidad. Método, umbral (0,306) y regla quedaron congelados en un commit (`b3a7ad1`) antes de abrir la prueba ciega.
 
 **Impacto en piezas válidas.** Impresos y manuscritos se aceptan 136/136. Las 13 válidas rechazadas son pinturas: 10 de ellas de **un solo cuadro** (el jarrón alto y angosto, bloque PIN010, fotos comprimidas por chat) y 3 de otros dos cuadros. La confirmación manual se conserva: un rechazo solo pide confirmar que la foto es una pieza admitida.
 
-**Resultado ciego (una sola ejecución, `results/scope_v2/blind.json`).** El control v2 alertó **16/18** negativos nunca vistos: 6/6 escenas, 6/6 objetos tridimensionales y 4/6 negativos difíciles. En la regresión positiva aceptó **72/72**. Cumple las tres condiciones de la regla, aunque los negativos difíciles quedan **justo en el mínimo (4/6)**. Los dos que no alertó (BLIND013 y BLIND014) son negativos difíciles con probabilidad de pieza válida de 0,51 y 0,69. Una de las 18 imágenes supera el límite de 40 MP de la app, que la rechazaría al cargarla antes de llegar al control.
+**Resultado ciego (una sola ejecución, `results/scope_v2/blind.json`).** El control v2 alertó **16/18** negativos nunca vistos: 6/6 escenas, 6/6 objetos tridimensionales y 4/6 negativos difíciles. En la regresión positiva aceptó **72/72**. Cumple las tres condiciones de la regla, aunque los negativos difíciles quedan **justo en el mínimo (4/6)**.
 
-**Incidente registrado.** El primer intento autorizado se detuvo al abrir esa imagen, porque el ejecutor usaba el cargador de la app y el desarrollo cargaba sin límite. Se detuvo antes de calcular ninguna predicción. Solo se corrigió el cargador del ejecutor (enmienda 1, commit `8e284c7`); el método, los pesos, el umbral y la regla conservaron los hashes de `b3a7ad1`.
+Un primer intento se detuvo al cargar una imagen de más de 40 MP, antes de producir ninguna predicción. Solo se corrigió el cargador del script (enmienda registrada en el protocolo); el método y el umbral no cambiaron.
 
-**Decisión: adoptar.** La v2 queda desplegada. **Mejora confirmada en prueba ciega**: frente al 43 % de la v0.4.0 en la prueba externa v1 (13/30), la v2 alertó el 89 % de una prueba ciega nueva (16/18). Las dos pruebas no son el mismo conjunto, así que la comparación es de órdenes de magnitud, no de puntos. **La confirmación manual se conserva**: el control avisa y la persona decide.
+**Decisión: adoptar.** La v2 queda desplegada. **Mejora confirmada en prueba ciega**: frente al 43 % de la v0.4.0 en la prueba externa v1 (13/30), la v2 alertó el 89 % de una prueba ciega nueva (16/18). No son el mismo conjunto, así que la comparación es orientativa. **La confirmación manual se conserva**: el control avisa y la persona decide.
 
 **Limitaciones.** La prueba ciega tiene solo 18 imágenes, y los negativos difíciles quedaron en el mínimo (4/6): objetos planos y rectangulares que parecen documentos o cuadros siguen siendo el punto débil. Los datos provienen de pocos hogares y tiendas. Pinturas poco comunes pueden rechazarse; en desarrollo la peor clase quedó en 90,4 %, casi toda por un solo cuadro alto y angosto. Las 72 fotos de regresión son un conjunto reutilizado. Ninguna prueba demuestra un detector universal de objetos desconocidos.
 
@@ -567,7 +573,7 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 **Principales resultados**
 
 - Se construyó un sistema funcional de extremo a extremo (cargar → identificar → encuadrar → mejorar → exportar) que integra clasificación, segmentación y PDI clásico, corre en CPU sin conexión y conserva el original byte a byte.
-- En el diagnóstico secundario de las mismas 72 fotos, el clasificador operativo acertó 70/72 y la CNN del curso 52/72. La validación cruzada del clasificador operativo obtuvo macro-F1 0,958; corresponde a otro protocolo y no se compara directamente con el F1 del diagnóstico de la CNN. Los resultados favorecen la transferencia en este conjunto, con las limitaciones de separación descritas.
+- En las mismas 72 fotos de diagnóstico, el clasificador por transferencia (ResNet18) acertó 70 y la CNN del curso 52. En validación cruzada por bloques, el clasificador obtuvo macro-F1 0,958.
 - Un experimento con hipótesis y regla fijadas de antemano corrigió la debilidad ante fotos giradas (0,880 → 0,955 de macro-F1 en validación cruzada) sin empeorar las fotos derechas.
 - La U-Net hizo confiable la detección del borde en documentos (IoU 0,968 en fotos de prueba, frente a 0,64 de los contornos clásicos). Al reentrenarla con 160 máscaras nuevas de manuscritos y pinturas, con una regla de adopción fijada de antemano, el borde propuesto en prueba subió de 0,811 a 0,937 de IoU media (pinturas 0,583 → 0,877; manuscritos 0,881 → 0,963) sin empeorar los impresos.
 - La interfaz pone a la persona en el centro: confirma la clase, corrige el borde, ve el efecto de cada ajuste y recibe avisos claros con la forma de recuperarse.
@@ -604,7 +610,12 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-**Los pesos se instalan solos.** Al iniciar (`run.py`, `Iniciar_Palimpsesto.cmd`, el instalador o la demo pública), `palimpsesto/weights.py` comprueba por SHA-256 que los pesos sean los que pide el código. Si faltan o son de otra versión, descarga `modelos_palimpsesto_v0.4.0.zip` de la [release pública v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0) (236 MB, solo la primera vez), verifica el ZIP y cada archivo y los coloca en `models/`. La dirección y el hash del ZIP están en `models/release.json`. Sin conexión no se borra nada: la aplicación arranca con los pesos que haya. También se puede hacer a mano con `python scripts/fetch_models.py` o extrayendo el ZIP en la raíz del proyecto. Deben existir `models/classifier.pt`, `models/unet_resnet18_3clases.pth` y `models/scope_reference.npz`; sus hashes están en `models/checksums.json`. El ZIP trae además los modelos anteriores (CNN del curso, clasificador v0.2.0 y la U-Net del parcial, `unet_resnet18_imagenet.pth`) para reproducir las comparaciones (SHA-256 del ZIP `bf9d44bb8face5437155fc0c4acf9aaa3d02087a481cb5d77d6e5ede75ddf393`). El dataset se necesita para reproducir los experimentos; para abrir la aplicación bastan el código, el entorno y los pesos.
+**Los pesos se instalan solos.**
+- Al iniciar, `palimpsesto/weights.py` comprueba los pesos por SHA-256. Si faltan o son de otra versión, descarga `modelos_palimpsesto_v0.4.0.zip` de la [release v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0) (236 MB, solo la primera vez), lo verifica y lo extrae en `models/`.
+- Sin conexión no se borra nada: la app arranca con los pesos que haya. También se puede hacer a mano con `python scripts/fetch_models.py`.
+- Pesos que se descargan: `classifier.pt` y `unet_resnet18_3clases.pth`. El control de alcance (`scope_head.npz` y `scope_reference.npz`) viene en el repositorio. Los hashes están en `models/checksums.json`.
+- El ZIP trae además los modelos anteriores (CNN del curso, clasificador v0.2.0 y U-Net del parcial) para reproducir las comparaciones.
+- Para abrir la aplicación bastan el código, el entorno y los pesos. El dataset solo hace falta para reproducir los experimentos.
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
@@ -616,7 +627,10 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 
 ### Reproducir entrenamiento, evaluación y figuras
 
-`--root` apunta a `datos/` al extraer el ZIP de la sección 5, y `--data` a la carpeta `segmentacion_3clases/` del ZIP de segmentación. `scripts/build_segmentation_dataset.py` reconstruye esa carpeta a partir de las fotos y las anotaciones de makesense.ai. También admite la carpeta `material_original/Material Proyecto de PDI` del paquete privado original.
+Usa los ZIP de las releases (sección 5):
+- `--root` apunta a la carpeta `datos/` de `dataset_palimpsesto_v1.zip`.
+- `--data` y `--seg` apuntan a `segmentacion_3clases/`; la carpeta `02_segmentacion_unet` del Drive también sirve.
+- `scripts/build_segmentation_dataset.py` reconstruye la segmentación a partir de las fotos y las anotaciones de makesense.ai.
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/train_classifier.py --root "C:\ruta\datos"      # CNN del curso y ANN
@@ -651,8 +665,6 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 
 El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
 
-La evaluación corresponde al dataset y a los protocolos documentados: no constituye una certificación de fidelidad patrimonial ni una garantía de generalización a cualquier pieza. La certificación de identidades físicas y la evaluación con piezas nuevas son ampliaciones recomendadas; no se han usado para inflar las cifras existentes.
-
 Quedan los entregables de comunicación: **póster académico, video de máximo tres minutos y sustentación oral**, incluida la demostración del funcionamiento.
 
 ## Demo compartida gratuita
@@ -661,7 +673,7 @@ Ejecuta `Iniciar_Enlace_Publico.cmd` para obtener un enlace HTTPS sin cuenta ni 
 
 El computador debe permanecer encendido y conectado. Es una demostración temporal: al reiniciar el túnel cambia la URL y no hay garantía de disponibilidad continua. Las fotos se procesan en el computador anfitrión a través de Cloudflare; las sesiones se eliminan tras 15 minutos sin actividad, con limpieza cada 30 segundos.
 
-El gestor consulta `main` de este repositorio cada 90 segundos. Los cambios de aplicación se aplican cuando no detecta sesiones activas; la URL del túnel se conserva mientras siga abierto. Un cambio solo de documentación o de historia/autor no reinicia la aplicación. Si cambian las dependencias o faltan pesos compatibles, se conserva la versión anterior y se explica el motivo en el registro. [Operación y actualizaciones](docs/DEMO_PUBLICA.md).
+La demo se actualiza sola con los cambios de `main` cuando no hay sesiones activas. Detalle en [Operación y actualizaciones](docs/DEMO_PUBLICA.md).
 
 ## Referencias
 

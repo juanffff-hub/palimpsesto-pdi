@@ -22,7 +22,7 @@ El cierre del acceso remoto añade ocho comprobaciones dirigidas a HTTPS, sesion
 
 ## Acceso y ejecución
 
-README sección 5 enlaza el dataset, los Drive y los pesos. La release v0.3.0 incluye el dataset de clasificación y la v0.4.0 los pesos actuales y el dataset de segmentación. `Iniciar_Palimpsesto.cmd` abre el modo local. `Iniciar_Enlace_Publico.cmd` crea una demo HTTPS temporal desde este computador, sin contratar servicios; `Detener_Enlace_Publico.cmd` cierra la publicación. Ver `DEMO_PUBLICA.md`.
+README sección 5 enlaza la carpeta de Drive con todas las fotos por rol, los ZIP de las releases y los pesos. La release v0.3.0 incluye el dataset de clasificación y la v0.4.0 los pesos actuales y el dataset de segmentación. `Iniciar_Palimpsesto.cmd` abre el modo local. `Iniciar_Enlace_Publico.cmd` crea una demo HTTPS temporal desde este computador, sin contratar servicios; `Detener_Enlace_Publico.cmd` cierra la publicación. Ver `DEMO_PUBLICA.md`.
 
 ## Coordinación de cambios
 

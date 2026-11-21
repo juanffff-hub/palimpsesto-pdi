@@ -12,7 +12,7 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 | Arquitectura completa | Diagrama Mermaid y tabla de módulos, README §2 |
 | Metodología | README §3 |
 | Implementación explicada | README §4; código, scripts y notebook |
-| Datos descritos, visualizados y accesibles | README §5: Drive, ZIP, manifiesto y figuras |
+| Datos descritos, visualizados y accesibles | README §5: Drive con todas las fotos por rol, ZIP de las releases, manifiesto y figuras |
 | GUI, prototipo, instrucciones y evidencias | README §6; prototipo navegable en `docs/prototipo/` (con estados de excepción); capturas de la app en `docs/img/`; flujo de cinco pasos |
 | Resultados | README §7 y fuentes numéricas en `results/` |
 | Conclusiones, límites y oportunidades | README §8 |
