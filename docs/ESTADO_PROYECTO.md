@@ -30,7 +30,25 @@ La aplicación compartida toma los archivos de `main` en una copia aislada. Si s
 
 La rama de trabajo del desarrollador no se restablece automáticamente; cada integrante debe actualizar su propia copia después de una reescritura coordinada. Las sesiones de la demo no se conservan tras reinicios del servidor. La copia de entrega separada se considera sustituida por el repositorio principal.
 
+## Estado técnico: terminado (20 de noviembre de 2026)
+
+La aplicación está completa y probada de principio a fin con 113 comprobaciones Python, 25 de navegador y 9 recorridos con modelos reales; el CI de `main` está en verde. Los pesos v0.4.0 se descargan solos y el control de alcance v2 está adoptado tras su prueba ciega. Lo que sigue es solo comunicación.
+
 ## Entregables siguientes
+
+**Infografía (póster académico), video de máximo tres minutos y sustentación oral.**
+
+Material ya listo para reutilizar:
+- **Problema y flujo:** el diagrama de arquitectura del README (§2) y las capturas `docs/img/gui_01` a `gui_07` (incluidas `gui_02b_semaforo`, `gui_03b_mascara` y `gui_04b_tonos`).
+- **Resultados:**
+  - `results/figures/confusion.png` y `rotation_experiment.png` (clasificación);
+  - `unet_3clases_comparacion.png` y `unet_3clases_ejemplos.jpg` (U-Net: IoU 0,811 → 0,937);
+  - `confianza_borde.png`;
+  - `semaforo_captura.png`;
+  - `tonos_recortados.png`;
+  - `alcance_v2_desarrollo.png` (control de alcance: 13/30 → 16/18 en prueba ciega).
+- **Guion de la demostración:** `docs/GUIA_SUSTENTACION.md`, recorrido y preguntas.
+- **Para el video:** cargar una foto borrosa (semáforo en rojo) y luego una buena; mostrar una pintura con borde dudoso y su máscara; subir la iluminación en un manuscrito para ver los tonos recortados; exportar el ZIP con el original intacto.
 
 Póster académico, video de máximo tres minutos y sustentación oral. Para las limitaciones experimentales, consultar `MODEL_CARD.md`, `DATA_CARD.md` y el análisis del README. Los datos de referencia y el material docente original permanecen intactos fuera del repositorio público.
 
