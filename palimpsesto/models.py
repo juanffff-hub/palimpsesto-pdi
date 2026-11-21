@@ -19,6 +19,19 @@ class CNNDocumentos(nn.Module):
         self.classifier = nn.Sequential(nn.Flatten(),nn.Linear(2048,64),nn.ReLU(),nn.Dropout(dropout),nn.Linear(64,3))
     def forward(self,x): return self.classifier(self.features(x))
 
+def piece_crop(rgb,prob,pad=.05):
+    """Recorte de la pieza según la U-Net: caja de su mayor región (+5 %). Sin máscara, la foto entera.
+
+    El control de alcance v2 mira la pieza y no la escena: las fotos válidas y las ajenas se
+    tomaron en los mismos interiores, así que el fondo confunde a los rasgos de la foto entera.
+    """
+    if prob is None:return rgb
+    n,_,stats,_=cv2.connectedComponentsWithStats((prob>.5).astype(np.uint8),8)
+    if n<=1:return rgb
+    x,y,w,h,_=stats[1+int(np.argmax(stats[1:,cv2.CC_STAT_AREA]))];H,W=rgb.shape[:2];sx,sy=W/prob.shape[1],H/prob.shape[0]
+    x0,y0=max(0,int((x-pad*w)*sx)),max(0,int((y-pad*h)*sy));x1,y1=min(W,int((x+w*(1+pad))*sx)),min(H,int((y+h*(1+pad))*sy))
+    return rgb[y0:y1,x0:x1] if x1-x0>32 and y1-y0>32 else rgb
+
 class ModelService:
     def __init__(self, directory):
         torch.set_num_threads(4)
@@ -49,6 +62,18 @@ class ModelService:
             self.classifier=None;self.encoder=None;self.scope_bank=None
             self.errors.append('No se pudo cargar el clasificador. Comprueba los pesos y sus metadatos.')
         if not path.exists():self.errors.append('Falta el archivo del clasificador; la selección será manual.')
+        # Control de alcance v2 (scripts/develop_scope_v2.py): regresión logística sobre los rasgos del recorte de la pieza.
+        self.scope_head=None
+        try:
+            head_path=self.directory/'scope_head.npz'
+            if head_path.exists() and self.encoder is not None:
+                with np.load(head_path,allow_pickle=False) as h:
+                    coef=h['coef'].astype(np.float32);intercept=float(h['intercept']);threshold=float(h['threshold'])
+                    if str(h['classifier_sha256'])!=hashlib.sha256(path.read_bytes()).hexdigest():raise ValueError('scope_head no corresponde al clasificador.')
+                    if coef.shape!=(512,) or not np.isfinite(coef).all() or not np.isfinite(intercept) or not 0<threshold<1:raise ValueError('scope_head inválido.')
+                    self.scope_head={'coef':coef,'intercept':intercept,'threshold':threshold}
+        except Exception:
+            self.scope_head=None;self.errors.append('El control de alcance v2 no corresponde a los pesos; se usa el control anterior.')
         try:
             path=self.directory/'unet_resnet18_3clases.pth'
             if path.exists():
@@ -77,6 +102,21 @@ class ModelService:
         else:logits=self.classifier(x)
         scores=logits.softmax(1)[0].numpy()
         return {'class':CLASSES[int(scores.argmax())],'scores':{c:float(v) for c,v in zip(CLASSES,scores)},'needs_confirmation':True,'low_score':float(scores.max())<.7,'available':True,'scope':scope,'evaluation_status':self.info.get('evaluation_status','provisional')}
+    def features(self,rgb):
+        """Rasgos de 512 del encoder congelado, normalizados L2 (mismo preproceso que la clasificación)."""
+        size=self.info.get('image_size',224)
+        a=cv2.resize(rgb,(size,size),interpolation=cv2.INTER_AREA).astype(np.float32)/255
+        a=(a-np.asarray(self.info['mean'],np.float32))/np.asarray(self.info['std'],np.float32)
+        with torch.inference_mode():f=self.encoder(torch.from_numpy(a.transpose(2,0,1).copy()).unsqueeze(0)).flatten().numpy()
+        return f/max(float(np.linalg.norm(f)),1e-8)
+    def scope_screen(self,rgb,prob,previous=None):
+        """Alerta de contenido ajeno v2: probabilidad de «pieza válida» del recorte de la pieza.
+
+        Sin cabeza v2, sin encoder o sin máscara de la U-Net se conserva el control anterior."""
+        if self.scope_head is None or self.encoder is None or prob is None:return previous or {'available':False,'flagged':False}
+        z=float(self.features(piece_crop(rgb,prob))@self.scope_head['coef']+self.scope_head['intercept']);p=float(1/(1+np.exp(-z)))
+        return {'available':True,'flagged':bool(p<self.scope_head['threshold']),'valid_probability':p,'threshold':self.scope_head['threshold'],
+                'method':'logistic regression on the U-Net piece crop (frozen ResNet18 features); scope v2'}
     @torch.inference_mode()
     def segment(self,rgb):
         if self.segmenter is None:return None

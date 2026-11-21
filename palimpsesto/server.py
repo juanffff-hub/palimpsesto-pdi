@@ -77,7 +77,7 @@ def home():return render_template('index.html',public_demo=app.config['PUBLIC_DE
 def status():
     with lock:
         active=sum(time.monotonic()-s['access']<=app.config['SESSION_TTL_SECONDS'] for s in states.values())
-    return jsonify(version='0.2.0',classifier=models is not None and models.classifier is not None,segmenter=models is not None and models.segmenter is not None,scope_screen=models is not None and getattr(models,'scope_bank',None) is not None,model_warnings=getattr(models,'errors',[]),presets=PRESETS,local=not app.config['PUBLIC_DEMO'],active_sessions=active)
+    return jsonify(version='0.2.0',classifier=models is not None and models.classifier is not None,segmenter=models is not None and models.segmenter is not None,scope_screen=models is not None and (getattr(models,'scope_bank',None) is not None or getattr(models,'scope_head',None) is not None),scope_version='v2' if getattr(models,'scope_head',None) is not None else 'v0.4.0',model_warnings=getattr(models,'errors',[]),presets=PRESETS,local=not app.config['PUBLIC_DEMO'],active_sessions=active)
 
 @app.post('/api/upload')
 def upload():
@@ -85,8 +85,10 @@ def upload():
     if not f:raise ValueError('Selecciona una imagen.')
     data=f.read();rgb,meta=load_image(data);sid=secrets.token_urlsafe(24);t=time.perf_counter()
     with model_lock:
-        prediction=models.classify(rgb);assessment=assess_input(rgb,prediction);kind=prediction['class'] or 'documento_impreso'
-        prob=models.segment(rgb);corners=detect_quad(rgb,models,kind,prob=prob);capture=assess_capture(rgb,prob,kind)
+        prediction=models.classify(rgb);prob=models.segment(rgb)
+        if hasattr(models,'scope_screen'):prediction['scope']=models.scope_screen(rgb,prob,prediction.get('scope'))
+        assessment=assess_input(rgb,prediction);kind=prediction['class'] or 'documento_impreso'
+        corners=detect_quad(rgb,models,kind,prob=prob);capture=assess_capture(rgb,prob,kind)
     state={'original_bytes':data,'rgb':rgb,'metadata':meta,'name':Path(f.filename or 'imagen').name[:180],'classification':prediction,'detection':corners,'assessment':assessment,'capture':capture,'mask_prob':prob,'scope_confirmed':False,'access':time.monotonic(),'result':None}
     with lock:
         old=session.get('sid')

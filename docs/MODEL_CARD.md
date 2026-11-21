@@ -55,7 +55,16 @@ Banco de 408 embeddings normalizados, media de tres similitudes coseno máximas.
 
 **Prueba externa v1, congelada antes de inferir.** Se seleccionaron visualmente 30 fotografías propias nuevas, una por identidad física o escena: 10 escenas, 10 objetos tridimensionales y 10 negativos difíciles. El filtro alertó 13/30 (43,3 %): 3/10, 8/10 y 2/10 respectivamente. La regla predeclarada exigía al menos 24/30 y 6/10 por etiqueta para evitar revisión prioritaria; no se cumplió. `data/external_negative_scope_v1.csv`, `results/scope/external_negatives_v1_protocol.json` y `results/scope/external_negatives_v1.json` conservan selección, protocolo, salidas y hashes.
 
-**Uso obligatorio tras este resultado.** El filtro es una advertencia auxiliar y la persona debe confirmar que hay una sola pieza plana admitida. No recalibrar el umbral ni entrenar con estas 30 y volver a llamarlas prueba externa. Para una v2: crear negativos distintos para desarrollo, comparar allí una clase negativa o un método explícito de fuera-de-distribución, fijar la puerta de adopción y medir una sola vez en un segundo conjunto ciego.
+**Uso obligatorio tras el resultado v1 (sigue vigente con la v2).** El filtro es una advertencia auxiliar y la persona debe confirmar que hay una sola pieza plana admitida. No recalibrar el umbral ni entrenar con estas 30 y volver a llamarlas prueba externa. Para una v2: crear negativos distintos para desarrollo, comparar allí una clase negativa o un método explícito de fuera-de-distribución, fijar la puerta de adopción y medir una sola vez en un segundo conjunto ciego.
+
+**Control de alcance v2 (desplegado, 20 de noviembre de 2026).** Se recorta la pieza con la caja de la mayor región de la U-Net (+5 %, `models.piece_crop`). Sobre ese recorte se calculan los 512 rasgos del encoder congelado del clasificador (normalizados L2) y una regresión logística binaria (pieza válida frente a contenido ajeno, C = 10, clases ponderadas) da la probabilidad de pieza válida. Alerta si es menor que 0,306, el umbral que acepta el 97 % de las válidas de desarrollo fuera de fold.
+- **Entrenamiento:** 408 positivos de desarrollo y 88 negativos nuevos (47 grupos de identidad).
+- **Desarrollo, validación por grupos:** 79/88 negativos alertados frente a 46/88 de la v0.4.0, con 395/408 válidas aceptadas; impresos y manuscritos 100 %, pinturas 90,4 %.
+- **Regresión positiva:** 72/72.
+- **Prueba ciega única:** 16/18 negativos alertados (escenas 6/6, objetos 6/6, difíciles 4/6), lo que cumple la regla predeclarada.
+- **Costo y respaldo:** añade unos 33 ms en CPU. Archivo `models/scope_head.npz`, ligado por SHA-256 al clasificador; si falta o no coincide, se vuelve a la v0.4.0.
+- **Limitaciones:** prueba ciega pequeña, negativos difíciles en el mínimo (objetos planos parecidos a documentos o cuadros) y pinturas poco comunes que pueden rechazarse.
+- **Detalle:** `results/scope_v2/` y `docs/PROGRESO_CONTROL_ALCANCE.md`.
 
 Recalibrar con `scripts/calibrate_scope.py` después de cambiar clasificador/manifiesto. Un banco incompatible se desactiva explícitamente. El frontend siempre pide confirmar una pieza plana; puede aceptar una pieza válida atípica tras revisión. No identifica rostros ni personas.
 

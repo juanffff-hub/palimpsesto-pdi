@@ -31,6 +31,10 @@
     "bytes": 920365,
     "sha256": "953bed14353184a8319350aaf2796f04db9386d38aa7d3ac6b6602097333a9ea"
   },
+  "scope_head.npz": {
+    "bytes": 7790,
+    "sha256": "c0fed7ee88ee266b2d737f0c80b2b6661f1fc6ab506d5138ec1746a928672253"
+  },
   "scope_reference.npz": {
     "bytes": 756525,
     "sha256": "e41d517f66f7f910f98bd3637521e9acbd84509bb40fbae32bbfa48363708f78"

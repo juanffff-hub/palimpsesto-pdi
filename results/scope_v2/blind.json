@@ -1,0 +1,27 @@
+{
+  "imagenes": 18,
+  "alertadas": "16/18",
+  "por_grupo": {
+    "01_escenas": "6/6",
+    "02_objetos_tridimensionales": "6/6",
+    "03_negativos_dificiles": "4/6"
+  },
+  "regresion_positiva_72": "72/72",
+  "aceptacion_positiva": 1.0,
+  "comprobaciones": {
+    "total": true,
+    "por_grupo": true,
+    "regresion_positiva": true
+  },
+  "decision": "adoptar",
+  "regla": {
+    "negativos_alertados_min": 15,
+    "de": 18,
+    "alertados_por_grupo_min": 4,
+    "por_grupo_de": 6,
+    "aceptacion_positiva_min": 0.95
+  },
+  "unica_ejecucion": true,
+  "imagenes_que_la_app_rechazaria_por_tamano": 1,
+  "enmienda": "Primer intento autorizado detenido al cargar una imagen de más de 40 MP: el ejecutor usaba el cargador de la app, con ese límite, mientras que el desarrollo cargaba sin límite. Se detuvo antes de calcular o mostrar ninguna predicción y no se escribió ningún resultado. Solo se corrigió el cargador del ejecutor para igualarlo al de desarrollo y se registra qué imágenes superan el límite de la app; método, pesos, cabeza, umbral, código de la app y regla no cambian."
+}

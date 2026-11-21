@@ -1,0 +1,513 @@
+{
+  "datos": {
+    "positivos_desarrollo": 408,
+    "grupos_positivos": 41,
+    "negativos_desarrollo": 88,
+    "grupos_negativos": 47,
+    "positivos_regresion_reutilizados": 72,
+    "manifest_sha256": "fc7e1b4cc9c4acc24d8eb350ac2ea36fc547a4b744b89d1ed5383fb971724381",
+    "negativos_sha256": "0d6549a5507bbbff76ce0405c92d6705f103600bf46f98df689400994778ca3d",
+    "classifier_sha256": "94cc64bd23d7811ada624324f6c7ccbd0813ce1b2bf9e11c17e3a21e6dc44d4b",
+    "unet_sha256": "54f8cd5b08113eb9c8311ca4164ddce4c5eac87258a019bda41b14a1d6a20d3f"
+  },
+  "validacion": "5 folds StratifiedGroupKFold por pieza/identidad, semilla 2026; umbral = aceptar 97% de positivos fuera de fold",
+  "puerta_desarrollo": {
+    "negativos_alertados_min": 0.85,
+    "positivos_aceptados_min": 0.95,
+    "aceptacion_por_clase_min": 0.9
+  },
+  "metodo_elegido": "regresión logística · recorte · C=10",
+  "tiempo_control_ms_cpu": 33.0,
+  "metodos": {
+    "v0.4.0 · similitud top-3 (foto)": {
+      "familia": "linea_base",
+      "umbral": 0.6990079283714294,
+      "fuera_de_fold": {
+        "negativos_alertados": "46/88",
+        "sensibilidad_negativos": 0.5227,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9338,
+          "pintura": 0.9706
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "8/21",
+          "02_objetos_tridimensionales": "34/52",
+          "03_negativos_dificiles": "4/15"
+        },
+        "balanced_accuracy": 0.7454,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 46,
+          "ajena_aceptada": 42
+        },
+        "cumple_puerta_desarrollo": false
+      },
+      "regresion_positiva_72": {
+        "aceptadas": "72/72",
+        "aceptacion": 1.0,
+        "por_clase": {
+          "documento_impreso": "24/24",
+          "manuscrito": "24/24",
+          "pintura": "24/24"
+        }
+      },
+      "referencia_v1_30_ya_abiertas": {
+        "alertadas": "13/30",
+        "01_escenas": "3/10",
+        "02_objetos_tridimensionales": "8/10",
+        "03_negativos_dificiles": "2/10"
+      }
+    },
+    "regresión logística · foto · C=0.01": {
+      "familia": "regresion_foto",
+      "C": 0.01,
+      "umbral": 0.4876505255699158,
+      "fuera_de_fold": {
+        "negativos_alertados": "42/88",
+        "sensibilidad_negativos": 0.4773,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9926,
+          "pintura": 0.9118
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "11/21",
+          "02_objetos_tridimensionales": "29/52",
+          "03_negativos_dificiles": "2/15"
+        },
+        "balanced_accuracy": 0.7227,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 42,
+          "ajena_aceptada": 46
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · foto · C=0.1": {
+      "familia": "regresion_foto",
+      "C": 0.1,
+      "umbral": 0.414089812040329,
+      "fuera_de_fold": {
+        "negativos_alertados": "41/88",
+        "sensibilidad_negativos": 0.4659,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9853,
+          "pintura": 0.9191
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "10/21",
+          "02_objetos_tridimensionales": "29/52",
+          "03_negativos_dificiles": "2/15"
+        },
+        "balanced_accuracy": 0.717,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 41,
+          "ajena_aceptada": 47
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · foto · C=1": {
+      "familia": "regresion_foto",
+      "C": 1.0,
+      "umbral": 0.25752608686685585,
+      "fuera_de_fold": {
+        "negativos_alertados": "45/88",
+        "sensibilidad_negativos": 0.5114,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9853,
+          "pintura": 0.9191
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "11/21",
+          "02_objetos_tridimensionales": "30/52",
+          "03_negativos_dificiles": "4/15"
+        },
+        "balanced_accuracy": 0.7398,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 45,
+          "ajena_aceptada": 43
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · foto · C=10": {
+      "familia": "regresion_foto",
+      "C": 10.0,
+      "umbral": 0.12444060452282434,
+      "fuera_de_fold": {
+        "negativos_alertados": "43/88",
+        "sensibilidad_negativos": 0.4886,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9632,
+          "pintura": 0.9412
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "11/21",
+          "02_objetos_tridimensionales": "27/52",
+          "03_negativos_dificiles": "5/15"
+        },
+        "balanced_accuracy": 0.7284,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 43,
+          "ajena_aceptada": 45
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "Mahalanobis · foto": {
+      "familia": "mahalanobis_foto",
+      "umbral": -2536.5712011718742,
+      "fuera_de_fold": {
+        "negativos_alertados": "30/88",
+        "sensibilidad_negativos": 0.3409,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9779,
+          "pintura": 0.9265
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "3/21",
+          "02_objetos_tridimensionales": "24/52",
+          "03_negativos_dificiles": "3/15"
+        },
+        "balanced_accuracy": 0.6545,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 30,
+          "ajena_aceptada": 58
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · recorte · C=0.01": {
+      "familia": "regresion_recorte",
+      "C": 0.01,
+      "umbral": 0.4875074854493141,
+      "fuera_de_fold": {
+        "negativos_alertados": "63/88",
+        "sensibilidad_negativos": 0.7159,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 1.0,
+          "pintura": 0.9044
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "16/21",
+          "02_objetos_tridimensionales": "39/52",
+          "03_negativos_dificiles": "8/15"
+        },
+        "balanced_accuracy": 0.842,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 63,
+          "ajena_aceptada": 25
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · recorte · C=0.1": {
+      "familia": "regresion_recorte",
+      "C": 0.1,
+      "umbral": 0.42534029930830003,
+      "fuera_de_fold": {
+        "negativos_alertados": "68/88",
+        "sensibilidad_negativos": 0.7727,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 1.0,
+          "pintura": 0.9044
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "16/21",
+          "02_objetos_tridimensionales": "43/52",
+          "03_negativos_dificiles": "9/15"
+        },
+        "balanced_accuracy": 0.8704,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 68,
+          "ajena_aceptada": 20
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · recorte · C=1": {
+      "familia": "regresion_recorte",
+      "C": 1.0,
+      "umbral": 0.34259012579917913,
+      "fuera_de_fold": {
+        "negativos_alertados": "77/88",
+        "sensibilidad_negativos": 0.875,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 1.0,
+          "pintura": 0.9044
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "49/52",
+          "03_negativos_dificiles": "11/15"
+        },
+        "balanced_accuracy": 0.9216,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 77,
+          "ajena_aceptada": 11
+        },
+        "cumple_puerta_desarrollo": true
+      }
+    },
+    "regresión logística · recorte · C=10": {
+      "familia": "regresion_recorte",
+      "C": 10.0,
+      "umbral": 0.3060433840751648,
+      "fuera_de_fold": {
+        "negativos_alertados": "79/88",
+        "sensibilidad_negativos": 0.8977,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 1.0,
+          "pintura": 0.9044
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "50/52",
+          "03_negativos_dificiles": "12/15"
+        },
+        "balanced_accuracy": 0.9329,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 79,
+          "ajena_aceptada": 9
+        },
+        "cumple_puerta_desarrollo": true
+      },
+      "regresion_positiva_72": {
+        "aceptadas": "72/72",
+        "aceptacion": 1.0,
+        "por_clase": {
+          "documento_impreso": "24/24",
+          "manuscrito": "24/24",
+          "pintura": "24/24"
+        }
+      },
+      "referencia_v1_30_ya_abiertas": {
+        "alertadas": "27/30",
+        "01_escenas": "10/10",
+        "02_objetos_tridimensionales": "10/10",
+        "03_negativos_dificiles": "7/10"
+      },
+      "fallos_fuera_de_fold": {
+        "validas_rechazadas": [
+          "I0333 (pintura, PIN004)",
+          "I0337 (pintura, PIN004)",
+          "I0344 (pintura, PIN005)",
+          "I0394 (pintura, PIN010)",
+          "I0395 (pintura, PIN010)",
+          "I0399 (pintura, PIN010)",
+          "I0401 (pintura, PIN010)",
+          "I0402 (pintura, PIN010)",
+          "I0403 (pintura, PIN010)",
+          "I0404 (pintura, PIN010)",
+          "I0405 (pintura, PIN010)",
+          "I0406 (pintura, PIN010)",
+          "I0426 (pintura, PIN010)"
+        ],
+        "ajenas_no_alertadas": [
+          "DEV006 puesto_de_computador (01_escenas)",
+          "DEV013 sofa_con_cojines (01_escenas)",
+          "DEV015 lampara_de_techo (01_escenas)",
+          "DEV025 puerta_de_madera (01_escenas)",
+          "DEV033 portatil_sobre_mesa (03_negativos_dificiles)",
+          "DEV038 regla (02_objetos_tridimensionales)",
+          "DEV069 jardinera (02_objetos_tridimensionales)",
+          "DEV070 caja_de_taladro (03_negativos_dificiles)",
+          "DEV086 corona_en_puerta (03_negativos_dificiles)"
+        ]
+      }
+    },
+    "Mahalanobis · recorte": {
+      "familia": "mahalanobis_recorte",
+      "umbral": -3179.929216308594,
+      "fuera_de_fold": {
+        "negativos_alertados": "68/88",
+        "sensibilidad_negativos": 0.7727,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9926,
+          "pintura": 0.9118
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "39/52",
+          "03_negativos_dificiles": "12/15"
+        },
+        "balanced_accuracy": 0.8704,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 68,
+          "ajena_aceptada": 20
+        },
+        "cumple_puerta_desarrollo": false
+      }
+    },
+    "regresión logística · recorte+mascara · C=0.01": {
+      "familia": "regresion_recorte+mascara",
+      "C": 0.01,
+      "umbral": 0.3392507535219193,
+      "fuera_de_fold": {
+        "negativos_alertados": "80/88",
+        "sensibilidad_negativos": 0.9091,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 1.0,
+          "pintura": 0.9044
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "50/52",
+          "03_negativos_dificiles": "13/15"
+        },
+        "balanced_accuracy": 0.9386,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 80,
+          "ajena_aceptada": 8
+        },
+        "cumple_puerta_desarrollo": true
+      }
+    },
+    "regresión logística · recorte+mascara · C=0.1": {
+      "familia": "regresion_recorte+mascara",
+      "C": 0.1,
+      "umbral": 0.29789306372404106,
+      "fuera_de_fold": {
+        "negativos_alertados": "80/88",
+        "sensibilidad_negativos": 0.9091,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 1.0,
+          "pintura": 0.9044
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "50/52",
+          "03_negativos_dificiles": "13/15"
+        },
+        "balanced_accuracy": 0.9386,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 80,
+          "ajena_aceptada": 8
+        },
+        "cumple_puerta_desarrollo": true
+      }
+    },
+    "regresión logística · recorte+mascara · C=1": {
+      "familia": "regresion_recorte+mascara",
+      "C": 1.0,
+      "umbral": 0.25621491983532957,
+      "fuera_de_fold": {
+        "negativos_alertados": "79/88",
+        "sensibilidad_negativos": 0.8977,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9926,
+          "pintura": 0.9118
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "49/52",
+          "03_negativos_dificiles": "13/15"
+        },
+        "balanced_accuracy": 0.9329,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 79,
+          "ajena_aceptada": 9
+        },
+        "cumple_puerta_desarrollo": true
+      }
+    },
+    "regresión logística · recorte+mascara · C=10": {
+      "familia": "regresion_recorte+mascara",
+      "C": 10.0,
+      "umbral": 0.3103986230492595,
+      "fuera_de_fold": {
+        "negativos_alertados": "80/88",
+        "sensibilidad_negativos": 0.9091,
+        "positivos_aceptados": "395/408",
+        "aceptacion_positivos": 0.9681,
+        "aceptacion_por_clase": {
+          "documento_impreso": 1.0,
+          "manuscrito": 0.9926,
+          "pintura": 0.9118
+        },
+        "alertas_por_categoria": {
+          "01_escenas": "17/21",
+          "02_objetos_tridimensionales": "50/52",
+          "03_negativos_dificiles": "13/15"
+        },
+        "balanced_accuracy": 0.9386,
+        "matriz_confusion": {
+          "valida_aceptada": 395,
+          "valida_rechazada": 13,
+          "ajena_alertada": 80,
+          "ajena_aceptada": 8
+        },
+        "cumple_puerta_desarrollo": true
+      }
+    }
+  }
+}
