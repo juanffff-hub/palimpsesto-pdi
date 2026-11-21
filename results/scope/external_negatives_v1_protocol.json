@@ -1,0 +1,18 @@
+{
+  "name": "Negativos externos de alcance v1",
+  "frozen_before_inference": true,
+  "n": 30,
+  "labels": {
+    "01_escenas": 10,
+    "02_objetos_tridimensionales": 10,
+    "03_negativos_dificiles": 10
+  },
+  "primary_metric": "scope_flagged",
+  "expected": "Todas fuera de alcance",
+  "decision_rule": {
+    "documentar_sin_recalibrar": ">=27/30 y >=8/10 por etiqueta",
+    "ampliar_desarrollo": ">=24/30 y >=6/10 por etiqueta sin cumplir la regla anterior",
+    "revision_prioritaria": "<24/30 o alguna etiqueta <6/10"
+  },
+  "independence": "La selección visual se fijó antes de consultar la salida del filtro. No usar estas imágenes para cambiar el umbral y volver a reportarlas como prueba independiente."
+}

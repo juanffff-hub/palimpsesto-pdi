@@ -11,8 +11,8 @@ Esta matriz delimita lo implementado. Ningún conjunto finito de pruebas demuest
 | EXIF de orientación o canal alfa | Reorienta RGB; compone alfa sobre blanco; conserva original | Python |
 | Imagen vacía/casi uniforme | Rechazo con petición de nueva captura | Python |
 | Poca resolución, oscuridad, sobreexposición, pocos bordes | Aviso orientativo; revisar detalle o repetir captura | Reglas explícitas; no diagnóstico de fidelidad |
-| Contenido ajeno a las piezas conocidas | Alerta de alcance; oculta clase y puntuaciones; exige confirmación explícita y categoría manual | Pruebas stub + evaluación real + gato en navegador |
-| Escena desconocida que no activa alerta | Puede pasar: confirmación de una pieza plana obligatoria en interfaz | Fallo documentado: astronaut |
+| Contenido ajeno a las piezas conocidas | Alerta de alcance; oculta clase y puntuaciones cuando se activa; exige confirmación explícita y categoría manual | Pruebas stub + evaluación real + gato en navegador |
+| Escena desconocida que no activa alerta | Puede pasar: confirmación de una pieza plana obligatoria en interfaz | 17/30 casos externos no alertados; `results/scope/external_negatives_v1.json` |
 | Retrato/pintura de retrato | Detector de presencia de rostro puede pedir revisión; no identifica personas | Heurística auxiliar, sin métrica aislada |
 | JSON roto/no objeto, campos desconocidos o faltantes | 400/415 con mensaje; no procesa | Python |
 | NaN/infinito, booleanos, null, listas, texto, valor fuera de rango | Rechaza antes de transformar | Python |
@@ -48,8 +48,10 @@ Esta matriz delimita lo implementado. Ningún conjunto finito de pruebas demuest
 
 `python scripts/evaluate_scope.py --root RUTA`: 10 negativos de conveniencia, 72 positivos provisionales y un escaneo externo. Resultado 9/10 alertas negativas, 0/72 y 0/1 positivas. **Un negativo pasa.** No es una estimación robusta de sensibilidad/especificidad en población abierta. La cara del astronaut no fue advertida por la heurística auxiliar de esta configuración. El umbral no se eligió con estos negativos.
 
+`python scripts/evaluate_scope_external.py --data RUTA_NEGATIVOS`: 30 negativos propios congelados antes de inferir, 10 por etiqueta. Resultado 13/30 alertados (43,3 %): escenas 3/10, objetos tridimensionales 8/10 y negativos difíciles 2/10. No se cambió el umbral, el banco, los pesos ni la selección tras observar las salidas. El conjunto queda reservado como prueba y no debe reutilizarse para optimizar. Ver protocolo, JSON y CSV en `results/scope/`.
+
 ## Límites funcionales que deben explicarse en la sustentación
 
-No se recupera información tapada, quemada o fuera de foco. No se garantizan colorimetría patrimonial, autenticidad, OCR ni reconstrucción documental. La homografía no aplana páginas curvas y la proporción automática no conoce dimensiones físicas. Pueden fallar clase/borde/alcance; por eso la revisión no es decorativa. No hay evaluación humana completada, test externo nuevo ni identidades físicas certificadas. La aplicación no está endurecida como servicio público multiusuario.
+No se recupera información tapada, quemada o fuera de foco. No se garantizan colorimetría patrimonial, autenticidad, OCR ni reconstrucción documental. La homografía no aplana páginas curvas y la proporción automática no conoce dimensiones físicas. Pueden fallar clase/borde/alcance; por eso la revisión no es decorativa. La prueba externa evidencia que el alcance automático no reemplaza la confirmación humana. Las identidades físicas del dataset de piezas tampoco están certificadas. La aplicación no está endurecida como servicio público multiusuario.
 
 Para cualquier fallo nuevo registrar foto original (con autorización), pasos, versión, parámetros, esperado/observado y resultado tras corregir. Añadir un test que reproduzca el defecto cuando sea estable y significativo, y conservar también el caso de fallo en el informe académico.

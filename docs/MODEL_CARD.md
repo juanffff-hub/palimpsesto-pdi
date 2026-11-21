@@ -53,6 +53,10 @@ U-Net del Parcial 3 (línea base de la v0.4.0): encoder ResNet18, checkpoint del
 
 Banco de 408 embeddings normalizados, media de tres similitudes coseno máximas. Umbral percentil 3 de similitudes de desarrollo excluyendo vecinos del mismo grupo. Banco ligado por SHA256 al checkpoint y manifiesto. Su propósito es pedir revisión, no determinar todos los objetos que existen. Evaluación exploratoria: 9/10 negativos avisados; falso negativo astronaut. No usar estos casos para optimizar y luego volver a reportarlos como validación independiente.
 
+**Prueba externa v1, congelada antes de inferir.** Se seleccionaron visualmente 30 fotografías propias nuevas, una por identidad física o escena: 10 escenas, 10 objetos tridimensionales y 10 negativos difíciles. El filtro alertó 13/30 (43,3 %): 3/10, 8/10 y 2/10 respectivamente. La regla predeclarada exigía al menos 24/30 y 6/10 por etiqueta para evitar revisión prioritaria; no se cumplió. `data/external_negative_scope_v1.csv`, `results/scope/external_negatives_v1_protocol.json` y `results/scope/external_negatives_v1.json` conservan selección, protocolo, salidas y hashes.
+
+**Uso obligatorio tras este resultado.** El filtro es una advertencia auxiliar y la persona debe confirmar que hay una sola pieza plana admitida. No recalibrar el umbral ni entrenar con estas 30 y volver a llamarlas prueba externa. Para una v2: crear negativos distintos para desarrollo, comparar allí una clase negativa o un método explícito de fuera-de-distribución, fijar la puerta de adopción y medir una sola vez en un segundo conjunto ciego.
+
 Recalibrar con `scripts/calibrate_scope.py` después de cambiar clasificador/manifiesto. Un banco incompatible se desactiva explícitamente. El frontend siempre pide confirmar una pieza plana; puede aceptar una pieza válida atípica tras revisión. No identifica rostros ni personas.
 
 ## Reproducción y uso

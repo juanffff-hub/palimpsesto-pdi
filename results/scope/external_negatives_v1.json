@@ -1,0 +1,512 @@
+{
+  "protocol": {
+    "selection": "30 fotografías propias seleccionadas visualmente antes de consultar el modelo; una toma por identidad física o escena.",
+    "expected": "Todas fuera de alcance.",
+    "primary_metric": "Proporción marcada scope_flagged; any_exception se informa aparte porque también puede incluir detección de rostro.",
+    "decision_rule_predeclared": {
+      "documentar_sin_recalibrar": ">=27/30 y >=8/10 en cada etiqueta",
+      "ampliar_desarrollo": ">=24/30 y >=6/10 en cada etiqueta, sin cumplir la regla anterior",
+      "revision_prioritaria": "<24/30 o alguna etiqueta <6/10"
+    },
+    "no_tuning": "No se modificaron pesos, banco, umbral ni selección después de observar las salidas."
+  },
+  "dataset": {
+    "manifest_sha256": "e8635dff2dca41944d00427fec2188fdc01cb8766a99604c8441de437e25e204",
+    "n": 30,
+    "labels": [
+      "01_escenas",
+      "02_objetos_tridimensionales",
+      "03_negativos_dificiles"
+    ]
+  },
+  "model": {
+    "classifier_sha256": "94cc64bd23d7811ada624324f6c7ccbd0813ce1b2bf9e11c17e3a21e6dc44d4b",
+    "scope_reference_sha256": "e41d517f66f7f910f98bd3637521e9acbd84509bb40fbae32bbfa48363708f78",
+    "scope_threshold": 0.699008
+  },
+  "summary": {
+    "total": {
+      "n": 30,
+      "scope_flagged": 13,
+      "scope_missed": 17,
+      "scope_recall": 0.4333,
+      "any_exception": 13
+    },
+    "01_escenas": {
+      "n": 10,
+      "scope_flagged": 3,
+      "scope_missed": 7,
+      "scope_recall": 0.3,
+      "any_exception": 3
+    },
+    "02_objetos_tridimensionales": {
+      "n": 10,
+      "scope_flagged": 8,
+      "scope_missed": 2,
+      "scope_recall": 0.8,
+      "any_exception": 8
+    },
+    "03_negativos_dificiles": {
+      "n": 10,
+      "scope_flagged": 2,
+      "scope_missed": 8,
+      "scope_recall": 0.2,
+      "any_exception": 2
+    }
+  },
+  "interpretation": {
+    "level": "revision_prioritaria",
+    "reason": "Se alertó menos de 80 % del total o alguna etiqueta quedó por debajo de 6/10.",
+    "next_step": "Mantener la confirmación humana obligatoria. Construir desarrollo negativo independiente, revisar el método y evaluar de nuevo en otro conjunto ciego."
+  },
+  "elapsed_seconds": 6.269,
+  "cases": [
+    {
+      "image_id": "NEG001",
+      "label": "01_escenas",
+      "content": "planta_sobre_mesa",
+      "source_name": "not_published",
+      "sha256": "a358b11168f1e2a4652ece26a1cce4b095c6029298692a45052235cdaf9c8d6b",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.708097,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.970154
+    },
+    {
+      "image_id": "NEG002",
+      "label": "01_escenas",
+      "content": "persona_sentada_sin_rostro",
+      "source_name": "not_published",
+      "sha256": "3195f4ce857466f883c65e86f129afead35d01907d62925ca519eb971e46b693",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.701549,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.992073
+    },
+    {
+      "image_id": "NEG003",
+      "label": "01_escenas",
+      "content": "mano_y_puesto_de_trabajo",
+      "source_name": "not_published",
+      "sha256": "e9bf47d3afb63e2d419e42c453b531b4e8f4b9b02e0ac2c9835117e3e49f5f6a",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.727801,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.962836
+    },
+    {
+      "image_id": "NEG004",
+      "label": "01_escenas",
+      "content": "escena_de_cocina",
+      "source_name": "not_published",
+      "sha256": "29b631c5e9307e5edd8218f2bdc3758d228c55b6b1ced780f596327e9f7eaf8b",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.648415,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.969211
+    },
+    {
+      "image_id": "NEG005",
+      "label": "01_escenas",
+      "content": "perro",
+      "source_name": "not_published",
+      "sha256": "3b9bcb017ee4d0c1be07ce76ea5d0ad461d39e35408d1bd3dddd71364482afae",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.654206,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.87325
+    },
+    {
+      "image_id": "NEG006",
+      "label": "01_escenas",
+      "content": "refrigerador_abierto",
+      "source_name": "not_published",
+      "sha256": "4b79c186dde6eae64c409c4c8c617080f2db760c25417d5dc6bf5227571874a1",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.71671,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.999202
+    },
+    {
+      "image_id": "NEG007",
+      "label": "01_escenas",
+      "content": "repisa_decorativa",
+      "source_name": "not_published",
+      "sha256": "4d02a6c08507ecb0509cefb9bbb462a65d5960b68ae6fa557d3b67798126d4a9",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.705981,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.537514
+    },
+    {
+      "image_id": "NEG008",
+      "label": "01_escenas",
+      "content": "jarrones_decorativos",
+      "source_name": "not_published",
+      "sha256": "cc23b16957e4d1cca8b26433453344fade18c1b053087be942b0c10bcb992735",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.706643,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.998835
+    },
+    {
+      "image_id": "NEG009",
+      "label": "01_escenas",
+      "content": "lavamanos",
+      "source_name": "not_published",
+      "sha256": "4f8abee8817c410839a52875f4c847b75b7caef9f46ffb87eaee1020dc1a95b2",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.694914,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.999207
+    },
+    {
+      "image_id": "NEG010",
+      "label": "01_escenas",
+      "content": "toalla_colgada",
+      "source_name": "not_published",
+      "sha256": "dbc25605a23e0370f4b0c1b5903ca0144d2ee8ba6a884b671d6e319355634609",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.724832,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.999637
+    },
+    {
+      "image_id": "NEG011",
+      "label": "02_objetos_tridimensionales",
+      "content": "ventilador",
+      "source_name": "not_published",
+      "sha256": "ff679273a835b8f61a92b8191b330c1446b91dc0b8a17d3896f653635fed622a",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.657062,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.880261
+    },
+    {
+      "image_id": "NEG012",
+      "label": "02_objetos_tridimensionales",
+      "content": "balon",
+      "source_name": "not_published",
+      "sha256": "4bace63b8a046f7105c86a2079de2731f92749064454f468af1d7e5fc8a8c744",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.732498,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.720038
+    },
+    {
+      "image_id": "NEG013",
+      "label": "02_objetos_tridimensionales",
+      "content": "silla",
+      "source_name": "not_published",
+      "sha256": "30b63c1550795ef7af2521923aea6db664b5064dc37c9e269c6e43723e8d2930",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.678503,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.832703
+    },
+    {
+      "image_id": "NEG014",
+      "label": "02_objetos_tridimensionales",
+      "content": "zapato",
+      "source_name": "not_published",
+      "sha256": "10b0f9973f65d4e071ee2460346aacf4bfe34542760f5769e230e3860c7f4595",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.714488,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.752056
+    },
+    {
+      "image_id": "NEG015",
+      "label": "02_objetos_tridimensionales",
+      "content": "teclado",
+      "source_name": "not_published",
+      "sha256": "0588ba7f9f1a93279dca487189d75bec8eb5e84ff694022efe40f7c6e0772728",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.65977,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.727892
+    },
+    {
+      "image_id": "NEG016",
+      "label": "02_objetos_tridimensionales",
+      "content": "mochila",
+      "source_name": "not_published",
+      "sha256": "b0e55a6f111bc89f6e383b3949fc93ba5397dec899c9cd0270397f388ef72154",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.697465,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.866248
+    },
+    {
+      "image_id": "NEG017",
+      "label": "02_objetos_tridimensionales",
+      "content": "aspiradora_y_bascula",
+      "source_name": "not_published",
+      "sha256": "348de440d4bc8246a7fa84ef90303bcfbcbe8763d14f6210a6866b74cba55041",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.69537,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.618518
+    },
+    {
+      "image_id": "NEG018",
+      "label": "02_objetos_tridimensionales",
+      "content": "papelera",
+      "source_name": "not_published",
+      "sha256": "bdc277584054fd31358d19f89e9616a160325f9051e83cc6020c2f9a7a6ac334",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.683955,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.877316
+    },
+    {
+      "image_id": "NEG019",
+      "label": "02_objetos_tridimensionales",
+      "content": "sanitario",
+      "source_name": "not_published",
+      "sha256": "190781dc798386e453d752f537f8066d9bc3457408a21f19f1788c7353860e81",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.682754,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.992754
+    },
+    {
+      "image_id": "NEG020",
+      "label": "02_objetos_tridimensionales",
+      "content": "control_remoto",
+      "source_name": "not_published",
+      "sha256": "d44a3a46de708882d7245fd46a11372ef4144b25829df71c740c83d07dbdaf21",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.678322,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.946714
+    },
+    {
+      "image_id": "NEG021",
+      "label": "03_negativos_dificiles",
+      "content": "suelo_marmol",
+      "source_name": "not_published",
+      "sha256": "2dd6ffa80feb00bc02e27bb41f44d7ffe1e01c559781e2047d69f82cd1d1e3ce",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.6848,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.666811
+    },
+    {
+      "image_id": "NEG022",
+      "label": "03_negativos_dificiles",
+      "content": "tableta_apagada",
+      "source_name": "not_published",
+      "sha256": "9f857717d3e05a3e85ae5aa87eef1d03bb7c1c5238c8fb0fe69a13889d7015b8",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.732326,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.666681
+    },
+    {
+      "image_id": "NEG023",
+      "label": "03_negativos_dificiles",
+      "content": "caja_de_producto",
+      "source_name": "not_published",
+      "sha256": "d5d6ef95d9a8f952d69528863ee2d543a7a196126c46cb99f827260c5b8a02d2",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.723403,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.965322
+    },
+    {
+      "image_id": "NEG024",
+      "label": "03_negativos_dificiles",
+      "content": "television_proyectada",
+      "source_name": "not_published",
+      "sha256": "ecc11c1f72913d5b3b94a90bba84b84bbdcb7a1c20e8d1d3b2259206ef46bcc4",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.766236,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.997627
+    },
+    {
+      "image_id": "NEG025",
+      "label": "03_negativos_dificiles",
+      "content": "carton_aplanado",
+      "source_name": "not_published",
+      "sha256": "95761e60f1c31f1bad9caa282395481bf415cc4e9781d8a8e088b00d8bc3e18a",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.780496,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.831535
+    },
+    {
+      "image_id": "NEG026",
+      "label": "03_negativos_dificiles",
+      "content": "empaque_en_espejo",
+      "source_name": "not_published",
+      "sha256": "8acc8d64eb8401395a68aedead651617ac68dfe8a5f725ff011896fcb25f4dbd",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.75078,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.640867
+    },
+    {
+      "image_id": "NEG027",
+      "label": "03_negativos_dificiles",
+      "content": "equipos_electronicos",
+      "source_name": "not_published",
+      "sha256": "c995151112a2ce2e79a36bb6a99ebb439e29387e443285e6c7cf1034649f2a00",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.722533,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.763197
+    },
+    {
+      "image_id": "NEG028",
+      "label": "03_negativos_dificiles",
+      "content": "camiseta_deportiva",
+      "source_name": "not_published",
+      "sha256": "4623972ff53c3a1807394f327a067ec59f4135847f10639b113a787110a79ea7",
+      "scope_flagged": true,
+      "exception_triggered": true,
+      "reasons": [
+        "El contenido se aleja de las piezas usadas para entrenar el sistema."
+      ],
+      "similarity": 0.691175,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.659219
+    },
+    {
+      "image_id": "NEG029",
+      "label": "03_negativos_dificiles",
+      "content": "fotografia_enmarcada",
+      "source_name": "not_published",
+      "sha256": "a92cc6ecb1e0c28726eca753f7bfd5243980ece92b90361a3a60f717d14c63e0",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.713771,
+      "threshold": 0.699008,
+      "suggested_class": "pintura",
+      "top_score": 0.705309
+    },
+    {
+      "image_id": "NEG030",
+      "label": "03_negativos_dificiles",
+      "content": "cilindro_con_palabras",
+      "source_name": "not_published",
+      "sha256": "3c4a72fb3ed4d89c3b2b018c38884d7cf6d72737fc1582d488cb8d013f234b4c",
+      "scope_flagged": false,
+      "exception_triggered": false,
+      "reasons": [],
+      "similarity": 0.728226,
+      "threshold": 0.699008,
+      "suggested_class": "manuscrito",
+      "top_score": 0.957193
+    }
+  ],
+  "limitations": "Prueba externa de conveniencia de 30 negativos propios. No demuestra detección universal de objetos desconocidos ni mide falsos positivos sobre piezas válidas."
+}

@@ -6,8 +6,8 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 |---|---|
 | Necesidad sobre arte y cultura, problemática y solución | README §1: captura documental y artística con supervisión humana |
 | PDI, visión computacional y GUI integrados | README §2–4; clasificación, U-Net, homografía, mejora y exportación |
-| Evaluar con datos reales registrados o capturados | 480 fotos reales y 240 con máscara (3 clases); protocolos y métricas en README §5 y §7, `results/` |
-| Métricas, ejemplos visuales y análisis de límites | Tablas, curvas, matrices, comparación geométrica y casos fallidos; fichas de modelo y datos |
+| Evaluar con datos reales registrados o capturados | 480 fotos reales, 240 con máscara (3 clases) y prueba externa congelada con 30 negativos propios; protocolos y métricas en README §5 y §7, `results/` |
+| Métricas, ejemplos visuales y análisis de límites | Tablas, curvas, matrices, comparación geométrica, figura de los 30 negativos externos y casos fallidos; fichas de modelo y datos |
 | Descripción | README §1 |
 | Arquitectura completa | Diagrama Mermaid y tabla de módulos, README §2 |
 | Metodología | README §3 |
@@ -21,6 +21,6 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 | Póster académico | Entregable de comunicación por preparar |
 | Sustentación oral con demostración y decisiones | Preparación y exposición del equipo |
 
-La rúbrica permite datos previamente registrados; no exige capturar un conjunto nuevo. Los resultados existentes se presentan con sus límites: grupos físicos provisionales, diagnóstico reutilizado, pocas pinturas y falsos negativos del filtro. No se presentan las comprobaciones de software como evidencia de fidelidad patrimonial. SSIM y PSNR corresponden únicamente a referencias sintéticas alineadas.
+Los resultados se presentan con sus límites: grupos físicos provisionales, diagnóstico reutilizado, pocas pinturas y 17/30 negativos externos no alertados por el filtro de alcance. Este último conjunto se congeló antes de inferir y no se usa para recalibrar. No se presentan las comprobaciones de software como evidencia de fidelidad patrimonial. SSIM y PSNR corresponden únicamente a referencias sintéticas alineadas.
 
 El enlace web es una facilidad adicional de demostración. La ejecución local sigue disponible y es el respaldo para la sustentación; la rúbrica no obliga a contratar alojamiento.

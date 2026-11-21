@@ -219,11 +219,14 @@ docs/               Fichas de modelo y datos, validación, guía de sustentació
 | **Fotos de clasificación** | 480 fotografías propias tomadas con celular, 160 por clase (impreso, manuscrito, pintura); 50 bloques provisionales de pieza | Entrenamiento y evaluación del clasificador y calibración del alcance |
 | **Segmentación** | 240 fotos con máscara, 80 por clase: 80 impresos del tercer parcial (18 documentos) + 80 manuscritos (10 piezas) y 80 pinturas (13 bloques) anotados con polígonos en makesense.ai; partición por pieza (160 / 40 / 40) | Entrenar y evaluar la U-Net |
 | **Referencias sintéticas** | Página construida con sombra, ruido y desenfoque controlados | Comparar técnicas de mejora con SSIM/PSNR |
-| **Negativos de alcance** | 10 imágenes públicas de scikit-image (gato, astronauta, monedas…) | Probar la alerta de contenido ajeno |
+| **Negativos de alcance exploratorios** | 10 imágenes públicas de scikit-image (gato, astronauta, monedas…) | Comprobación inicial de la alerta de contenido ajeno |
+| **Negativos externos v1** | 30 fotografías propias nuevas, una por objeto o escena: 10 escenas, 10 objetos tridimensionales y 10 negativos difíciles | Prueba externa congelada del filtro de alcance; no se usan para entrenar ni ajustar el umbral |
 
 ![Distribución del dataset](results/figures/dataset_distribution.png)
 
 ![Muestra del dataset](results/figures/dataset_muestras.jpg)
+
+![Negativos externos de alcance v1](results/figures/negativos_externos_v1.jpg)
 
 Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artificial, reflejos y ángulos. Las miniaturas de documentos aparecen difuminadas porque algunos contienen nombres de personas.
 
@@ -232,6 +235,7 @@ Las fotos se tomaron en contextos reales: distintos fondos, luz natural y artifi
 - **Google Drive:** [480 fotos de clasificación](https://drive.google.com/drive/folders/1x-kLwxyBtguRjrFI5dU6oVQEYpr3U4Ay) y [fotos, máscaras y anotaciones de segmentación](https://drive.google.com/drive/folders/1a8JVuc3vZH-Qbuj92hRyBT6S9kvS6V3K). Son las carpetas originales de trabajo; sus etiquetas históricas train/test/val no sustituyen las particiones del manifiesto.
 - **Descarga reproducible recomendada:** [dataset_palimpsesto_v1.zip · 820 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.3.0/dataset_palimpsesto_v1.zip). Contiene las 480 fotos del manifiesto, 80 fotos de segmentación, 80 máscaras, cinco extras y dos archivos de anotación: **647 archivos de datos**, más manifiesto, instrucciones y hashes. Se comprobaron los 480 hashes contra el manifiesto y los 647 archivos dentro del ZIP. No incluye material docente ni pesos.
 - **Segmentación de 3 clases:** [segmentacion_3clases_v1.zip · 209 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/segmentacion_3clases_v1.zip), en la release v0.4.0. Contiene las 240 fotos, sus 240 máscaras, `segmentation_manifest.csv`, las anotaciones COCO de makesense.ai y los hashes de sus 485 archivos. Las fotos de manuscritos y pinturas son las mismas del ZIP principal, elegidas entre las 160 de cada clase. SHA-256 del ZIP: `7fec6df5bcccc27344bd0a65746cd2306f1c4d93eee2fe5c9f817c10dc9b4000`.
+- **Prueba externa del control de alcance:** [negativos_alcance_v1.zip · 79,2 MB](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/v0.4.0/negativos_alcance_v1.zip). Incluye las 30 fotos, manifiestos, hashes, criterios y estructura por etiqueta. La selección visual se congeló antes de ejecutar el modelo y se limitó a una toma por identidad física o escena. La copia pública elimina EXIF/GPS, datos de cámara y nombres originales, con la orientación aplicada a los píxeles. SHA-256: `2063dd1ec00552c591c7c121d1c4f3a53a549f20309786aba5f6363d9158aaf3`; copia auditable del manifiesto en `data/external_negative_scope_v1.csv`.
 - Extrae el ZIP y usa su carpeta `datos/` como `--root`. Incluye `LEEME_DATASET.txt`, `manifest.csv` y `SHA256_ARCHIVOS.json`. SHA-256 del ZIP: `1b00cb28f0490d1247b7f11874b0542dd3d73e1f3b590ef163a7768ca72d8820`.
 - **Código y pesos para el docente:** [repositorio principal](https://github.com/juanffff-hub/palimpsesto-pdi) y [release v0.4.0](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/v0.4.0). Se pueden consultar y descargar sin cuenta ni permisos de colaborador. Este es el único repositorio principal y de entrega. El material completo del curso se conserva fuera de la publicación.
 - Las carpetas originales de Drive permiten actualmente editar a cualquiera con el enlace. Para una copia estable de consulta, usa el ZIP de la release; no modifiques los originales.
@@ -462,7 +466,18 @@ No existe un ajuste universal: cada defecto pide una técnica distinta, y por es
 
 ### Control de alcance
 
-Alertó en 9 de 10 imágenes ajenas (gato, monedas, cohete…) y en 0 de las 72 fotos de diagnóstico. **El retrato del astronauta pasó sin alerta:** no es un detector universal. Por eso la confirmación humana de que la foto es una pieza admitida es obligatoria.
+La comprobación exploratoria original alertó en 9 de 10 imágenes públicas ajenas (gato, monedas, cohete…) y en 0 de las 72 fotos de diagnóstico. Sin embargo, diez ejemplos de conveniencia no representaban la variedad de entradas reales. Por eso se capturaron y congelaron 30 negativos propios antes de consultar la salida del modelo (`results/scope/external_negatives_v1_protocol.json`). La métrica principal es cuántos activa directamente el filtro de alcance; otras excepciones se informan aparte.
+
+| Prueba externa v1 | Alertados | No alertados | Sensibilidad a negativos |
+|---|---:|---:|---:|
+| Escenas | 3/10 | 7/10 | 30,0 % |
+| Objetos tridimensionales | 8/10 | 2/10 | 80,0 % |
+| Negativos difíciles | 2/10 | 8/10 | 20,0 % |
+| **Total** | **13/30** | **17/30** | **43,3 %** |
+
+El filtro separa mejor objetos tridimensionales, pero confunde con frecuencia escenas y superficies que comparten textura o composición con pinturas y documentos. Entre los fallos hay una planta, una persona sin rostro visible, un refrigerador, una tableta apagada, empaques, cartón, una pantalla y una fotografía enmarcada. El clasificador puede asignarles una clase con puntuación alta; esa puntuación **no demuestra que estén dentro del alcance**.
+
+**Decisión y siguiente paso.** La regla fijada antes de inferir exigía al menos 24/30 y 6/10 por categoría para considerar una ampliación menor; 13/30 activa `revision_prioritaria`. Estas 30 fotos quedan cerradas como prueba externa y **no deben usarse para recalibrar y volver a reportar el mismo resultado**. Hasta una mejora independiente, la confirmación humana de que existe una sola pieza plana admitida sigue siendo obligatoria. La siguiente iteración debe: (1) reunir otro conjunto de negativos para desarrollo, separado por identidad física; (2) comparar un detector explícito de fuera-de-distribución o una clase negativa con el banco actual; (3) fijar la regla de adopción; y (4) evaluar una sola vez en un segundo conjunto ciego distinto. El protocolo, los 30 casos y el resultado reproducible están en `results/scope/`; el historial y la ruta de mejora se mantienen en [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
 
 ### Pruebas del sistema
 
@@ -489,18 +504,21 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 - El histograma del paso 4 muestra el efecto real de cada ajuste en los tonos. Con los preajustes ninguna de 240 fotos pierde detalle por recorte; cuando un ajuste extremo quema detalle (sobre todo iluminación alta en manuscritos), la app lo dice y marca dónde.
 - La etiqueta de confianza del borde avisa cuándo dudar de la U-Net: en las fotos de prueba marcó como dudosos los 21 bordes malos (6 de 6 con la U-Net desplegada), y ningún borde «seguro» resultó malo. La máscara superpuesta muestra en qué se basó la red.
 - El semáforo de la captura lleva a la práctica el escenario de uso: dice en el momento si conviene repetir la foto. Frente a los avisos anteriores, detecta defectos controlados en el 80–100 % de los casos (antes 2–23 %) y marcó en rojo las 23 fotos reales que lo merecían, de las que antes se detectaban 5.
+- La prueba externa de alcance identificó 13/30 entradas ajenas. Este resultado negativo es útil: evidencia que el control automático todavía no puede sustituir la confirmación humana y define una mejora posterior sin contaminar la prueba.
 
 **Limitaciones**
 
 - Las identidades físicas de las piezas no están certificadas y el diagnóstico de 72 fotos ya se había usado, así que **las métricas son provisionales y no prueban generalización a piezas nuevas**.
 - Manuscritos de letra muy regular todavía se confunden con impresos. La U-Net acierta menos en pinturas que en documentos (IoU 0,877 frente a 0,96–0,97), sobre todo cuando la pintura y el fondo tienen colores parecidos, y su prueba tiene solo 8 piezas o bloques.
 - No hay referencia real para medir la fidelidad de la mejora; la homografía no corrige páginas curvas.
+- El control de alcance detectó 43,3 % de 30 negativos externos; es una barrera de advertencia, no un detector universal de objetos desconocidos.
 
 **Oportunidades de mejora**
 
 - Certificar las piezas y capturar 6–9 piezas nuevas para una evaluación realmente independiente.
 - Anotar más pinturas sobre fondos de colores parecidos y manuscritos de borde irregular, para seguir ampliando la U-Net.
 - Ajustar el modelo completo (*fine-tuning*) una vez exista una partición certificada.
+- Mejorar el rechazo de entradas ajenas con negativos de desarrollo independientes y comprobarlo después en un segundo conjunto ciego; no ajustar con `negativos_alcance_v1`.
 - Incorporar dewarping para páginas curvas y OCR como herramienta externa de evaluación.
 
 ---
@@ -537,6 +555,7 @@ Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la int
 .\.venv\Scripts\python.exe scripts/calibrate_scope.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_model.py --root "C:\ruta\datos"
 .\.venv\Scripts\python.exe scripts/evaluate_scope.py --root "C:\ruta\datos"
+.\.venv\Scripts\python.exe scripts/evaluate_scope_external.py --data "C:\ruta\negativos_alcance_v1"  # prueba externa congelada; no recalibra
 .\.venv\Scripts\python.exe scripts/evaluate_capture.py --root "C:\ruta\datos" --seg "C:\ruta\segmentacion_3clases"   # semáforo de la captura
 .\.venv\Scripts\python.exe scripts/evaluate_border_confidence.py --seg "C:\ruta\segmentacion_3clases" --root "C:\ruta\datos"   # confianza del borde
 .\.venv\Scripts\python.exe scripts/evaluate_tones.py --root "C:\ruta\datos"   # histograma y tonos recortados

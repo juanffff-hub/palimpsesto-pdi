@@ -15,7 +15,7 @@ Repositorio único: https://github.com/juanffff-hub/palimpsesto-pdi
 - Histograma y tonos recortados: con los preajustes, 0 de 240 fotos pierde detalle por recorte; el aviso aparece sobre todo con iluminación alta en manuscritos (8 de 80 al 100 %).
 - Confianza del borde: en fotos de prueba marca como dudosos los 21 bordes malos de las 3 U-Net (6 de 6 con la desplegada) y 10 de 98 buenos; ningún borde «seguro» resultó malo.
 - Semáforo de la captura: con defectos controlados avisa en el 80–100 % de los casos (antes 2–23 %); en fotos reales marca en rojo 23 fotos, todas revisadas a ojo y justificadas.
-- Filtro de alcance: nueve de diez negativos de conveniencia alertados; persiste un falso negativo.
+- Filtro de alcance: la comprobación exploratoria alertó 9/10 negativos de conveniencia, pero una prueba externa congelada de 30 fotos propias alertó 13/30 (43,3 %): escenas 3/10, objetos tridimensionales 8/10 y negativos difíciles 2/10. El control sigue siendo auxiliar y la confirmación humana es obligatoria.
 - Clasificación propia del curso y ANN conservadas como líneas base, incluidos sus fallos.
 
 El cierre del acceso remoto añade ocho comprobaciones dirigidas a HTTPS, sesiones, espera, expiración y recuperación; no repite la evaluación científica.
@@ -33,6 +33,10 @@ La rama de trabajo del desarrollador no se restablece automáticamente; cada int
 ## Entregables siguientes
 
 Póster académico, video de máximo tres minutos y sustentación oral. Para las limitaciones experimentales, consultar `MODEL_CARD.md`, `DATA_CARD.md` y el análisis del README. Los datos de referencia y el material docente original permanecen intactos fuera del repositorio público.
+
+## Continuación técnica del control de alcance
+
+`negativos_alcance_v1` queda cerrado como prueba externa y no se usa para ajustar el sistema. Si se continúa esta línea, el siguiente paso es crear un conjunto **diferente** de negativos de desarrollo, separado por objeto o escena; comparar allí el banco actual contra una clase negativa o un método explícito de fuera-de-distribución; predeclarar una puerta de adopción; y evaluar una sola vez en otro conjunto ciego. Hasta entonces no presentar el filtro como detector universal y conservar la confirmación explícita de una pieza válida. Los comandos y resultados están en `scripts/evaluate_scope_external.py` y `results/scope/`; el registro de iteraciones está en `docs/PROGRESO_CONTROL_ALCANCE.md`.
 
 ## Reescritura de autores (20 de noviembre de 2026)
 
