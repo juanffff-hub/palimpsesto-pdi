@@ -32,8 +32,16 @@ def main():
     if changed:
         raise SystemExit('Cambió algo congelado desde el protocolo: ' + ', '.join(changed))
     import numpy as np
-    from palimpsesto.imaging import load_image
+    from PIL import Image, ImageOps
+    from palimpsesto.imaging import load_image, MAX_PIXELS
     from palimpsesto.models import ModelService
+
+    def load_dev(path):
+        # Enmienda 1: mismo cargador que scripts/develop_scope_v2.py (sin el límite de 40 MP de la app).
+        with Image.open(path) as im:
+            big = im.width * im.height > MAX_PIXELS
+            return np.asarray(ImageOps.exif_transpose(im).convert('RGB')), big
+    Image.MAX_IMAGE_PIXELS = None
     ms = ModelService(ROOT / 'models'); assert ms.scope_head is not None and ms.segmenter is not None
     blind = Path(args.blind); rows = []
     manifest = blind / 'manifest.csv'
@@ -41,8 +49,9 @@ def main():
                 for r in csv.DictReader(open(manifest, encoding='utf-8-sig'))] if manifest.exists()
                else [(p.parent.name, p, p.stem) for p in sorted(blind.glob('*/*')) if p.suffix.lower() in ('.jpg', '.jpeg', '.png')])
     for label, path, image_id in entries:
-        rgb, _ = load_image(path.read_bytes()); prob = ms.segment(rgb); s = ms.scope_screen(rgb, prob)
-        rows.append({'image_id': image_id, 'label': label, 'alertada': bool(s['flagged']), 'p_valida': round(s['valid_probability'], 4), 'sha256': sha256(path)})
+        rgb, big = load_dev(path); prob = ms.segment(rgb); s = ms.scope_screen(rgb, prob)
+        rows.append({'image_id': image_id, 'label': label, 'alertada': bool(s['flagged']), 'p_valida': round(s['valid_probability'], 4),
+                     'supera_40MP_de_la_app': big, 'sha256': sha256(path)})
     # Regresión positiva: 72 fotos de diagnóstico (reutilizadas), misma ruta de la app.
     pos = [r for r in csv.DictReader(open(ROOT / 'data/manifest.csv', encoding='utf-8-sig')) if r['split'] == 'test']; accepted = 0
     for r in pos:
@@ -55,7 +64,9 @@ def main():
               'regresion_positiva': pos_acc >= rule['aceptacion_positiva_min']}
     result = {'imagenes': len(rows), 'alertadas': f'{total}/{len(rows)}', 'por_grupo': {l: f'{per[l]}/{n[l]}' for l in labels},
               'regresion_positiva_72': f'{accepted}/{len(pos)}', 'aceptacion_positiva': round(pos_acc, 4), 'comprobaciones': checks,
-              'decision': 'adoptar' if all(checks.values()) else 'no_adoptar', 'regla': rule, 'unica_ejecucion': True}
+              'decision': 'adoptar' if all(checks.values()) else 'no_adoptar', 'regla': rule, 'unica_ejecucion': True,
+              'imagenes_que_la_app_rechazaria_por_tamano': sum(r['supera_40MP_de_la_app'] for r in rows),
+              'enmienda': protocol.get('enmienda_1', {}).get('resumen')}
     (OUT / 'blind.json').write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')
     with open(OUT / 'blind_per_image.csv', 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, list(rows[0]), lineterminator='\n'); w.writeheader(); w.writerows(rows)

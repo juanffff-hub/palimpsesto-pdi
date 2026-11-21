@@ -113,8 +113,14 @@
     "palimpsesto/validation.py": "ebde87bf767cf47992caa68a0927fc59e7994785bd4ecb74bc4d7d0af5c78648",
     "palimpsesto/server.py": "ad86464f5dc4516a7e8be9080144eb73146d1bc52dba6922c949a0bbefbe01cd",
     "scripts/develop_scope_v2.py": "938e59c9dd54ee59c976988845fb2d0bc0b13c155a13eb641b64d17e162c94e0",
-    "scripts/evaluate_scope_blind_v2.py": "83f9fb1c956749c103d7114d4d4086efac78b6b29b5414d16bb86cbb41e055dd",
+    "scripts/evaluate_scope_blind_v2.py": "5b73de0cf2d39c7e8bafa74bd97f766b7266da62cdcf13195d6b3a42023d34fd",
     "data/scope_negatives_dev_v2.csv": "0d6549a5507bbbff76ce0405c92d6705f103600bf46f98df689400994778ca3d",
     "data/manifest.csv": "fc7e1b4cc9c4acc24d8eb350ac2ea36fc547a4b744b89d1ed5383fb971724381"
+  },
+  "enmienda_1": {
+    "fecha": "2026-11-20",
+    "resumen": "Primer intento autorizado detenido al cargar una imagen de más de 40 MP: el ejecutor usaba el cargador de la app, con ese límite, mientras que el desarrollo cargaba sin límite. Se detuvo antes de calcular o mostrar ninguna predicción y no se escribió ningún resultado. Solo se corrigió el cargador del ejecutor para igualarlo al de desarrollo y se registra qué imágenes superan el límite de la app; método, pesos, cabeza, umbral, código de la app y regla no cambian.",
+    "hash_anterior_del_ejecutor": "83f9fb1c956749c103d7114d4d4086efac78b6b29b5414d16bb86cbb41e055dd",
+    "commit_congelado_original": "b3a7ad1"
   }
 }
