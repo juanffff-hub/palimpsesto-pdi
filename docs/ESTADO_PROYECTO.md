@@ -36,7 +36,9 @@ La aplicación está completa y probada de principio a fin con 113 comprobacione
 
 ## Entregables siguientes
 
-**Infografía (póster académico), video de máximo tres minutos y sustentación oral.**
+**Infografía (póster académico): lista** en `docs/poster/`: PDF A3 para imprimir y PNG de alta resolución. El ejemplo de resultados es una pintura del conjunto de prueba procesada con la aplicación.
+
+**Pendientes: video de máximo tres minutos y sustentación oral.**
 
 Material ya listo para reutilizar:
 - **Problema y flujo:** el diagrama de arquitectura del README (§2) y las capturas `docs/img/gui_01` a `gui_07` (incluidas `gui_02b_semaforo`, `gui_03b_mascara` y `gui_04b_tonos`).

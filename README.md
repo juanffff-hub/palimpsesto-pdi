@@ -665,7 +665,9 @@ Usa los ZIP de las releases (sección 5):
 
 El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
 
-Quedan los entregables de comunicación: **póster académico, video de máximo tres minutos y sustentación oral**, incluida la demostración del funcionamiento.
+**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). Quedan el **video de máximo tres minutos** y la **sustentación oral**, incluida la demostración del funcionamiento.
+
+[![Póster de Palimpsesto](docs/poster/poster_palimpsesto.png)](docs/poster/poster_palimpsesto_A3.pdf)
 
 ## Demo compartida gratuita
 
