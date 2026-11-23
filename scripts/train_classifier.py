@@ -6,8 +6,6 @@ El manifiesto es la única fuente de particiones. No se usan los nombres de carp
 from pathlib import Path
 import sys,argparse,json,csv,time,copy,random
 ROOT=Path(__file__).resolve().parents[1]
-research_deps=ROOT.parent.parent/'work/pydeps'
-if research_deps.exists():sys.path.insert(0,str(research_deps))
 sys.path.insert(0,str(ROOT))
 import numpy as np,cv2,torch
 from torch import nn
