@@ -680,8 +680,6 @@ Ejecuta `Iniciar_Enlace_Publico.cmd` para obtener un enlace HTTPS sin cuenta ni 
 
 El computador debe permanecer encendido, conectado y sin suspenderse. Es una demostración temporal: al reiniciar el túnel cambia la URL (actualiza entonces el enlace de este README) y no hay garantía de disponibilidad continua. Las fotos se procesan en el computador anfitrión a través de Cloudflare; las sesiones se eliminan tras 15 minutos sin actividad, con limpieza cada 30 segundos.
 
-**Enlace permanente (sin depender de un computador):** la aplicación está preparada para Hugging Face Spaces, gratis y en CPU, con `scripts/deploy_hf.py` y `deploy/huggingface/`. Pasos en [`docs/DEMO_PUBLICA.md`](docs/DEMO_PUBLICA.md#enlace-permanente-en-hugging-face-spaces).
-
 La demo se actualiza sola con los cambios de `main` cuando no hay sesiones activas. Detalle en [Operación y actualizaciones](docs/DEMO_PUBLICA.md).
 
 ## Referencias
