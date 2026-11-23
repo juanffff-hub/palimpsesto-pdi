@@ -6,7 +6,21 @@ Proyecto final de **Procesamiento Digital de Imágenes** · Universidad Autónom
 Equipo: **David Neira Conde · Juan Sebastián Gómez Muñoz · Juan Felipe Fajardo Valencia**
 Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (línea de patrimonio cultural, obras de arte y museos).
 
-**Pruébalo en línea:** [queries-network-strategy-multimedia.trycloudflare.com](https://queries-network-strategy-multimedia.trycloudflare.com) · sin cuenta ni instalación. La aplicación se sirve desde un computador del equipo; si el enlace no responde, ese equipo está apagado y la app se puede ejecutar en local ([instalación](#9-instalación-y-ejecución)).
+## Entregables
+
+| Entregable | Dónde verlo |
+|---|---|
+| **Video demostrativo** (2:50) | [Ver en YouTube](https://youtu.be/CjWwmcuZH_8) · [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) |
+| **Póster académico** (A3) | [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png) |
+| **Diapositivas de la sustentación** | [PDF, 14 diapositivas](docs/sustentacion/diapositivas_sustentacion.pdf) |
+| **Aplicación en línea** | [queries-network-strategy-multimedia.trycloudflare.com](https://queries-network-strategy-multimedia.trycloudflare.com), sin cuenta ni instalación. Se sirve desde un computador del equipo: si no responde, ese equipo está apagado y la app se puede [ejecutar en local](#9-instalación-y-ejecución). |
+| **Repositorio y documentación** | Este README (secciones 1 a 9) y la [matriz de cumplimiento de la rúbrica](docs/CIERRE_RUBRICA.md) |
+| **Datos** | [Carpeta de Drive «Dataset de Palimpsesto»](https://drive.google.com/drive/folders/1IIC5X-oEXs4mcuuWMMLGhzr5HQmRVveq?usp=sharing) y ZIP de las releases ([sección 5](#5-datos)) |
+| **Todo en un solo lugar** | [Release «Entregables finales»](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2): video, póster y diapositivas |
+
+[![Video de Palimpsesto en YouTube](https://img.youtube.com/vi/CjWwmcuZH_8/hqdefault.jpg)](https://youtu.be/CjWwmcuZH_8)
+
+## Contenido
 
 ![Interfaz de Palimpsesto](docs/img/gui_01_cargar.png)
 
@@ -668,7 +682,7 @@ Usa los ZIP de las releases (sección 5):
 
 El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
 
-**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:50):** [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba, incluido el aviso ante una foto que no es una pieza. **Diapositivas de la sustentación:** [PDF](docs/sustentacion/diapositivas_sustentacion.pdf).
+**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:50):** [ver en YouTube](https://youtu.be/CjWwmcuZH_8) · [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba, incluido el aviso ante una foto que no es una pieza. **Diapositivas de la sustentación:** [PDF](docs/sustentacion/diapositivas_sustentacion.pdf).
 
 [![Póster de Palimpsesto](docs/poster/poster_palimpsesto.png)](docs/poster/poster_palimpsesto_A3.pdf)
 
