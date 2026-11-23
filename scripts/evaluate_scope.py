@@ -1,8 +1,7 @@
 """Prueba pequeña de alertas de alcance: NO certifica detección universal OOD."""
 from pathlib import Path
 import sys,json,csv,argparse
-ROOT=Path(__file__).resolve().parents[1];deps=ROOT.parent.parent/'work/pydeps'
-if deps.exists():sys.path.insert(0,str(deps))
+ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 import numpy as np
 from PIL import Image,ImageOps

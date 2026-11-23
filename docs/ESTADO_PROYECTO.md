@@ -38,7 +38,7 @@ La aplicación está completa y probada de principio a fin con 113 comprobacione
 
 **Infografía (póster académico): lista** en `docs/poster/`: PDF A3 para imprimir y PNG de alta resolución. El ejemplo de resultados es una pintura del conjunto de prueba procesada con la aplicación.
 
-**Video demostrativo: listo** (2:50, 1080p, incluye el aviso ante una foto que no es una pieza) en la release [`entregables-2026-2`](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2), junto con el póster. Combina escenas animadas con la grabación real de la aplicación y lleva música original. Guion de voz opcional en `docs/video/GUION_VOZ.md`.
+**Video demostrativo: listo** (2:50, 1080p, incluye el aviso ante una foto que no es una pieza) en la release [`entregables-2026-2`](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2), junto con el póster. Combina escenas animadas con la grabación real de la aplicación y lleva música original.
 
 **Diapositivas de la sustentación:** `docs/sustentacion/diapositivas_sustentacion.pdf` (14 diapositivas, 10 minutos, con notas por expositor en la versión editable).
 
