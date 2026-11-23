@@ -17,7 +17,7 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 | Resultados | README §7 y fuentes numéricas en `results/` |
 | Conclusiones, límites y oportunidades | README §8 |
 | Instalación y ejecución reproducibles | README §9, pesos con hashes, lanzadores y dependencias |
-| Video demostrativo ≤3 min | ✅ 2:50, presentación y demostración real de la app (incluye el aviso ante una foto que no es una pieza); [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2) |
+| Video demostrativo ≤3 min | ✅ [YouTube](https://youtu.be/CjWwmcuZH_8) · 2:50, presentación y demostración real de la app (incluye el aviso ante una foto que no es una pieza); [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2) |
 | Póster académico | ✅ A3 en `docs/poster/` (PDF y PNG), con la estructura sugerida |
 | Sustentación oral con demostración y decisiones | Diapositivas en `docs/sustentacion/` (14, para 10 minutos) y guía de preguntas en `docs/GUIA_SUSTENTACION.md`; exposición del equipo |
 
