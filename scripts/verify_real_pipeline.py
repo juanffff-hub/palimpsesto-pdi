@@ -2,8 +2,6 @@
 from pathlib import Path
 import sys,json,csv,io,zipfile,argparse,time,hashlib
 ROOT=Path(__file__).resolve().parents[1]
-deps=ROOT.parent.parent/'work/pydeps'
-if deps.exists():sys.path.insert(0,str(deps))
 sys.path.insert(0,str(ROOT))
 from PIL import Image
 from palimpsesto import server

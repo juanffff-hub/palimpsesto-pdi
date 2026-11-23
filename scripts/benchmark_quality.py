@@ -2,8 +2,6 @@
 from pathlib import Path
 import sys,csv,json
 ROOT=Path(__file__).resolve().parents[1]
-deps=ROOT.parent.parent/'work/pydeps'
-if deps.exists():sys.path.insert(0,str(deps))
 sys.path.insert(0,str(ROOT))
 import cv2,numpy as np
 from PIL import Image,ImageDraw,ImageFont

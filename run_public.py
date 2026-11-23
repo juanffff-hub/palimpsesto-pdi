@@ -6,10 +6,6 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-research_deps = ROOT.parent.parent / 'work/pydeps'
-if research_deps.exists():
-    sys.path.insert(0, str(research_deps))
-
 from palimpsesto import server
 
 

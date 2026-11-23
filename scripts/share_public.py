@@ -84,9 +84,6 @@ def start_server():
     env = os.environ.copy()
     for key in ('GH_TOKEN', 'GITHUB_TOKEN', 'HF_TOKEN', 'VERCEL_TOKEN'):
         env.pop(key, None)
-    deps = ROOT.parent.parent / 'work/pydeps'
-    if deps.exists():
-        env['PYTHONPATH'] = str(deps)
     env['PALIMPSESTO_PUBLIC_PORT'] = str(PORT)
     env['PYTHONIOENCODING'] = 'utf-8'
     log = (STATE / 'server.log').open('a', encoding='utf-8')

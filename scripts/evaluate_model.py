@@ -2,8 +2,6 @@
 from pathlib import Path
 import sys,json,csv,argparse,time
 ROOT=Path(__file__).resolve().parents[1]
-deps=ROOT.parent.parent/'work/pydeps'
-if deps.exists():sys.path.insert(0,str(deps))
 sys.path.insert(0,str(ROOT))
 import numpy as np,cv2,torch
 from PIL import Image,ImageOps,ImageDraw,ImageFont

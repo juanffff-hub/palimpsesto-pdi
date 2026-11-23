@@ -3,9 +3,6 @@ from pathlib import Path
 import argparse, csv, hashlib, json, sys, time
 
 ROOT = Path(__file__).resolve().parents[1]
-DEPS = ROOT.parent.parent / 'work' / 'pydeps'
-if DEPS.exists():
-    sys.path.insert(0, str(DEPS))
 sys.path.insert(0, str(ROOT))
 
 from palimpsesto.imaging import load_image
