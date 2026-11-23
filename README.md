@@ -665,7 +665,7 @@ Usa los ZIP de las releases (sección 5):
 
 El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
 
-**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). Quedan el **video de máximo tres minutos** y la **sustentación oral**, incluida la demostración del funcionamiento.
+**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:40):** [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba. Queda la **sustentación oral**, incluida la demostración en vivo.
 
 [![Póster de Palimpsesto](docs/poster/poster_palimpsesto.png)](docs/poster/poster_palimpsesto_A3.pdf)
 
