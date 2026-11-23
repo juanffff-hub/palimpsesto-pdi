@@ -17,9 +17,9 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 | Resultados | README §7 y fuentes numéricas en `results/` |
 | Conclusiones, límites y oportunidades | README §8 |
 | Instalación y ejecución reproducibles | README §9, pesos con hashes, lanzadores y dependencias |
-| Video demostrativo ≤3 min | Entregable de comunicación por preparar |
-| Póster académico | Entregable de comunicación por preparar |
-| Sustentación oral con demostración y decisiones | Preparación y exposición del equipo |
+| Video demostrativo ≤3 min | ✅ 2:50, presentación y demostración real de la app (incluye el aviso ante una foto que no es una pieza); [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2) |
+| Póster académico | ✅ A3 en `docs/poster/` (PDF y PNG), con la estructura sugerida |
+| Sustentación oral con demostración y decisiones | Diapositivas en `docs/sustentacion/` (14, para 10 minutos) y guía de preguntas en `docs/GUIA_SUSTENTACION.md`; exposición del equipo |
 
 Los resultados se presentan con sus límites: grupos físicos provisionales, diagnóstico reutilizado, pocas pinturas y un control de alcance que, aunque mejoró de 13/30 (v0.4.0, prueba externa) a 16/18 (v2, prueba ciega única), sigue fallando con negativos difíciles. Los conjuntos de prueba se congelaron antes de inferir y no se usan para recalibrar. No se presentan las comprobaciones de software como evidencia de fidelidad patrimonial. SSIM y PSNR corresponden únicamente a referencias sintéticas alineadas.
 

@@ -6,6 +6,8 @@ Proyecto final de **Procesamiento Digital de Imágenes** · Universidad Autónom
 Equipo: **David Neira Conde · Juan Sebastián Gómez Muñoz · Juan Felipe Fajardo Valencia**
 Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (línea de patrimonio cultural, obras de arte y museos).
 
+**Pruébalo en línea:** [queries-network-strategy-multimedia.trycloudflare.com](https://queries-network-strategy-multimedia.trycloudflare.com) · sin cuenta ni instalación. La aplicación se sirve desde un computador del equipo; si el enlace no responde, ese equipo está apagado y la app se puede ejecutar en local ([instalación](#9-instalación-y-ejecución)).
+
 ![Interfaz de Palimpsesto](docs/img/gui_01_cargar.png)
 
 | Sección de la rúbrica | Dónde está |
@@ -285,6 +287,7 @@ En la parte inferior del prototipo hay unos **controles de estados** que simulan
 | Paso | Qué hace el usuario | Qué responde el sistema |
 |---|---|---|
 | ![](docs/img/gui_02_identificar.png) **2 · Identificar** | Confirma que la foto es una pieza admitida y confirma o cambia el tipo | Puntuaciones por clase, preajuste y alerta de alcance |
+| ![](docs/img/gui_02c_alcance.png) **2 · Foto que no es una pieza** | Sube algo que no es un impreso, un manuscrito ni una pintura (aquí, un perro) | Aviso «Puede que la foto no sea una pieza admitida»; oculta la sugerencia de la red y ofrece cargar otra foto o confirmar a mano |
 | ![](docs/img/gui_02b_semaforo.png) **2 · Semáforo de la captura** | Lee si la foto sirve; si está en rojo, la repite con un clic | Veredicto, cinco chequeos con el motivo concreto y botón para cargar otra foto |
 | ![](docs/img/gui_03_encuadrar.png) **3 · Encuadrar** | Arrastra las 4 esquinas, vuelve a detectar, marca a mano o gira 90° | Cuadrilátero sobre la foto y método usado (U-Net, contornos, manual) |
 | ![](docs/img/gui_03b_mascara.png) **3 · Borde dudoso** | Mira la máscara de la red y lleva los puntos a las esquinas reales | Etiqueta «borde dudoso» con el motivo, máscara superpuesta y acceso al borde manual |
@@ -665,15 +668,17 @@ Usa los ZIP de las releases (sección 5):
 
 El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
 
-**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:40):** [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba. Queda la **sustentación oral**, incluida la demostración en vivo.
+**Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:50):** [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba, incluido el aviso ante una foto que no es una pieza. **Diapositivas de la sustentación:** [PDF](docs/sustentacion/diapositivas_sustentacion.pdf).
 
 [![Póster de Palimpsesto](docs/poster/poster_palimpsesto.png)](docs/poster/poster_palimpsesto_A3.pdf)
 
 ## Demo compartida gratuita
 
+**Enlace actual:** [queries-network-strategy-multimedia.trycloudflare.com](https://queries-network-strategy-multimedia.trycloudflare.com).
+
 Ejecuta `Iniciar_Enlace_Publico.cmd` para obtener un enlace HTTPS sin cuenta ni tarjeta. Se publica la aplicación completa, con las dos redes y el control de alcance. El enlace aparece en la consola y en `.public_runtime/enlace.txt`. Para cerrarlo, usa `Detener_Enlace_Publico.cmd`.
 
-El computador debe permanecer encendido y conectado. Es una demostración temporal: al reiniciar el túnel cambia la URL y no hay garantía de disponibilidad continua. Las fotos se procesan en el computador anfitrión a través de Cloudflare; las sesiones se eliminan tras 15 minutos sin actividad, con limpieza cada 30 segundos.
+El computador debe permanecer encendido, conectado y sin suspenderse. Es una demostración temporal: al reiniciar el túnel cambia la URL (actualiza entonces el enlace de este README) y no hay garantía de disponibilidad continua. Las fotos se procesan en el computador anfitrión a través de Cloudflare; las sesiones se eliminan tras 15 minutos sin actividad, con limpieza cada 30 segundos.
 
 La demo se actualiza sola con los cambios de `main` cuando no hay sesiones activas. Detalle en [Operación y actualizaciones](docs/DEMO_PUBLICA.md).
 
