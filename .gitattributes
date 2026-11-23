@@ -17,3 +17,5 @@ data/manifest.csv -text
 data/segmentation_manifest.csv -text
 # El protocolo ciego del control de alcance v2 registra el hash exacto de este manifiesto.
 data/scope_negatives_dev_v2.csv -text
+# El Dockerfile del despliegue debe conservar LF: un \r tras "\" rompe las líneas continuadas.
+Dockerfile text eol=lf
