@@ -600,9 +600,9 @@ Cinco personas probaron la aplicación y se reunieron cinco respuestas a un cues
 
 ### Sesiones de prueba
 
-| Esquinas en celular | Identificación en celular | Histograma en celular | Identificación en portátil |
-|:---:|:---:|:---:|:---:|
-| ![Manos ajustando las esquinas de un documento en un celular](docs/img/usuarios/usuario_1_celular.jpg) | ![Celular en el paso de identificar una pintura](docs/img/usuarios/usuario_2_celular.jpg) | ![Celular con el histograma y las métricas del ajuste](docs/img/usuarios/usuario_3_celular.jpg) | ![Portátil en el paso de identificar una pintura](docs/img/usuarios/usuario_4_portatil.jpg) |
+| Inicio en celular | Esquinas en celular | Identificación en celular | Histograma en celular | Identificación en portátil |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Celular en la pantalla de inicio de Palimpsesto](docs/img/usuarios/usuario_6_celular.jpg) | ![Manos ajustando las esquinas de un documento en un celular](docs/img/usuarios/usuario_1_celular.jpg) | ![Celular en el paso de identificar una pintura](docs/img/usuarios/usuario_2_celular.jpg) | ![Celular con el histograma y las métricas del ajuste](docs/img/usuarios/usuario_3_celular.jpg) | ![Portátil en el paso de identificar una pintura](docs/img/usuarios/usuario_4_portatil.jpg) |
 
 ![Confirmación de una pintura en el computador, con la vista de la cámara difuminada](docs/img/usuarios/usuario_5_portatil.jpg)
 
