@@ -23,4 +23,4 @@ Fuente: «Rubrica proyecto final PDI 2026-2», tres páginas, suministrada por e
 
 Los resultados se presentan con sus límites: grupos físicos provisionales, diagnóstico reutilizado, pocas pinturas y un control de alcance que, aunque mejoró de 13/30 (v0.4.0, prueba externa) a 16/18 (v2, prueba ciega única), sigue fallando con negativos difíciles. Los conjuntos de prueba se congelaron antes de inferir y no se usan para recalibrar. No se presentan las comprobaciones de software como evidencia de fidelidad patrimonial. SSIM y PSNR corresponden únicamente a referencias sintéticas alineadas.
 
-El enlace web es una facilidad adicional de demostración. La ejecución local sigue disponible y es el respaldo para la sustentación; la rúbrica no obliga a contratar alojamiento.
+La aplicación se ejecuta en local; las instrucciones están en la sección 9 del README.
