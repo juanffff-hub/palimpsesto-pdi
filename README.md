@@ -15,7 +15,7 @@ Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (lín
 | **Diapositivas de la sustentación** | [PDF, 14 diapositivas](docs/sustentacion/diapositivas_sustentacion.pdf) |
 | **Aplicación** | Se ejecuta en local: [instrucciones paso a paso](#9-instalación-y-ejecución) |
 | **Pruebas con usuarios** | [Formulario de usabilidad](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform), [respuestas](data/respuestas_usabilidad.csv), análisis y fotos ([ver sección](#pruebas-con-usuarios)) |
-| **Repositorio y documentación** | Este README (secciones 1 a 9) y la [matriz de cumplimiento de la rúbrica](docs/CIERRE_RUBRICA.md) |
+| **Repositorio y documentación** | Este README (secciones 1 a 9) |
 | **Datos** | [Carpeta de Drive «Dataset de Palimpsesto»](https://drive.google.com/drive/folders/1IIC5X-oEXs4mcuuWMMLGhzr5HQmRVveq?usp=sharing) y ZIP de las releases ([sección 5](#5-datos)) |
 | **Todo en un solo lugar** | [Release «Entregables finales»](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2): video, póster y diapositivas |
 
@@ -25,7 +25,7 @@ Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (lín
 
 ![Interfaz de Palimpsesto](docs/img/gui_01_cargar.png)
 
-| Sección de la rúbrica | Dónde está |
+| Sección | Dónde está |
 |---|---|
 | Descripción del proyecto | [1. Descripción](#1-descripción-del-proyecto) |
 | Arquitectura del sistema | [2. Arquitectura](#2-arquitectura-del-sistema) |
@@ -215,8 +215,8 @@ tests/              113 pruebas Python y 25 de navegador
 notebooks/          Recorrido académico con FFT y evaluación
 data/manifest.csv   480 fotos, clase, bloque, partición y hash
 data/segmentation_manifest.csv  240 fotos con máscara, clase, bloque, partición y hash (U-Net)
-results/            Fuente numérica de todas las cifras del README
-docs/               Fichas de modelo y datos, validación, guía de sustentación
+results/            Resultados numéricos de los experimentos
+docs/               Fichas de modelo y datos, validación
 ```
 
 | Funcionalidad | Cómo se implementa |
@@ -283,7 +283,7 @@ Las fotos propias de los negativos están saneadas: sin EXIF/GPS ni nombres orig
 
 ### Prototipo
 
-Antes de programar la aplicación, el flujo de cinco pasos de la Tabla 2 de la propuesta se diseñó como un **prototipo navegable** (Momento 3). Representa las pantallas, la conexión entre ellas y los estados alternativos, con datos de ejemplo y sin ejecutar ninguna función real. Se abre con doble clic en cualquier navegador: [`docs/prototipo/palimpsesto_prototipo.html`](docs/prototipo/palimpsesto_prototipo.html).
+Antes de programar la aplicación, el flujo de cinco pasos se diseñó como un **prototipo navegable**. Representa las pantallas, la conexión entre ellas y los estados alternativos, con datos de ejemplo y sin ejecutar ninguna función real. Se abre con doble clic en cualquier navegador: [`docs/prototipo/palimpsesto_prototipo.html`](docs/prototipo/palimpsesto_prototipo.html).
 
 | Inicio | Tipo de pieza | Esquinas | Ajuste |
 |---|---|---|---|
@@ -446,7 +446,7 @@ No existe un ajuste universal: cada defecto pide una técnica distinta, y por es
 
 ### Histograma y tonos recortados
 
-**Qué resuelve.** Las métricas de nitidez y contraste suben con cualquier ajuste, así que no dicen si el ajuste destruyó información. El histograma de luminancia (clase S5 del curso) muestra cómo se redistribuyen los tonos. Además, la app cuenta **píxel a píxel cuántos llevó el ajuste a negro (≤ 2) o blanco (≥ 253) puros, que antes no lo eran**: ese detalle ya no se recupera. Si pasa del 1 % de la imagen, lo avisa y puede marcar dónde en el «después». En la versión en blanco y negro (Otsu/Sauvola) el recorte es intencional y no se cuenta.
+**Qué resuelve.** Las métricas de nitidez y contraste suben con cualquier ajuste, así que no dicen si el ajuste destruyó información. El histograma de luminancia muestra cómo se redistribuyen los tonos. Además, la app cuenta **píxel a píxel cuántos llevó el ajuste a negro (≤ 2) o blanco (≥ 253) puros, que antes no lo eran**: ese detalle ya no se recupera. Si pasa del 1 % de la imagen, lo avisa y puede marcar dónde en el «después». En la versión en blanco y negro (Otsu/Sauvola) el recorte es intencional y no se cuenta.
 
 **Cómo se comprobó** (`scripts/evaluate_tones.py`, `results/tones/`). Se tomaron 240 fotos reales (80 por clase), se rectificaron con el borde de la U-Net y se aplicaron seis ajustes con la función de la aplicación:
 
@@ -514,8 +514,6 @@ El filtro detectaba bien los objetos tridimensionales, pero dejaba pasar escenas
 
 ### Evolución del control de alcance
 
-La historia del control se conserva completa, incluidos los resultados desfavorables. El detalle está en la bitácora [`docs/PROGRESO_CONTROL_ALCANCE.md`](docs/PROGRESO_CONTROL_ALCANCE.md).
-
 | Versión / iteración | Datos | Negativos alertados | Piezas válidas aceptadas | Tipo de evidencia | Decisión |
 |---|---|---:|---:|---|---|
 | v0.4.0 · similitud top-3 (foto entera) | 10 imágenes públicas de conveniencia | 9/10 | 72/72 (diagnóstico) | Exploratoria, pocos ejemplos | Desplegada |
@@ -582,8 +580,6 @@ Un primer intento se detuvo al cargar una imagen de más de 40 MP, antes de prod
 | `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, confianza del borde y máscara, histograma, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 25/25 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
 
-Las pruebas automáticas verifican los contratos del software. La evaluación experimental del modelo se describe por separado, con sus protocolos y limitaciones.
-
 ---
 
 ## Pruebas con usuarios
@@ -645,8 +641,6 @@ Datos completos: [respuestas_usabilidad.csv](data/respuestas_usabilidad.csv).
 2. Separar visualmente la confirmación del tipo y la del alcance (P05).
 3. Explicar brevemente el borde dudoso la primera vez que aparece (P02).
 4. Añadir un atajo de teclado para comparar antes y después (P04).
-
-**Alcance.** Con cinco respuestas, los resultados orientan mejoras pero no permiten generalizar. El archivo exportado no conserva las marcas temporales, y las fotos documentan sesiones sin estar vinculadas a respuestas concretas.
 
 ---
 
@@ -712,7 +706,7 @@ py -3.12 -m venv .venv
 
 Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. La aplicación escucha solo en localhost: las fotos no salen del equipo.
 
-Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
+Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la interfaz entra en **modo manual** (categoría y borde a mano), sin los modelos de IA. Para comprobar que están activos, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
 
 ### Reproducir entrenamiento, evaluación y figuras
 
@@ -744,15 +738,13 @@ Usa los ZIP de las releases (sección 5):
 .\.venv\Scripts\python.exe scripts/check.py
 ```
 
-**El entrenamiento sobrescribe checkpoints y resultados:** conserva una copia de la release antes de repetirlo. `experiment_rotation.py --promote` guarda siempre el modelo anterior como `classifier_v0.2.0.pt`. Después de cambiar el clasificador, ejecuta `calibrate_scope.py` y actualiza `models/checksums.json`. La U-Net se entrena en GPU si hay una disponible (en CPU tarda más, pero funciona). Las semillas fijas reducen la variación, pero no garantizan resultados idénticos bit a bit entre equipos.
+**El entrenamiento sobrescribe checkpoints y resultados:** conserva una copia de la release antes de repetirlo. La U-Net se entrena en GPU si hay una disponible (en CPU tarda más, pero funciona). Las semillas fijas reducen la variación, pero no garantizan resultados idénticos bit a bit entre equipos.
 
-**Pruebas de navegador:** con el servidor activo, `npm install` y `npm run test:ui` (Node y Chrome; `CHROME_PATH` es opcional). Las capturas del README se regeneran con `node scripts/capture_gui.cjs`.
+**Pruebas de navegador:** con el servidor activo, `npm install` y `npm run test:ui` (Node y Chrome; `CHROME_PATH` es opcional).
 
 ---
 
-## Cierre técnico y entregables
-
-El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia experimental con datos reales, métricas, ejemplos y análisis de limitaciones. Consulta la [matriz de cumplimiento](docs/CIERRE_RUBRICA.md).
+## Póster y video
 
 **Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:50):** [ver en YouTube](https://youtu.be/CjWwmcuZH_8) · [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba, incluido el aviso ante una foto que no es una pieza. **Diapositivas de la sustentación:** [PDF](docs/sustentacion/diapositivas_sustentacion.pdf).
 
@@ -775,5 +767,3 @@ El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia
 - Documentación: [OpenCV · homografía](https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html), [PyTorch · transferencia](https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html), [scikit-image · métricas](https://scikit-image.org/docs/stable/api/skimage.metrics.html), [scikit-learn · StratifiedGroupKFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedGroupKFold.html).
 
 **Derechos.** No se presupone una licencia pública para las fotografías, las obras ni el material docente. El código y los modelos se entregan para este proyecto académico; revisa las autorizaciones antes de redistribuir. Las bibliotecas y el preentrenamiento conservan sus propias licencias.
-
-**Estado del proyecto.** `docs/ESTADO_PROYECTO.md` resume la versión, los comandos y las limitaciones para el mantenimiento del equipo.
