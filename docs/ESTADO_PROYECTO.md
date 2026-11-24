@@ -22,19 +22,19 @@ El cierre del acceso remoto añade ocho comprobaciones dirigidas a HTTPS, sesion
 
 ## Acceso y ejecución
 
-README sección 5 enlaza la carpeta de Drive con todas las fotos por rol, los ZIP de las releases y los pesos. La release v0.3.0 incluye el dataset de clasificación y la v0.4.0 los pesos actuales y el dataset de segmentación. `Iniciar_Palimpsesto.cmd` abre el modo local. `Iniciar_Enlace_Publico.cmd` crea una demo HTTPS temporal desde este computador, sin contratar servicios; `Detener_Enlace_Publico.cmd` cierra la publicación. Ver `DEMO_PUBLICA.md`.
+README sección 5 enlaza la carpeta de Drive con todas las fotos por rol, los ZIP de las releases y los pesos. La release v0.3.0 incluye el dataset de clasificación y la v0.4.0 los pesos actuales y el dataset de segmentación. La aplicación se ejecuta en local con `Iniciar_Palimpsesto.cmd`.
 
 ## Coordinación de cambios
 
-La aplicación compartida toma los archivos de `main` en una copia aislada. Si se reescribe la historia para corregir autores, conservar íntegros los archivos actuales, especialmente `run_public.py`, `scripts/share_public.py`, lanzadores y documentación. No partir de una instantánea anterior al cierre de publicación. No es necesario cambiar ni volver a entrenar las redes para modificar los autores de Git.
+Si se reescribe la historia para corregir autores, conservar íntegros los archivos actuales. No partir de una instantánea anterior al cierre de publicación. No es necesario cambiar ni volver a entrenar las redes para modificar los autores de Git.
 
-La rama de trabajo del desarrollador no se restablece automáticamente; cada integrante debe actualizar su propia copia después de una reescritura coordinada. Las sesiones de la demo no se conservan tras reinicios del servidor. La copia de entrega separada se considera sustituida por el repositorio principal.
+La rama de trabajo del desarrollador no se restablece automáticamente; cada integrante debe actualizar su propia copia después de una reescritura coordinada. Las sesiones no se conservan tras reinicios del servidor. La copia de entrega separada se considera sustituida por el repositorio principal.
 
 ## Estado técnico: terminado (20 de noviembre de 2026)
 
-La aplicación está completa y probada de principio a fin con 113 comprobaciones Python, 25 de navegador y 9 recorridos con modelos reales; el CI de `main` está en verde. Los pesos v0.4.0 se descargan solos y el control de alcance v2 está adoptado tras su prueba ciega. Lo que sigue es solo comunicación.
+La aplicación está completa y probada de principio a fin con 113 comprobaciones Python, 25 de navegador y 9 recorridos con modelos reales; el CI de `main` está en verde. Los pesos v0.4.0 se descargan solos y el control de alcance v2 está adoptado tras su prueba ciega. Los entregables de comunicación también están terminados.
 
-## Entregables siguientes
+## Entregables
 
 **Infografía (póster académico): lista** en `docs/poster/`: PDF A3 para imprimir y PNG de alta resolución. El ejemplo de resultados es una pintura del conjunto de prueba procesada con la aplicación.
 
@@ -42,9 +42,9 @@ La aplicación está completa y probada de principio a fin con 113 comprobacione
 
 **Diapositivas de la sustentación:** `docs/sustentacion/diapositivas_sustentacion.pdf` (14 diapositivas, 10 minutos, con notas por expositor en la versión editable).
 
-**Enlace público de la app:** https://queries-network-strategy-multimedia.trycloudflare.com (Cloudflare Quick Tunnel desde un computador del equipo; cambia si se reinicia: ver `docs/DEMO_PUBLICA.md`).
+**Pruebas con usuarios:** formulario y fotos de las sesiones en el README; sin puntajes publicados.
 
-**Pendiente: sustentación oral.**
+**Sustentación oral: realizada. Proyecto terminado (24 de noviembre de 2026).**
 
 Material ya listo para reutilizar:
 - **Problema y flujo:** el diagrama de arquitectura del README (§2) y las capturas `docs/img/gui_01` a `gui_07` (incluidas `gui_02b_semaforo`, `gui_03b_mascara` y `gui_04b_tonos`).
@@ -58,7 +58,7 @@ Material ya listo para reutilizar:
 - **Guion de la demostración:** `docs/GUIA_SUSTENTACION.md`, recorrido y preguntas.
 - **Para el video:** cargar una foto borrosa (semáforo en rojo) y luego una buena; mostrar una pintura con borde dudoso y su máscara; subir la iluminación en un manuscrito para ver los tonos recortados; exportar el ZIP con el original intacto.
 
-Póster académico, video de máximo tres minutos y sustentación oral. Para las limitaciones experimentales, consultar `MODEL_CARD.md`, `DATA_CARD.md` y el análisis del README. Los datos de referencia y el material docente original permanecen intactos fuera del repositorio público.
+Para las limitaciones experimentales, consultar `MODEL_CARD.md`, `DATA_CARD.md` y el análisis del README. Los datos de referencia y el material docente original permanecen intactos fuera del repositorio público.
 
 ## Continuación técnica del control de alcance
 

@@ -13,7 +13,8 @@ Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (lín
 | **Video demostrativo** (2:50) | [Ver en YouTube](https://youtu.be/CjWwmcuZH_8) · [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) |
 | **Póster académico** (A3) | [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png) |
 | **Diapositivas de la sustentación** | [PDF, 14 diapositivas](docs/sustentacion/diapositivas_sustentacion.pdf) |
-| **Aplicación en línea** | [queries-network-strategy-multimedia.trycloudflare.com](https://queries-network-strategy-multimedia.trycloudflare.com), sin cuenta ni instalación. Se sirve desde un computador del equipo: si no responde, ese equipo está apagado y la app se puede [ejecutar en local](#9-instalación-y-ejecución). |
+| **Aplicación** | Se ejecuta en local: [instrucciones paso a paso](#9-instalación-y-ejecución) |
+| **Pruebas con usuarios** | [Formulario de usabilidad](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform) y fotos de las sesiones ([ver sección](#pruebas-con-usuarios)) |
 | **Repositorio y documentación** | Este README (secciones 1 a 9) y la [matriz de cumplimiento de la rúbrica](docs/CIERRE_RUBRICA.md) |
 | **Datos** | [Carpeta de Drive «Dataset de Palimpsesto»](https://drive.google.com/drive/folders/1IIC5X-oEXs4mcuuWMMLGhzr5HQmRVveq?usp=sharing) y ZIP de las releases ([sección 5](#5-datos)) |
 | **Todo en un solo lugar** | [Release «Entregables finales»](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2): video, póster y diapositivas |
@@ -32,7 +33,7 @@ Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (lín
 | Implementación | [4. Implementación](#4-implementación) |
 | Datos | [5. Datos](#5-datos) |
 | Interfaz gráfica de usuario | [6. Interfaz](#6-interfaz-gráfica-de-usuario) |
-| Resultados | [7. Resultados](#7-resultados) |
+| Resultados | [7. Resultados](#7-resultados) · [Pruebas con usuarios](#pruebas-con-usuarios) |
 | Conclusiones | [8. Conclusiones](#8-conclusiones) |
 | Instalación y ejecución | [9. Instalación](#9-instalación-y-ejecución) |
 
@@ -585,6 +586,30 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 
 ---
 
+## Pruebas con usuarios
+
+Varias personas probaron la aplicación en celular y en computador. Para recoger su experiencia se preparó un formulario anónimo: **[Evaluación de usabilidad de Palimpsesto](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform)**.
+
+| Bloque | Qué pregunta |
+|---|---|
+| Contexto | Experiencia con imágenes, dispositivo y si se completó el flujo hasta exportar |
+| Facilidad (1 a 5) | Cargar la foto, confirmar el tipo de pieza, corregir las cuatro esquinas, aceptar y exportar |
+| Claridad y utilidad (1 a 5) | Avisos y recuperación de errores, semáforo de la captura, comparación antes/después e histograma |
+| Control humano (1 a 5) | Si la persona pudo revisar y controlar las decisiones del sistema |
+| Comentarios | Elemento más útil, dificultades y mejoras propuestas |
+
+| Esquinas en celular | Identificación en celular | Histograma en celular | Identificación en portátil |
+|:---:|:---:|:---:|:---:|
+| ![Manos ajustando las esquinas de un documento en un celular](docs/img/usuarios/usuario_1_celular.jpg) | ![Celular en el paso de identificar una pintura](docs/img/usuarios/usuario_2_celular.jpg) | ![Celular con el histograma y las métricas del ajuste](docs/img/usuarios/usuario_3_celular.jpg) | ![Portátil en el paso de identificar una pintura](docs/img/usuarios/usuario_4_portatil.jpg) |
+
+![Confirmación de una pintura en el computador, con la vista de la cámara difuminada](docs/img/usuarios/usuario_5_portatil.jpg)
+
+*Fotos de las sesiones de prueba, recortadas o difuminadas para no mostrar rostros.*
+
+**Alcance.** Las fotos muestran el uso de la aplicación, pero no miden su usabilidad. Esta versión no incluye puntajes: solo se publicarán respuestas reales, con códigos anónimos `P01`, `P02`…, y con pocas personas servirán para orientar mejoras, no para generalizar.
+
+---
+
 ## 8. Conclusiones
 
 **Principales resultados**
@@ -638,7 +663,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe run.py
 ```
 
-Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. Este lanzador escucha solo en localhost. Para compartir una demo HTTPS gratuita, consulta «Demo compartida gratuita».
+Abre **http://127.0.0.1:8765**. También puedes usar `Instalar_Palimpsesto.cmd` y `Iniciar_Palimpsesto.cmd`. Ctrl+C detiene el servidor. En Linux/macOS usa `.venv/bin/python`. El puerto se cambia con `PALIMPSESTO_PORT`. La aplicación escucha solo en localhost: las fotos no salen del equipo.
 
 Si aun así faltan los pesos (por ejemplo, sin conexión la primera vez), la interfaz entra en **modo manual** (categoría y borde a mano), pero ese modo no demuestra el componente de IA. Para comprobarlo, `/api/status` debe devolver `classifier`, `segmenter` y `scope_screen` en `true`.
 
@@ -685,16 +710,6 @@ El repositorio reúne los ocho apartados documentales de la rúbrica y evidencia
 **Póster académico (A3):** [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png). **Video demostrativo (2:50):** [ver en YouTube](https://youtu.be/CjWwmcuZH_8) · [descargar MP4](https://github.com/juanffff-hub/palimpsesto-pdi/releases/download/entregables-2026-2/palimpsesto_video.mp4) · [release de entregables](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2). Presenta el proyecto y muestra la aplicación real en funcionamiento con fotos del conjunto de prueba, incluido el aviso ante una foto que no es una pieza. **Diapositivas de la sustentación:** [PDF](docs/sustentacion/diapositivas_sustentacion.pdf).
 
 [![Póster de Palimpsesto](docs/poster/poster_palimpsesto.png)](docs/poster/poster_palimpsesto_A3.pdf)
-
-## Demo compartida gratuita
-
-**Enlace actual:** [queries-network-strategy-multimedia.trycloudflare.com](https://queries-network-strategy-multimedia.trycloudflare.com).
-
-Ejecuta `Iniciar_Enlace_Publico.cmd` para obtener un enlace HTTPS sin cuenta ni tarjeta. Se publica la aplicación completa, con las dos redes y el control de alcance. El enlace aparece en la consola y en `.public_runtime/enlace.txt`. Para cerrarlo, usa `Detener_Enlace_Publico.cmd`.
-
-El computador debe permanecer encendido, conectado y sin suspenderse. Es una demostración temporal: al reiniciar el túnel cambia la URL (actualiza entonces el enlace de este README) y no hay garantía de disponibilidad continua. Las fotos se procesan en el computador anfitrión a través de Cloudflare; las sesiones se eliminan tras 15 minutos sin actividad, con limpieza cada 30 segundos.
-
-La demo se actualiza sola con los cambios de `main` cuando no hay sesiones activas. Detalle en [Operación y actualizaciones](docs/DEMO_PUBLICA.md).
 
 ## Referencias
 

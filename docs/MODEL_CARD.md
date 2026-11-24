@@ -72,4 +72,4 @@ Recalibrar con `scripts/calibrate_scope.py` después de cambiar clasificador/man
 
 Pesos y sus hashes en `models/`; código de entrenamiento/evaluación en `scripts/`. El paquete completo incluye todos los checkpoints, datos y resultados; la release de modelos permite inferencia sin material docente. No cambiar parámetros ni entrenar mirando nuevas fotos de prueba. Para afirmar generalización, congelar esta versión y usar piezas nuevas etiquetadas por humanos.
 
-Uso previsto académico, fotografías de una sola pieza plana; no validado para preservación profesional ni uso público masivo. La demo compartida es de alcance académico. El preentrenamiento y bibliotecas conservan sus licencias; no se afirma propiedad sobre modelos o fotografías del curso.
+Uso previsto académico, fotografías de una sola pieza plana; no validado para preservación profesional ni uso público masivo. El preentrenamiento y bibliotecas conservan sus licencias; no se afirma propiedad sobre modelos o fotografías del curso.
