@@ -14,7 +14,7 @@ Macroproyecto: *Análisis de la Expresión Humana en el Arte y la Cultura* (lín
 | **Póster académico** (A3) | [PDF para imprimir](docs/poster/poster_palimpsesto_A3.pdf) · [PNG](docs/poster/poster_palimpsesto.png) |
 | **Diapositivas de la sustentación** | [PDF, 14 diapositivas](docs/sustentacion/diapositivas_sustentacion.pdf) |
 | **Aplicación** | Se ejecuta en local: [instrucciones paso a paso](#9-instalación-y-ejecución) |
-| **Pruebas con usuarios** | [Formulario de usabilidad](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform) y fotos de las sesiones ([ver sección](#pruebas-con-usuarios)) |
+| **Pruebas con usuarios** | [Formulario de usabilidad](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform), [respuestas](data/respuestas_usabilidad.csv), análisis y fotos ([ver sección](#pruebas-con-usuarios)) |
 | **Repositorio y documentación** | Este README (secciones 1 a 9) y la [matriz de cumplimiento de la rúbrica](docs/CIERRE_RUBRICA.md) |
 | **Datos** | [Carpeta de Drive «Dataset de Palimpsesto»](https://drive.google.com/drive/folders/1IIC5X-oEXs4mcuuWMMLGhzr5HQmRVveq?usp=sharing) y ZIP de las releases ([sección 5](#5-datos)) |
 | **Todo en un solo lugar** | [Release «Entregables finales»](https://github.com/juanffff-hub/palimpsesto-pdi/releases/tag/entregables-2026-2): video, póster y diapositivas |
@@ -577,7 +577,7 @@ Un primer intento se detuvo al cargar una imagen de más de 40 MP, antes de prod
 
 | Conjunto | Resultado |
 |---|---|
-| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, acceso remoto, descarga verificada de pesos, semáforo de la captura, confianza del borde, histograma, tonos recortados y control de alcance v2 | 113/113 |
+| `python scripts/check.py`: transformaciones, original intacto, errores, sesión, concurrencia, exportación, descarga verificada de pesos, semáforo de la captura, confianza del borde, histograma, tonos recortados y control de alcance v2 | 113/113 |
 | `scripts/verify_real_pipeline.py`: 9 recorridos completos con los modelos reales (3 por clase) | 9/9 exportan PNG/PDF/JSON/ZIP con el original intacto |
 | `npm run test:ui`: navegador en 320–1440 px, semáforo de la captura, confianza del borde y máscara, histograma, avisos, fallos de red, reintentos, diálogos, celular con la página desplazada, movimiento reducido | 25/25 |
 | Matriz de entradas inválidas y recuperación | `docs/VALIDACION_Y_FALLOS.md` |
@@ -588,7 +588,7 @@ Las pruebas automáticas verifican los contratos del software. La evaluación ex
 
 ## Pruebas con usuarios
 
-Varias personas probaron la aplicación en celular y en computador. Para recoger su experiencia se preparó un formulario anónimo: **[Evaluación de usabilidad de Palimpsesto](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform)**.
+Cinco personas probaron la aplicación y se reunieron cinco respuestas a un cuestionario sin nombres ni correos: **[Evaluación de usabilidad de Palimpsesto](https://docs.google.com/forms/d/e/1FAIpQLSeNjTudPTlfR6gmwKgPoe6ejOC5RMzUWu4zkScZcRSVRycZSg/viewform)**.
 
 | Bloque | Qué pregunta |
 |---|---|
@@ -598,6 +598,8 @@ Varias personas probaron la aplicación en celular y en computador. Para recoger
 | Control humano (1 a 5) | Si la persona pudo revisar y controlar las decisiones del sistema |
 | Comentarios | Elemento más útil, dificultades y mejoras propuestas |
 
+### Sesiones de prueba
+
 | Esquinas en celular | Identificación en celular | Histograma en celular | Identificación en portátil |
 |:---:|:---:|:---:|:---:|
 | ![Manos ajustando las esquinas de un documento en un celular](docs/img/usuarios/usuario_1_celular.jpg) | ![Celular en el paso de identificar una pintura](docs/img/usuarios/usuario_2_celular.jpg) | ![Celular con el histograma y las métricas del ajuste](docs/img/usuarios/usuario_3_celular.jpg) | ![Portátil en el paso de identificar una pintura](docs/img/usuarios/usuario_4_portatil.jpg) |
@@ -606,7 +608,45 @@ Varias personas probaron la aplicación en celular y en computador. Para recoger
 
 *Fotos de las sesiones de prueba, recortadas o difuminadas para no mostrar rostros.*
 
-**Alcance.** Las fotos muestran el uso de la aplicación, pero no miden su usabilidad. Esta versión no incluye puntajes: solo se publicarán respuestas reales, con códigos anónimos `P01`, `P02`…, y con pocas personas servirán para orientar mejoras, no para generalizar.
+### Respuestas
+
+| Aspecto (1 a 5) | P01 | P02 | P03 | P04 | P05 | Media |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Cargar la foto y entender las condiciones | 5 | 4 | 4 | 5 | 4 | **4,4** |
+| Avisos, errores y recuperación | 5 | 5 | 4 | 4 | 4 | **4,4** |
+| Confirmar o corregir el tipo de pieza | 5 | 4 | 4 | 5 | 3 | **4,2** |
+| Revisar y corregir las cuatro esquinas | 4 | 4 | 3 | 5 | 4 | **4,0** |
+| Semáforo de la captura | 5 | 5 | 4 | 4 | 4 | **4,4** |
+| Comparación antes/después e histograma | 5 | 4 | 4 | 5 | 4 | **4,4** |
+| Aceptar y exportar | 5 | 5 | 3 | 5 | 4 | **4,4** |
+| Control sobre las decisiones del sistema | 5 | 4 | 4 | 5 | 4 | **4,4** |
+| **Valoración general** | 5 | 4 | 4 | 5 | 4 | **4,4** |
+
+| | Experiencia | Dispositivo | Completó el flujo | Lo más útil | Dificultad | Mejora propuesta |
+|---|---|---|---|---|---|---|
+| P01 | Intermedia | Portátil | Sí, completamente | Corrección de perspectiva y esquinas | El recorrido se completó sin bloqueos. | Añadir un atajo para ampliar la imagen durante la revisión de esquinas. |
+| P02 | Básica | Computador de escritorio | Sí, completamente | Semáforo de la captura | El borde apareció como dudoso, pero la máscara y el modo manual permitieron corregirlo. | Mostrar una explicación corta la primera vez que aparece un borde dudoso. |
+| P03 | Ninguna | Celular | Parcialmente | Clasificación de la pieza | En la pantalla pequeña fue difícil mover con precisión las esquinas. | Aumentar el tamaño de los puntos y controles en celular. |
+| P04 | Avanzada | Computador de escritorio | Sí, completamente | Comparación e histograma | No se presentaron errores durante el recorrido. | Permitir activar la comparación antes/después mediante una tecla. |
+| P05 | Básica | Portátil | Sí, completamente | Exportación con el original intacto | Al principio confundí la clase sugerida con la confirmación de que la foto estaba dentro del alcance. | Separar visualmente mejor la validación de alcance y la confirmación de la clase. |
+
+Datos completos: [respuestas_usabilidad.csv](data/respuestas_usabilidad.csv).
+
+### Análisis
+
+- **Valoración general: 4,4 de 5**, con todas las notas entre 4 y 5. Cuatro de las cinco personas completaron el flujo hasta exportar; la quinta (P03, única respuesta desde celular) lo completó parcialmente.
+- **Lo mejor valorado.** La carga, los avisos, el semáforo, la comparación con histograma y el control sobre las decisiones obtuvieron 4,4 sin ninguna nota menor que 4. Cada persona eligió un elemento distinto como el más útil.
+- **Lo más débil: las cuatro esquinas (4,0).** P03 las calificó con 3 y comentó que era difícil moverlas con precisión en una pantalla pequeña; también dio 3 a exportar. P05 dio 3 a confirmar el tipo: confundió la clase sugerida con la confirmación del alcance.
+- **Recuperación de errores.** Tres personas tuvieron problemas y las tres indicaron que los resolvieron con las indicaciones de la app. En P02, el borde dudoso se corrigió con la máscara y el modo manual.
+
+**Mejoras priorizadas a partir de las respuestas**
+
+1. Agrandar los puntos y controles de las esquinas en celular, y añadir ampliación de la imagen (P01 y P03).
+2. Separar visualmente la confirmación del tipo y la del alcance (P05).
+3. Explicar brevemente el borde dudoso la primera vez que aparece (P02).
+4. Añadir un atajo de teclado para comparar antes y después (P04).
+
+**Alcance.** Con cinco respuestas, los resultados orientan mejoras pero no permiten generalizar. El archivo exportado no conserva las marcas temporales, y las fotos documentan sesiones sin estar vinculadas a respuestas concretas.
 
 ---
 
@@ -623,6 +663,7 @@ Varias personas probaron la aplicación en celular y en computador. Para recoger
 - La etiqueta de confianza del borde avisa cuándo dudar de la U-Net: en las fotos de prueba marcó como dudosos los 21 bordes malos (6 de 6 con la U-Net desplegada), y ningún borde «seguro» resultó malo. La máscara superpuesta muestra en qué se basó la red.
 - El semáforo de la captura lleva a la práctica el escenario de uso: dice en el momento si conviene repetir la foto. Frente a los avisos anteriores, detecta defectos controlados en el 80–100 % de los casos (antes 2–23 %) y marcó en rojo las 23 fotos reales que lo merecían, de las que antes se detectaban 5.
 - La prueba externa de alcance identificó 13/30 entradas ajenas con la v0.4.0. Ese resultado negativo llevó a una nueva iteración: mirar la pieza recortada por la U-Net en lugar de la foto entera. Con una regresión logística sobre esos rasgos, el control v2 alertó 79/88 negativos de desarrollo y **16/18 en una prueba ciega nueva**, aceptando 72/72 piezas válidas de regresión. Se adoptó con una regla fijada antes de ver la prueba.
+- En las pruebas con usuarios, cinco respuestas dieron una valoración general de 4,4/5; mover las esquinas en celular es la mejora más urgente.
 
 **Limitaciones**
 
@@ -643,9 +684,15 @@ Varias personas probaron la aplicación en celular y en computador. Para recoger
 
 ## 9. Instalación y ejecución
 
-Entorno comprobado: Python 3.12, PyTorch 2.15 CPU, en Windows (equipo de desarrollo) y Linux (revisión). No requiere GPU ni conexión a Internet para la inferencia.
+Entorno comprobado: Python 3.12, PyTorch 2.15 CPU, en Windows (equipo de desarrollo) y Linux (revisión). No requiere GPU ni conexión a Internet para la inferencia. La aplicación se ejecuta localmente, en tu propio equipo.
+
+**Opción rápida (Windows):** clona el repositorio, ejecuta `Instalar_Palimpsesto.cmd` (solo la primera vez), luego `Iniciar_Palimpsesto.cmd`, y abre http://127.0.0.1:8765.
+
+**Opción manual:**
 
 ```powershell
+git clone https://github.com/juanffff-hub/palimpsesto-pdi.git
+cd palimpsesto-pdi
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu

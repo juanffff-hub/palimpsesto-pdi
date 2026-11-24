@@ -42,7 +42,7 @@ La aplicación está completa y probada de principio a fin con 113 comprobacione
 
 **Diapositivas de la sustentación:** `docs/sustentacion/diapositivas_sustentacion.pdf` (14 diapositivas, 10 minutos, con notas por expositor en la versión editable).
 
-**Pruebas con usuarios:** formulario y fotos de las sesiones en el README; sin puntajes publicados.
+**Pruebas con usuarios:** formulario, fotos, cinco respuestas y análisis en el README; datos en `data/respuestas_usabilidad.csv`.
 
 **Sustentación oral: realizada. Proyecto terminado (24 de noviembre de 2026).**
 
@@ -66,7 +66,7 @@ Para las limitaciones experimentales, consultar `MODEL_CARD.md`, `DATA_CARD.md` 
 
 ## Reescritura de autores (20 de noviembre de 2026)
 
-Se reescribió la historia de `main` para que los commits de la revisión de interfaz y clasificador figuren a nombre de DavidN09 y sin líneas de coautoría. Los archivos quedaron idénticos byte a byte (mismo árbol que el commit anterior `687fe80`); los commits de juanffff-hub conservan su autor y su fecha. No se tocaron redes, pesos, métricas ni el trabajo de la demo pública: los 12 archivos de ese cierre (`run_public.py`, `scripts/share_public.py`, lanzadores, `server.py`, pruebas…) están completos en `main`. Comprobado: 87 pruebas Python pasan.
+Se reescribió la historia de `main` para que los commits de la revisión de interfaz y clasificador figuren a nombre de DavidN09 y sin líneas de coautoría. Los archivos quedaron idénticos byte a byte (mismo árbol que el commit anterior `687fe80`); los commits de juanffff-hub conservan su autor y su fecha. No se tocaron redes, pesos ni métricas. Comprobado: 87 pruebas Python pasan.
 
 Equivalencias de commits: `687fe80` → `0aa3877` (demo HTTPS), `6e15970` → `5c86e8d` (acceso al dataset), `d7e11f1` → `88a8b93`.
 
